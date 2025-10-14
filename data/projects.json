@@ -1,5 +1,12 @@
 [
   {
+    "name": "Company Website",
+    "description": "Official website for company.",
+    "tags": ["HTML", "CSS", "JavaScript"],
+    "emoji": "💻",
+    "link": ""
+  },
+  {
     "name": "Gold NOW Investment Application",
     "description": "Gold investment mobile app with real-time pricing and portfolio management.",
     "tags": ["Flutter", "Laravel", "REST API"],
@@ -18,6 +25,20 @@
     "description": "Attendance app with real-time tracking and automated reporting.",
     "tags": ["React Native", "Expo", "Laravel"],
     "emoji": "📚",
+    "link": ""
+  },
+  {
+    "name": "Booking Management System",
+    "description": "Real-time booking system with admin dashboard and automated reporting.",
+    "tags": ["Laravel", "Filament v3", "Vue.js", "MySQL", "REST API", "Payment Integration"],
+    "emoji": "📅",
+    "link": ""
+  },
+  {
+    "name": "E-commerce Website Template",
+    "description": "E-commerce website template that suitable for various type of business.",
+    "tags": ["Laravel", "Filament v3", "Vue.js", "MySQL", "REST API", "Payment Integration", "WhatsApp Integration"],
+    "emoji": "🛒",
     "link": ""
   }
 ]
