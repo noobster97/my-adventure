@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muhammad Syafiq – Software Developer</title>
+    <meta name="description" content="Portfolio of Muhammad Syafiq, Software Developer specializing in Laravel, PHP, JavaScript, Flutter, and React Native.">
+    <meta name="theme-color" content="#000000">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <meta property="og:title" content="Muhammad Syafiq – Software Developer">
+    <meta property="og:description" content="Full Stack Developer crafting elegant, performant digital experiences.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="profile.jpg">
+    <meta property="og:url" content="./">
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="cursor" aria-hidden="true"></div>
+    <div class="cursor-follower" aria-hidden="true"></div>
+    <div class="bg-animation"></div>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+
+    <nav id="nav" role="navigation" aria-label="Primary">
+        <div class="logo">SYAFIQ</div>
+        <ul class="nav-links" id="navLinks">
+            <li class="nav-panel-header" aria-hidden="true" style="display:none;">
+                <div class="nav-panel-avatar">MS</div>
+                <div class="nav-panel-meta"><strong>Muhammad Syafiq</strong><span>Software Developer</span></div>
+            </li>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+			<li><a href="#experience">Experience</a></li>
+			<li><a href="#education">Education</a></li>
+			<li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <button class="mobile-menu" id="mobileMenu" aria-label="Toggle menu" aria-controls="navLinks" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+        <div id="navOverlay" style="display:none; position:fixed; inset:0; background: rgba(0,0,0,0.25); z-index: 900;"></div>
+    </nav>
+
+    <main>
+        <section class="hero" id="home" aria-label="Hero">
+            <div class="hero-content">
+                <h1>Hello, I'm <span class="gradient-text">Muhammad Syafiq</span></h1>
+                <div class="typewriter" aria-live="polite"><span id="typed-text"></span></div>
+                <div class="cta-buttons">
+                    <a href="#projects" class="btn btn-primary"><span>View My Work</span></a>
+                    <a href="./Muhammad Syafiq - Software Developer.pdf" class="btn btn-secondary" download>Download Resume</a>
+                </div>
+            </div>
+            <div class="scroll-indicator" aria-hidden="true">
+                <div class="mouse"></div>
+                <span style="color: rgba(255,255,255,0.6); font-size: 12px; letter-spacing: 2px;">SCROLL</span>
+            </div>
+        </section>
+
+        <section class="section" id="about" aria-label="About">
+            <h2 class="section-title">About Me</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>Crafting Digital Experiences</p>
+                    <p>I'm a Full Stack Developer with 5+ years of experience building web and mobile applications. I blend clean design with robust engineering to deliver products that are delightful and reliable.</p>
+                    <p style="margin-top: 16px;">I work across Laravel/PHP, JavaScript, Flutter, and React Native—shaping ideas into scalable, maintainable systems.</p>
+                    <div class="stats" aria-label="Stats">
+                        <div class="stat-box"><span class="stat-number" data-key="projects">0+</span><span class="stat-label">Projects</span></div>
+                        <div class="stat-box"><span class="stat-number" data-key="years">0+</span><span class="stat-label">Years</span></div>
+                    </div>
+                </div>
+                <div class="skills" aria-label="Skills">
+                    <div class="skill"><div class="skill-name"><span>Frontend Development</span><span>95%</span></div><div class="skill-bar"><div class="skill-progress" data-width="95%"></div></div></div>
+                    <div class="skill"><div class="skill-name"><span>UI/UX Design</span><span>90%</span></div><div class="skill-bar"><div class="skill-progress" data-width="90%"></div></div></div>
+                    <div class="skill"><div class="skill-name"><span>React & Next.js</span><span>92%</span></div><div class="skill-bar"><div class="skill-progress" data-width="92%"></div></div></div>
+                    <div class="skill"><div class="skill-name"><span>Backend Development</span><span>85%</span></div><div class="skill-bar"><div class="skill-progress" data-width="85%"></div></div></div>
+                    <div class="skill"><div class="skill-name"><span>3D & Animation</span><span>88%</span></div><div class="skill-bar"><div class="skill-progress" data-width="88%"></div></div></div>
+                </div>
+                <div class="stack-badges" aria-label="Tech Stack">
+                    <span class="badge">Laravel</span>
+                    <span class="badge">PHP</span>
+                    <span class="badge">MySQL</span>
+                    <span class="badge">Flutter</span>
+                    <span class="badge">React Native</span>
+                    <span class="badge">Expo</span>
+                    <span class="badge">React</span>
+                    <span class="badge">Next.js</span>
+                    <span class="badge">Tailwind CSS</span>
+                    <span class="badge">Bootstrap</span>
+                    <span class="badge">REST API</span>
+                    <span class="badge">GitHub</span>
+                </div>
+                <div class="skills-details-grid" aria-label="Skills Details">
+                    <div class="skill-detail-card">
+                        <h3>Languages</h3>
+                        <p>PHP, JavaScript, Java, HTML, CSS</p>
+                    </div>
+                    <div class="skill-detail-card">
+                        <h3>Frameworks & Libraries</h3>
+                        <p>Laravel, Flutter, React Native, Filament v3, Tailwind, Bootstrap</p>
+                    </div>
+                    <div class="skill-detail-card">
+                        <h3>Databases & APIs</h3>
+                        <p>MySQL, MySQLi, RESTful APIs, PHPMyAdmin</p>
+                    </div>
+                    <div class="skill-detail-card">
+                        <h3>Tools</h3>
+                        <p>PhpStorm, WebStorm, VS Code, Git, GitHub, API testing</p>
+                    </div>
+                    <div class="skill-detail-card">
+                        <h3>Specializations</h3>
+                        <p>Full Stack Development, System Architecture, Software Design</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="experience" aria-label="Experience">
+            <h2 class="section-title">Experience</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-bullet" aria-hidden="true"></div>
+                    <div class="job-card">
+                        <div class="job-title">Full Stack Developer</div>
+                        <div class="company-role">Murtadha Dakwah Center (MADAD)</div>
+                        <div class="job-meta">February 2024 – Present • Sungai Petani, Kedah, Malaysia • On-site</div>
+                        <ul class="job-points">
+                            <li>Developed attendance Android app and web system, improving efficiency by 40%.</li>
+                            <li>Built pet care management system with CRUD operations and reporting.</li>
+                            <li>Created educational management system for streamlined administration.</li>
+                            <li>Led migration of legacy systems to Laravel and implemented Filament v3.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-bullet" aria-hidden="true"></div>
+                    <div class="job-card">
+                        <div class="job-title">Back End Developer</div>
+                        <div class="company-role">Applink Solutions</div>
+                        <div class="job-meta">November 2022 – May 2024 • Alor Setar, Kedah, Malaysia • On-site</div>
+                        <ul class="job-points">
+                            <li>Designed RESTful APIs for mobile/web applications serving 1000+ users.</li>
+                            <li>Built scalable backend systems using Laravel and PHP.</li>
+                            <li>Developed cross-platform apps with React Native and Expo.</li>
+                            <li>Optimized MySQL databases reducing response time by 25%.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-bullet" aria-hidden="true"></div>
+                    <div class="job-card">
+                        <div class="job-title">Assistant Executive Officer - IT</div>
+                        <div class="company-role">LEMBAGA HASIL DALAM NEGERI</div>
+                        <div class="job-meta">January 2020 – October 2022 • Selangor, Malaysia • On-site</div>
+                        <ul class="job-points">
+                            <li>Assisted in 5G technology research and implementation projects.</li>
+                            <li>Maintained network infrastructure ensuring 99.8% uptime.</li>
+                            <li>Supervised network installation projects across multiple locations.</li>
+                            <li>Developed Hasil Transformation System using OutSystems.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-bullet" aria-hidden="true"></div>
+                    <div class="job-card">
+                        <div class="job-title">Mobile Application Developer</div>
+                        <div class="company-role">SKYNUE SDN BHD</div>
+                        <div class="job-meta">February 2019 – December 2019 • Kedah, Malaysia</div>
+                        <ul class="job-points">
+                            <li>Developed native Android applications using Java.</li>
+                            <li>Built React Native mobile solutions for cross-platform support.</li>
+                            <li>Implemented backend integration using PHP and MySQLi.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="education" aria-label="Education">
+            <h2 class="section-title">Education</h2>
+            <div class="education-card">
+                <h3>Diploma in Information Technology</h3>
+                <div class="education-meta">Politeknik Tuanku Syed Sirajuddin • 2015 – 2019</div>
+            </div>
+        </section>
+
+        <section class="section" id="projects" aria-label="Projects">
+            <h2 class="section-title">Projects</h2>
+            <div class="projects-grid">
+                <article class="project-card">
+                    <div class="project-image" aria-hidden="true">📈</div>
+                    <div class="project-info">
+                        <h3>Gold NOW Investment Application</h3>
+                        <p>Gold investment mobile app with real-time pricing and portfolio management.</p>
+                        <div class="project-tags">
+                            <span class="tag">Flutter</span><span class="tag">Laravel</span><span class="tag">REST API</span>
+                        </div>
+                    </div>
+                </article>
+                <article class="project-card">
+                    <div class="project-image" aria-hidden="true">📊</div>
+                    <div class="project-info">
+                        <h3>Cooperative Investment Management System</h3>
+                        <p>Investment platform for cooperatives with tracking and reporting features.</p>
+                        <div class="project-tags">
+                            <span class="tag">Laravel</span><span class="tag">MySQL</span><span class="tag">Filament v3</span>
+                        </div>
+                    </div>
+                </article>
+                <article class="project-card">
+                    <div class="project-image" aria-hidden="true">📚</div>
+                    <div class="project-info">
+                        <h3>Student Attendance Management System</h3>
+                        <p>Attendance app with real-time tracking and automated reporting.</p>
+                        <div class="project-tags">
+                            <span class="tag">React Native</span><span class="tag">Expo</span><span class="tag">Laravel</span>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+        </section>
+
+        <section class="section" id="contact" aria-label="Contact">
+            <h2 class="section-title">Contact</h2>
+            <div class="contact-content">
+                <form class="contact-form" name="contact" method="POST" data-netlify="true">
+                    <input type="hidden" name="form-name" value="contact">
+                    <div class="form-group"><input aria-label="Name" name="name" type="text" placeholder="Your name" required></div>
+                    <div class="form-group"><input aria-label="Email" name="email" type="email" placeholder="Your email" required></div>
+                    <div class="form-group"><textarea aria-label="Message" name="message" placeholder="Your message" required></textarea></div>
+                    <div><button type="submit" class="btn btn-primary">Send Message</button></div>
+                </form>
+                <div class="social-links" aria-label="Links">
+                    <a class="social-link" href="mailto:muhammadsyafiq1102@gmail.com"><img src="icons/mail.svg" alt="Email"><span>Email</span></a>
+                    <a class="social-link" href="https://www.linkedin.com/in/muhammadsyafiq97" target="_blank" rel="noopener"><img src="icons/linkedin.svg" alt="LinkedIn"><span>LinkedIn</span></a>
+                    <a class="social-link" href="https://github.com/noobster97" target="_blank" rel="noopener"><img src="icons/github.svg" alt="GitHub"><span>GitHub</span></a>
+                    <a class="social-link" href="tel:+601114648597"><img src="icons/phone.svg" alt="Call"><span>Call</span></a>
+                </div>
+            </div>
+        </section>
+
+        
+    </main>
+
+    <footer>
+        © <span id="year"></span> Muhammad Syafiq. All rights reserved.
+    </footer>
+
+    <!-- Local fallback data for file:// viewing -->
+    <script id="experience-data" type="application/json" style="display:none">[
+      {"title":"Full Stack Developer","company":"Murtadha Dakwah Center (MADAD)","period":"February 2024 – Present","location":"Sungai Petani, Kedah, Malaysia • On-site","points":["Developed attendance Android app and web system, improving efficiency by 40%.","Built pet care management system with CRUD operations and reporting.","Created educational management system for streamlined administration.","Led migration of legacy systems to Laravel and implemented Filament v3."]},
+      {"title":"Back End Developer","company":"Applink Solutions","period":"November 2022 – May 2024","location":"Alor Setar, Kedah, Malaysia • On-site","points":["Designed RESTful APIs for mobile/web applications serving 1000+ users.","Built scalable backend systems using Laravel and PHP.","Developed cross-platform apps with React Native and Expo.","Optimized MySQL databases reducing response time by 25%."]},
+      {"title":"Assistant Executive Officer - IT","company":"LEMBAGA HASIL DALAM NEGERI","period":"January 2020 – October 2022","location":"Selangor, Malaysia • On-site","points":["Assisted in 5G technology research and implementation projects.","Maintained network infrastructure ensuring 99.8% uptime.","Supervised network installation projects across multiple locations.","Developed Hasil Transformation System using OutSystems."]},
+      {"title":"Mobile Application Developer","company":"SKYNUE SDN BHD","period":"February 2019 – December 2019","location":"Kedah, Malaysia","points":["Developed native Android applications using Java.","Built React Native mobile solutions for cross-platform support.","Implemented backend integration using PHP and MySQLi."]}
+    ]</script>
+    <script id="projects-data" type="application/json" style="display:none">[
+      {"name":"Gold NOW Investment Application","description":"Gold investment mobile app with real-time pricing and portfolio management.","tags":["Flutter","Laravel","REST API"],"emoji":"📈","link":""},
+      {"name":"Cooperative Investment Management System","description":"Investment platform for cooperatives with tracking and reporting features.","tags":["Laravel","MySQL","Filament v3"],"emoji":"📊","link":""},
+      {"name":"Student Attendance Management System","description":"Attendance app with real-time tracking and automated reporting.","tags":["React Native","Expo","Laravel"],"emoji":"📚","link":""}
+    ]</script>
+    <script id="skills-data" type="application/json" style="display:none">{
+      "summary": [
+        { "name": "Frontend Development", "percent": 95 },
+        { "name": "UI/UX Design", "percent": 90 },
+        { "name": "React & Next.js", "percent": 92 },
+        { "name": "Backend Development", "percent": 85 },
+        { "name": "3D & Animation", "percent": 88 }
+      ],
+      "badges": [
+        "Laravel", "PHP", "MySQL", "Flutter", "React Native", "Expo",
+        "React", "Next.js", "Tailwind CSS", "Bootstrap", "REST API", "GitHub"
+      ]
+    }</script>
+    <script src="js/main.js?v=2"></script>
+</body>
+</html>
+
+

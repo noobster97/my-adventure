@@ -1,0 +1,19 @@
+{
+  "name": "Muhammad Syafiq Md Asri",
+  "title": "Software Developer",
+  "location": "Sungai Petani, Kedah, Malaysia",
+  "email": "muhammadsyafiq1102@gmail.com",
+  "phone": "+60 11-1464-8597",
+  "links": {
+    "linkedin": "linkedin.com/in/muhammadsyafiq97",
+    "github": "github.com/noobster97"
+  },
+  "about": {
+    "headline": "Crafting Digital Experiences",
+    "summary": "I'm a Full Stack Developer building web and mobile apps across Laravel/PHP, JavaScript, Flutter and React Native—blending clean UI with robust engineering.",
+    "phrases": ["Full Stack Developer", "Laravel, PHP, JavaScript", "Flutter & React Native", "Building elegant, reliable software"]
+  },
+  "stats": {}
+}
+
+

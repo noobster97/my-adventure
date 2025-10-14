@@ -1,0 +1,25 @@
+[
+  {
+    "name": "Gold NOW Investment Application",
+    "description": "Gold investment mobile app with real-time pricing and portfolio management.",
+    "tags": ["Flutter", "Laravel", "REST API"],
+    "emoji": "📈",
+    "link": ""
+  },
+  {
+    "name": "Cooperative Investment Management System",
+    "description": "Investment platform for cooperatives with tracking and reporting features.",
+    "tags": ["Laravel", "MySQL", "Filament v3"],
+    "emoji": "📊",
+    "link": ""
+  },
+  {
+    "name": "Student Attendance Management System",
+    "description": "Attendance app with real-time tracking and automated reporting.",
+    "tags": ["React Native", "Expo", "Laravel"],
+    "emoji": "📚",
+    "link": ""
+  }
+]
+
+

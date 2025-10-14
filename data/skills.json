@@ -1,0 +1,20 @@
+{
+  "summary": [
+    { "name": "Programming Languages" },
+    { "name": "Frameworks & Libraries" },
+    { "name": "Databases & APIs" },
+    { "name": "Mobile Development" },
+    { "name": "Development Tools" },
+    { "name": "Specializations" }
+  ],
+  "badges": [
+    "PHP", "JavaScript", "Java", "HTML", "CSS",
+    "Laravel", "Flutter", "React Native", "Filament v3", "Tailwind CSS", "Bootstrap",
+    "MySQL", "MySQLi", "RESTful API Development", "PHPMyAdmin",
+    "Android Development", "Cross-platform Development", "Expo",
+    "PhpStorm", "WebStorm", "VS Code", "Git", "GitHub", "API Testing",
+    "Full Stack Development", "System Architecture", "Software Design"
+  ]
+}
+
+

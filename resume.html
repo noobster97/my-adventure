@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muhammad Syafiq - Software Developer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            padding: 10px;
+            line-height: 1.4;
+            color: #334155;
+        }
+        
+        .container {
+            max-width: 210mm;
+            width: 100%;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 8px;
+            overflow: hidden;
+            min-height: 297mm;
+        }
+        
+        .download-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.2s ease;
+        }
+        
+        .download-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.15);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 24px 30px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            position: relative;
+        }
+        
+        .header-content {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .photo-container {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .photo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        
+        .photo-placeholder {
+            color: #64748b;
+            font-size: 12px;
+            text-align: center;
+            padding: 20px;
+            line-height: 1.4;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #2563eb, #7c3aed, #dc2626);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: -0.025em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header .subtitle {
+            font-size: 16px;
+            font-weight: 400;
+            margin-bottom: 16px;
+            color: #cbd5e1;
+        }
+        
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 13px;
+            font-weight: 400;
+            margin-top: 12px;
+        }
+        
+        .contact-info span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #e2e8f0;
+        }
+        
+        .contact-info a {
+            color: #e2e8f0;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        .contact-info a:hover {
+            color: white;
+        }
+        
+        .url-link {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 12px;
+        }
+        
+        .content {
+            padding: 24px 30px;
+        }
+        
+        .section {
+            margin-bottom: 20px;
+        }
+        
+        .section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 12px;
+            position: relative;
+            padding-bottom: 4px;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 30px;
+            height: 2px;
+            background: linear-gradient(90deg, #2563eb, #7c3aed);
+            border-radius: 1px;
+        }
+        
+        .summary {
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+        
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        
+        .skill-box {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .skill-box::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #2563eb, #7c3aed);
+            border-radius: 0 2px 2px 0;
+        }
+        
+        .skill-box:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+            transform: translateY(-1px);
+        }
+        
+        .skill-box h3 {
+            color: #1e293b;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .skill-box p {
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .job {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .job:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .job-header {
+            margin-bottom: 8px;
+        }
+        
+        .job-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 2px;
+        }
+        
+        .company {
+            font-size: 14px;
+            color: #2563eb;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        
+        .duration {
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 400;
+            margin-bottom: 2px;
+        }
+        
+        .location {
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 400;
+        }
+        
+        .job-description ul {
+            margin-left: 0;
+            list-style: none;
+            color: #475569;
+            font-size: 12px;
+        }
+        
+        .job-description li {
+            margin-bottom: 4px;
+            padding-left: 16px;
+            position: relative;
+            line-height: 1.4;
+        }
+        
+        .job-description li::before {
+            content: '•';
+            color: #2563eb;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .project {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .project::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #7c3aed, #dc2626);
+            border-radius: 0 2px 2px 0;
+        }
+        
+        .project:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+            transform: translateY(-1px);
+        }
+        
+        .project h3 {
+            color: #1e293b;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .project p {
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .education {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            position: relative;
+        }
+        
+        .education::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, #2563eb, #7c3aed);
+            border-radius: 0 2px 2px 0;
+        }
+        
+        .education h3 {
+            color: #1e293b;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .school {
+            color: #2563eb;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        
+        .year {
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 400;
+        }
+        
+        .highlights {
+            display: grid;
+            gap: 6px;
+        }
+        
+        .highlights div {
+            display: flex;
+            align-items: flex-start;
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.4;
+            padding-left: 16px;
+            position: relative;
+        }
+        
+        .highlights div::before {
+            content: '✓';
+            color: #2563eb;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        
+        .experience-projects-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        .experience-column {
+            flex: 1;
+        }
+        
+        .projects-column {
+            flex: 1;
+        }
+        
+        .education-achievements-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        .education-column {
+            flex: 1;
+        }
+        
+        .achievements-column {
+            flex: 1;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                border-radius: 8px;
+            }
+            
+            .header {
+                padding: 20px 24px;
+                flex-direction: row;
+                gap: 20px;
+                text-align: left;
+            }
+            
+            .photo-container {
+                width: 80px;
+                height: 80px;
+                flex-shrink: 0;
+            }
+            
+            .header-content {
+                text-align: center;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .content {
+                padding: 32px 24px;
+            }
+            
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-info {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 8px;
+            }
+            
+            .experience-projects-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .education-achievements-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+        
+        @media print {
+            @page {
+                size: A4;
+                margin: 0.15in;
+            }
+            
+            body {
+                background: white;
+                padding: 0;
+                font-size: 12px;
+                line-height: 1.3;
+                color: #000;
+            }
+            
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+                max-width: none;
+                width: 100%;
+                min-height: auto;
+                background: white;
+            }
+            
+            .download-btn {
+                display: none;
+            }
+            
+            .header {
+                padding: 8px 12px;
+                page-break-inside: avoid;
+                background: #f8f9fa;
+                color: #000;
+                border-bottom: 2px solid #2563eb;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .header::before {
+                display: none;
+            }
+            
+            .photo-container {
+                width: 70px;
+                height: 70px;
+                border: 2px solid #ddd;
+                background: #f8f9fa;
+            }
+            
+            .photo-placeholder {
+                font-size: 9px;
+                padding: 7px;
+            }
+            
+            .header-content {
+                flex: 1;
+                text-align: center;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+                margin-bottom: 2px;
+                color: #000;
+                font-weight: bold;
+            }
+            
+            .header .subtitle {
+                font-size: 13px;
+                margin-bottom: 4px;
+                color: #2563eb;
+                font-weight: bold;
+            }
+            
+            .contact-info {
+                font-size: 11px;
+                gap: 6px;
+                color: #000;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .contact-info span {
+                color: #000;
+            }
+            
+            .url-link {
+                color: #000;
+                font-size: 10px;
+            }
+            
+            .content {
+                padding: 10px 14px;
+            }
+            
+            .section {
+                margin-bottom: 10px;
+                page-break-inside: avoid;
+            }
+            
+            .section-title {
+                font-size: 13px;
+                margin-bottom: 5px;
+                color: #000;
+                font-weight: bold;
+                text-transform: uppercase;
+                border-bottom: 2px solid #2563eb;
+                padding-bottom: 2px;
+            }
+            
+            .section-title::after {
+                display: none;
+            }
+            
+            .skill-box::before {
+                display: none;
+            }
+            
+            .project::before {
+                display: none;
+            }
+            
+            .education::before {
+                display: none;
+            }
+            
+            .summary {
+                font-size: 12px;
+                line-height: 1.3;
+                color: #000;
+            }
+            
+            .skills-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 5px;
+            }
+            
+            .skill-box {
+                padding: 5px;
+                background: #f8f9fa;
+                border: 1px solid #ddd;
+            }
+            
+            .skill-box h3 {
+                font-size: 10px;
+                margin-bottom: 2px;
+                color: #000;
+                font-weight: bold;
+            }
+            
+            .skill-box p {
+                font-size: 10px;
+                color: #000;
+            }
+            
+            .job {
+                margin-bottom: 6px;
+                padding-bottom: 6px;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .job-title {
+                font-size: 12px;
+                color: #000;
+                font-weight: bold;
+            }
+            
+            .company {
+                font-size: 11px;
+                color: #2563eb;
+                font-weight: bold;
+            }
+            
+            .duration {
+                font-size: 9px;
+                color: #666;
+                font-style: italic;
+            }
+            
+            .location {
+                font-size: 9px;
+                color: #666;
+            }
+            
+            .job-description ul {
+                font-size: 11px;
+                color: #000;
+            }
+            
+            .job-description li {
+                margin-bottom: 0px;
+                padding-left: 8px;
+            }
+            
+            .job-description li::before {
+                color: #2563eb;
+            }
+            
+            .project {
+                padding: 5px;
+                margin-bottom: 3px;
+                background: #f8f9fa;
+                border: 1px solid #ddd;
+            }
+            
+            .project h3 {
+                font-size: 10px;
+                color: #000;
+                font-weight: bold;
+            }
+            
+            .project p {
+                font-size: 9px;
+                color: #000;
+            }
+            
+            .education {
+                padding: 6px;
+                background: #f8f9fa;
+                border: 1px solid #ddd;
+            }
+            
+            .education h3 {
+                font-size: 10px;
+                color: #000;
+                font-weight: bold;
+            }
+            
+            .school {
+                font-size: 9px;
+                color: #2563eb;
+                font-weight: bold;
+            }
+            
+            .year {
+                font-size: 9px;
+                color: #666;
+            }
+            
+            .highlights div {
+                font-size: 10px;
+                color: #000;
+                padding-left: 8px;
+            }
+            
+            .highlights div::before {
+                color: #2563eb;
+            }
+            
+            .experience-projects-container {
+                grid-template-columns: 2fr 1fr;
+                gap: 10px;
+            }
+            
+            .education-achievements-container {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="download-btn" onclick="window.print()">📥 Download PDF</button>
+    
+    <div class="container">
+        <div class="header">
+            <div class="photo-container">
+                <img src="profile.jpg" alt="Muhammad Syafiq Md Asri">
+            </div>
+            <div class="header-content">
+                <h1>Muhammad Syafiq Md Asri</h1>
+                <div class="subtitle">Software Developer</div>
+                <div class="contact-info">
+                    <span>📧 muhammadsyafiq1102@gmail.com</span>
+                    <span>📱 +60 11-1464-8597</span>
+                    <span>📍 Sungai Petani, Kedah, Malaysia</span>
+                    <span class="url-link">🔗 linkedin.com/in/muhammadsyafiq97</span>
+                    <span class="url-link">💻 github.com/noobster97</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2 class="section-title">PROFESSIONAL SUMMARY</h2>
+                <p class="summary">
+                    Experienced Full Stack Developer with 5+ years expertise in web and mobile development. Proficient in Laravel, PHP, JavaScript, Flutter, and React Native. Proven track record delivering end-to-end solutions including attendance systems, management platforms, and investment applications. Strong background in frontend/backend development across government and private sectors.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">TECHNICAL SKILLS</h2>
+                <div class="skills-grid">
+                    <div class="skill-box">
+                        <h3>Programming Languages</h3>
+                        <p>PHP, JavaScript, Java, HTML, CSS</p>
+                    </div>
+                    <div class="skill-box">
+                        <h3>Frameworks & Libraries</h3>
+                        <p>Laravel, Flutter, React Native, Filament v3, Tailwind CSS, Bootstrap</p>
+                    </div>
+                    <div class="skill-box">
+                        <h3>Databases & APIs</h3>
+                        <p>MySQL, MySQLi, RESTful API Development, PHPMyAdmin</p>
+                    </div>
+                    <div class="skill-box">
+                        <h3>Mobile Development</h3>
+                        <p>Android Development, Cross-platform Development, Expo</p>
+                    </div>
+                    <div class="skill-box">
+                        <h3>Development Tools</h3>
+                        <p>PhpStorm, WebStorm, VS Code, Git, GitHub, API Testing</p>
+                    </div>
+                    <div class="skill-box">
+                        <h3>Specializations</h3>
+                        <p>Full Stack Development, System Architecture, Software Design</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="experience-projects-container">
+                    <div class="experience-column">
+                        <h2 class="section-title">PROFESSIONAL EXPERIENCE</h2>
+                        
+                        <div class="job">
+                            <div class="job-header">
+                                <div class="job-title">Full Stack Developer</div>
+                                <div class="company">Murtadha Dakwah Center (MADAD)</div>
+                                <div class="duration">February 2024 - Present (1 year 9 months)</div>
+                                <div class="location">📍 Sungai Petani, Kedah, Malaysia · On-site</div>
+                            </div>
+                            <div class="job-description">
+                                <ul>
+                                    <li>Developed attendance Android app and web system, improving efficiency by 40%</li>
+                                    <li>Built pet care management system with CRUD operations and reporting</li>
+                                    <li>Created educational management system for streamlined administration</li>
+                                    <li>Led migration of legacy systems to Laravel framework</li>
+                                    <li>Implemented Filament v3 for rapid admin panel development</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="job">
+                            <div class="job-header">
+                                <div class="job-title">Back End Developer</div>
+                                <div class="company">Applink Solutions</div>
+                                <div class="duration">November 2022 - May 2024 (1 year 7 months)</div>
+                                <div class="location">📍 Alor Setar, Kedah, Malaysia · On-site</div>
+                            </div>
+                            <div class="job-description">
+                                <ul>
+                                    <li>Designed RESTful APIs for mobile/web applications serving 1000+ users</li>
+                                    <li>Built scalable backend systems using Laravel and PHP</li>
+                                    <li>Developed cross-platform mobile apps using React Native and Expo</li>
+                                    <li>Performed API testing achieving 99.9% uptime</li>
+                                    <li>Optimized MySQL databases reducing response time by 25%</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="job">
+                            <div class="job-header">
+                                <div class="job-title">Assistant Executive Officer - IT</div>
+                                <div class="company">LEMBAGA HASIL DALAM NEGERI</div>
+                                <div class="duration">January 2020 - October 2022 (2 years 10 months)</div>
+                                <div class="location">📍 Selangor, Malaysia · On-site</div>
+                            </div>
+                            <div class="job-description">
+                                <ul>
+                                    <li>Assisted in 5G technology research and implementation projects</li>
+                                    <li>Maintained network infrastructure ensuring 99.8% uptime</li>
+                                    <li>Supervised network installation projects across multiple locations</li>
+                                    <li>Developed Hasil Transformation System using OutSystems platform</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="job">
+                            <div class="job-header">
+                                <div class="job-title">Mobile Application Developer</div>
+                                <div class="company">SKYNUE SDN BHD</div>
+                                <div class="duration">February 2019 - December 2019 (11 months)</div>
+                                <div class="location">📍 Kedah, Malaysia</div>
+                            </div>
+                            <div class="job-description">
+                                <ul>
+                                    <li>Developed native Android applications using Java</li>
+                                    <li>Built mobile solutions with React Native for cross-platform compatibility</li>
+                                    <li>Implemented backend integration using PHP and MySQLi</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="projects-column">
+                        <h2 class="section-title">PROJECTS</h2>
+                        
+                        <div class="project">
+                            <h3>Gold NOW Investment Application</h3>
+                            <p>Gold investment mobile app with real-time pricing and portfolio management.</p>
+                        </div>
+
+                        <div class="project">
+                            <h3>Cooperative Investment Management System</h3>
+                            <p>Investment platform for cooperatives with tracking and reporting features.</p>
+                        </div>
+
+                        <div class="project">
+                            <h3>Student Attendance Management System</h3>
+                            <p>Attendance app with real-time tracking and automated reporting.</p>
+                        </div>
+                        
+                        <h2 class="section-title">KEY ACHIEVEMENTS</h2>
+                        <div class="highlights">
+                            <div>Delivered 15+ full-stack projects from concept to deployment</div>
+                            <div>Experience across NGO, private sector, and government organizations</div>
+                            <div>Strong problem-solving skills with legacy system upgrade experience</div>
+                            <div>Proven ability to work independently and in cross-functional teams</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">EDUCATION</h2>
+                <div class="education">
+                    <h3>Diploma in Information Technology</h3>
+                    <div class="school">Politeknik Tuanku Syed Sirajuddin</div>
+                    <div class="year">2015 - 2019</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
