@@ -113,36 +113,116 @@
                             <h2 class="section-title">About Me</h2>
                             <div class="about-content">
                                 <div class="about-text">
-                                    <h2>Crafting Digital Experiences</h2>
-                                    <p>I'm a Full Stack Developer with 5+ years of experience building web and mobile applications. I blend clean design with robust engineering to deliver products that are delightful and reliable.</p>
-                                    <p>I work across Laravel/PHP, JavaScript, Flutter, and React Native—shaping ideas into scalable, maintainable systems.</p>
+                                    <div class="about-intro">
+                                        <h3 class="about-subtitle">Crafting Digital Experiences</h3>
+                                        <p class="about-description">I'm a Full Stack Developer with 5+ years of experience building web and mobile applications. I blend clean design with robust engineering to deliver products that are delightful and reliable.</p>
+                                        <p class="about-focus">I work across Laravel/PHP, JavaScript, Flutter, and React Native—shaping ideas into scalable, maintainable systems.</p>
+                                    </div>
                                 </div>
                                 <div class="about-stats">
-                                    <div class="stat-card">
+                                    <div class="stat-card" data-stat="projects">
+                                        <div class="stat-icon">💻</div>
                                         <span class="stat-number" data-key="projects">0+</span>
                                         <span class="stat-label">Projects</span>
                                     </div>
-                                    <div class="stat-card">
+                                    <div class="stat-card" data-stat="years">
+                                        <div class="stat-icon">⏱️</div>
                                         <span class="stat-number" data-key="years">0+</span>
                                         <span class="stat-label">Years</span>
+                                    </div>
+                                    <div class="stat-card" data-stat="technologies">
+                                        <div class="stat-icon">🛠️</div>
+                                        <span class="stat-number" data-key="technologies">15+</span>
+                                        <span class="stat-label">Technologies</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="skills-showcase">
                                 <h3>Technologies I Work With</h3>
-                                <div class="skills-grid">
-                                    <div class="skill-badge"><span>Laravel</span></div>
-                                    <div class="skill-badge"><span>PHP</span></div>
-                                    <div class="skill-badge"><span>JavaScript</span></div>
-                                    <div class="skill-badge"><span>Flutter</span></div>
-                                    <div class="skill-badge"><span>React Native</span></div>
-                                    <div class="skill-badge"><span>MySQL</span></div>
-                                    <div class="skill-badge"><span>React</span></div>
-                                    <div class="skill-badge"><span>Next.js</span></div>
-                                    <div class="skill-badge"><span>Tailwind CSS</span></div>
-                                    <div class="skill-badge"><span>Filament v3</span></div>
-                                    <div class="skill-badge"><span>REST API</span></div>
-                                    <div class="skill-badge"><span>Expo</span></div>
+                                <div class="skills-container">
+                                    <div class="skill-group">
+                                        <div class="skill-group-header">
+                                            <div class="skill-group-icon">⚙️</div>
+                                            <h4>Backend</h4>
+                                        </div>
+                                        <div class="skill-items">
+                                            <div class="skill-item" data-skill="Laravel">
+                                                <span>Laravel</span>
+                                                <div class="skill-tooltip">PHP Framework</div>
+                                            </div>
+                                            <div class="skill-item" data-skill="PHP">
+                                                <span>PHP</span>
+                                                <div class="skill-tooltip">Server-side Language</div>
+                                            </div>
+                                            <div class="skill-item" data-skill="MySQL">
+                                                <span>MySQL</span>
+                                                <div class="skill-tooltip">Database</div>
+                                            </div>
+                                            <div class="skill-item" data-skill="REST API">
+                                                <span>REST API</span>
+                                                <div class="skill-tooltip">API Development</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="skill-group">
+                                        <div class="skill-group-header">
+                                            <div class="skill-group-icon">🎨</div>
+                                            <h4>Frontend</h4>
+                                        </div>
+                                        <div class="skill-items">
+                                            <div class="skill-item" data-skill="JavaScript">
+                                                <span>JavaScript</span>
+                                                <div class="skill-tooltip">Frontend Language</div>
+                                            </div>
+                                            <div class="skill-item" data-skill="React">
+                                                <span>React</span>
+                                                <div class="skill-tooltip">UI Library</div>
+                                            </div>
+                                            <div class="skill-item" data-skill="Next.js">
+                                                <span>Next.js</span>
+                                                <div class="skill-tooltip">React Framework</div>
+                                            </div>
+                                            <div class="skill-item" data-skill="Tailwind CSS">
+                                                <span>Tailwind CSS</span>
+                                                <div class="skill-tooltip">CSS Framework</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="skill-group">
+                                        <div class="skill-group-header">
+                                            <div class="skill-group-icon">📱</div>
+                                            <h4>Mobile</h4>
+                                        </div>
+                                        <div class="skill-items">
+                                            <div class="skill-item" data-skill="Flutter">
+                                                <span>Flutter</span>
+                                                <div class="skill-tooltip">Cross-platform Mobile</div>
+                                            </div>
+                                            <div class="skill-item" data-skill="React Native">
+                                                <span>React Native</span>
+                                                <div class="skill-tooltip">Mobile Framework</div>
+                                            </div>
+                                            <div class="skill-item" data-skill="Expo">
+                                                <span>Expo</span>
+                                                <div class="skill-tooltip">React Native Platform</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="skill-group">
+                                        <div class="skill-group-header">
+                                            <div class="skill-group-icon">🛠️</div>
+                                            <h4>Tools</h4>
+                                        </div>
+                                        <div class="skill-items">
+                                            <div class="skill-item" data-skill="Filament v3">
+                                                <span>Filament v3</span>
+                                                <div class="skill-tooltip">Laravel Admin Panel</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -279,59 +359,12 @@
                 <div class="slide-content">
                     <div class="projects-section">
                         <div class="projects-container">
-                            <h2 class="section-title">Projects</h2>
-                            <div class="projects-grid">
-                                <article class="project-card">
-                                    <div class="project-header">
-                                        <div class="project-emoji">📈</div>
-                                        <div class="project-title">Gold NOW Investment Application</div>
-                                    </div>
-                                    <div class="project-description">
-                                        Gold investment mobile app with real-time pricing and portfolio management features.
-                                    </div>
-                                    <div class="project-tags">
-                                        <span class="project-tag">Flutter</span>
-                                        <span class="project-tag">Laravel</span>
-                                        <span class="project-tag">REST API</span>
-                                    </div>
-                                    <div class="project-links">
-                                        <a href="#" class="project-link">View Project</a>
-                                    </div>
-                                </article>
-                                <article class="project-card">
-                                    <div class="project-header">
-                                        <div class="project-emoji">📊</div>
-                                        <div class="project-title">Cooperative Investment Management System</div>
-                                    </div>
-                                    <div class="project-description">
-                                        Investment platform for cooperatives with tracking and reporting features.
-                                    </div>
-                                    <div class="project-tags">
-                                        <span class="project-tag">Laravel</span>
-                                        <span class="project-tag">MySQL</span>
-                                        <span class="project-tag">Filament v3</span>
-                                    </div>
-                                    <div class="project-links">
-                                        <a href="#" class="project-link">View Project</a>
-                                    </div>
-                                </article>
-                                <article class="project-card">
-                                    <div class="project-header">
-                                        <div class="project-emoji">📚</div>
-                                        <div class="project-title">Student Attendance Management System</div>
-                                    </div>
-                                    <div class="project-description">
-                                        Attendance app with real-time tracking and automated reporting capabilities.
-                                    </div>
-                                    <div class="project-tags">
-                                        <span class="project-tag">React Native</span>
-                                        <span class="project-tag">Expo</span>
-                                        <span class="project-tag">Laravel</span>
-                                    </div>
-                                    <div class="project-links">
-                                        <a href="#" class="project-link">View Project</a>
-                                    </div>
-                                </article>
+                            <div class="projects-header">
+                                <h2 class="section-title">Projects</h2>
+                            </div>
+                            
+                            <div class="projects-scroll" id="projects-container">
+                                <!-- Projects will be dynamically loaded here -->
                             </div>
                         </div>
                     </div>

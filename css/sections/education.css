@@ -127,58 +127,100 @@
     font-size: 12px;
 }
 
-/* Mobile Responsiveness */
+/* Enhanced Mobile Responsiveness */
 @media (max-width: 768px) {
+    .education-section {
+        border-radius: 16px;
+        margin: 10px;
+        height: calc(100% - 20px);
+    }
+    
     .education-container {
         padding: 15px;
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
     
-    .education-grid {
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 15px;
+    .education-timeline {
+        gap: 20px;
+        padding: 0 10px;
+        max-width: 100%;
+        align-items: center;
     }
     
-    .education-card {
-        padding: 15px;
+    .education-item {
+        padding: 20px;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
     }
     
     .education-header {
-        margin-bottom: 10px;
+        margin-bottom: 12px;
     }
     
     .education-degree {
-        font-size: 16px;
-        margin-bottom: 4px;
+        font-size: 18px;
+        margin-bottom: 6px;
+        line-height: 1.3;
     }
     
     .education-school {
         font-size: 16px;
-        margin-bottom: 6px;
+        margin-bottom: 8px;
     }
     
     .education-meta {
         gap: 6px;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
     }
     
     .education-date,
     .education-location {
-        font-size: 14px;
-        padding: 3px 6px;
+        font-size: 12px;
+        padding: 3px 8px;
+        border-radius: 6px;
     }
     
     .education-description {
-        font-size: 16px;
-        margin-bottom: 8px;
+        font-size: 15px;
+        margin-bottom: 10px;
+        line-height: 1.5;
+    }
+    
+    .education-highlights {
+        margin-top: 10px;
     }
     
     .education-highlights li {
-        font-size: 16px;
+        font-size: 14px;
         margin-bottom: 6px;
+        padding-left: 18px;
+        line-height: 1.4;
     }
     
     .education-highlights li::before {
-        font-size: 12px;
+        font-size: 10px;
+        left: 0;
+    }
+    
+    /* Mobile-specific education animations */
+    .education-item {
+        animation: fadeInUpMobile 0.6s ease-out 0.3s both;
+    }
+    
+    @keyframes fadeInUpMobile {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 }
 

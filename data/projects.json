@@ -22,8 +22,8 @@
   },
   {
     "name": "Student Attendance Management System",
-    "description": "Attendance app with real-time tracking and automated reporting.",
-    "tags": ["React Native", "Expo", "Laravel"],
+    "description": "Android app and web system for real-time attendance tracking and automated reporting.",
+    "tags": ["React Native", "Expo", "Laravel", "Android", "Web System"],
     "emoji": "📚",
     "link": ""
   },

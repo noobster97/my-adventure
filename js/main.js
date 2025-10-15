@@ -1,7 +1,7 @@
 // Horizontal Slide Navigation System
 (function() {
     var currentSlide = 0;
-    var totalSlides = 5;
+    var totalSlides = 6;
     var slidesWrapper = document.querySelector('.slides-wrapper');
     var slides = document.querySelectorAll('.slide');
     var indicators = document.querySelectorAll('.indicator');
@@ -69,7 +69,7 @@
         slides[slideIndex].classList.add('active');
         
         // Move slides wrapper
-        var translateX = -slideIndex * 20;
+        var translateX = -slideIndex * 16.666;
         slidesWrapper.style.transform = 'translateX(' + translateX + '%)';
         
         // Update indicators and progress
@@ -141,47 +141,127 @@
             }, 50);
         }, { passive: true });
         
-        // Touch/swipe navigation
-        var startX = 0;
-        var startY = 0;
-        var isSwipe = false;
+    // Enhanced touch/swipe navigation for mobile
+    var startX = 0;
+    var startY = 0;
+    var startTime = 0;
+    var isSwipe = false;
+    var minSwipeDistance = 50;
+    var maxSwipeTime = 300;
+    var isScrolling = false;
+    
+    document.addEventListener('touchstart', function(e) {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        startTime = Date.now();
+        isSwipe = false;
+        isScrolling = false;
+    }, { passive: true });
+    
+    document.addEventListener('touchmove', function(e) {
+        if (!startX || !startY) return;
         
-        document.addEventListener('touchstart', function(e) {
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-            isSwipe = false;
-        }, { passive: true });
+        var diffX = startX - e.touches[0].clientX;
+        var diffY = startY - e.touches[0].clientY;
         
-        document.addEventListener('touchmove', function(e) {
-            if (!startX || !startY) return;
+        // Check if user is scrolling vertically (not swiping horizontally)
+        if (Math.abs(diffY) > Math.abs(diffX)) {
+            isScrolling = true;
+            return;
+        }
+        
+        // Determine if this is a horizontal swipe
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+            isSwipe = true;
             
-            var diffX = startX - e.touches[0].clientX;
-            var diffY = startY - e.touches[0].clientY;
-            
-            if (Math.abs(diffX) > Math.abs(diffY)) {
-                isSwipe = true;
+            // Only prevent default if we can actually cancel the event and it's not scrolling
+            if (e.cancelable && !isScrolling) {
                 e.preventDefault();
             }
-        }, { passive: false });
-        
-        document.addEventListener('touchend', function(e) {
-            if (!isSwipe || isTransitioning) return;
             
-            var diffX = startX - e.changedTouches[0].clientX;
-            var threshold = 50;
-            
-            if (Math.abs(diffX) > threshold) {
-                if (diffX > 0) {
-                    nextSlide();
-                } else {
-                    prevSlide();
-                }
+            // Add visual feedback for swipe
+            var swipeIndicator = document.querySelector('.swipe-indicator');
+            if (!swipeIndicator) {
+                swipeIndicator = document.createElement('div');
+                swipeIndicator.className = 'swipe-indicator';
+                swipeIndicator.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 60px;
+                    height: 60px;
+                    background: rgba(102, 126, 234, 0.2);
+                    border: 2px solid var(--primary);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 24px;
+                    color: var(--primary);
+                    z-index: 10000;
+                    backdrop-filter: blur(10px);
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                    pointer-events: none;
+                `;
+                document.body.appendChild(swipeIndicator);
             }
             
-            startX = 0;
-            startY = 0;
-            isSwipe = false;
-        }, { passive: true });
+            if (diffX > 0) {
+                swipeIndicator.innerHTML = '→';
+                swipeIndicator.style.opacity = '1';
+            } else {
+                swipeIndicator.innerHTML = '←';
+                swipeIndicator.style.opacity = '1';
+            }
+        }
+    }, { passive: false });
+    
+    document.addEventListener('touchend', function(e) {
+        if (!isSwipe || isTransitioning || isScrolling) {
+            // Hide swipe indicator
+            var swipeIndicator = document.querySelector('.swipe-indicator');
+            if (swipeIndicator) {
+                swipeIndicator.style.opacity = '0';
+                setTimeout(() => swipeIndicator.remove(), 300);
+            }
+            return;
+        }
+        
+        var diffX = startX - e.changedTouches[0].clientX;
+        var diffY = startY - e.changedTouches[0].clientY;
+        var swipeTime = Date.now() - startTime;
+        
+        // Check if it's a valid swipe
+        if (Math.abs(diffX) > minSwipeDistance && 
+            Math.abs(diffX) > Math.abs(diffY) && 
+            swipeTime < maxSwipeTime) {
+            
+            if (diffX > 0) {
+                nextSlide();
+            } else {
+                prevSlide();
+            }
+            
+            // Add haptic feedback if available
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+        
+        // Hide swipe indicator
+        var swipeIndicator = document.querySelector('.swipe-indicator');
+        if (swipeIndicator) {
+            swipeIndicator.style.opacity = '0';
+            setTimeout(() => swipeIndicator.remove(), 300);
+        }
+        
+        startX = 0;
+        startY = 0;
+        isSwipe = false;
+        isScrolling = false;
+    }, { passive: true });
         
         // Keyboard navigation
         document.addEventListener('keydown', function(e) {
@@ -574,29 +654,51 @@
 
 // Mobile menu toggle
 (function() {
-    var btn = document.getElementById('mobileMenu');
-    var links = document.getElementById('navLinks');
-    var overlay = document.getElementById('navOverlay');
+    var btn = document.querySelector('.mobile-menu');
+    var links = document.querySelector('.nav-links');
     if (!btn || !links) return;
+    
     btn.addEventListener('click', function() {
         var isOpen = links.classList.toggle('open');
         btn.setAttribute('aria-expanded', String(isOpen));
-        if (overlay) overlay.style.display = isOpen ? 'block' : 'none';
         // lock scroll when menu open
         document.body.classList.toggle('menu-open', isOpen);
+        
+        // Add mobile menu animation
+        if (isOpen) {
+            btn.style.transform = 'rotate(90deg)';
+        } else {
+            btn.style.transform = 'rotate(0deg)';
+        }
     });
+    
     function closeMenu() {
         links.classList.remove('open');
         btn.setAttribute('aria-expanded', 'false');
-        if (overlay) overlay.style.display = 'none';
         document.body.classList.remove('menu-open');
+        btn.style.transform = 'rotate(0deg)';
     }
-    links.querySelectorAll('a').forEach(function(a) { a.addEventListener('click', closeMenu); });
-    if (overlay) overlay.addEventListener('click', closeMenu);
+    
+    links.querySelectorAll('a').forEach(function(a) { 
+        a.addEventListener('click', closeMenu); 
+    });
+    
     // close on ESC
-    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeMenu(); });
+    document.addEventListener('keydown', function(e){ 
+        if (e.key === 'Escape') closeMenu(); 
+    });
+    
     // close on resize to desktop
-    window.addEventListener('resize', function(){ if (window.innerWidth > 768) closeMenu(); });
+    window.addEventListener('resize', function(){ 
+        if (window.innerWidth > 768) closeMenu(); 
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!btn.contains(e.target) && !links.contains(e.target) && links.classList.contains('open')) {
+            closeMenu();
+        }
+    });
 })();
 
 // Typewriter starter (called after data load)
@@ -679,13 +781,105 @@ async function renderData() {
             }).join('');
         }
 
-        var projGrid = document.querySelector('#projects .projects-grid');
-        if (projGrid) {
-            projGrid.innerHTML = projects.map(function(p){
-                var tags = p.tags.map(function(t){ return '<span class="tag">' + t + '</span>'; }).join('');
-                var linkStart = p.link ? '<a href="' + p.link + '" target="_blank" rel="noopener" class="project-card">' : '<article class="project-card">';
-                var linkEnd = p.link ? '</a>' : '</article>';
-                return linkStart + '\n  <div class="project-image" aria-hidden="true">' + (p.emoji || '💻') + '</div>\n  <div class="project-info">\n    <h3>' + p.name + '</h3>\n    <p>' + p.description + '</p>\n    <div class="project-tags">' + tags + '</div>\n  </div>\n' + linkEnd;
+        var projContainer = document.querySelector('#projects-container');
+        if (projContainer) {
+            projContainer.innerHTML = projects.map(function(p, index){
+                // Determine project category based on tags
+                var category = 'Web Application';
+                var categoryIcon = '🌐';
+                if (p.tags.some(function(tag) { return ['Flutter', 'React Native', 'Expo', 'Android'].includes(tag); })) {
+                    category = 'Mobile Application';
+                    categoryIcon = '📱';
+                } else if (p.tags.some(function(tag) { return ['Laravel', 'Filament v3'].includes(tag); })) {
+                    category = 'Web Application';
+                    categoryIcon = '🌐';
+                }
+                
+                // Generate tech groups based on tags
+                var techGroups = '';
+                var frontendTags = p.tags.filter(function(tag) { 
+                    return ['Flutter', 'React Native', 'Expo', 'Vue.js', 'JavaScript', 'React', 'Next.js', 'Tailwind CSS'].includes(tag); 
+                });
+                var backendTags = p.tags.filter(function(tag) { 
+                    return ['Laravel', 'PHP', 'MySQL', 'REST API', 'Filament v3'].includes(tag); 
+                });
+                var otherTags = p.tags.filter(function(tag) { 
+                    return !frontendTags.includes(tag) && !backendTags.includes(tag); 
+                });
+                
+                if (frontendTags.length > 0) {
+                    techGroups += '<div class="tech-group"><span class="tech-label">Frontend</span><div class="tech-tags">';
+                    frontendTags.forEach(function(tag) {
+                        var tagClass = tag.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                        techGroups += '<span class="tech-tag ' + tagClass + '">' + tag + '</span>';
+                    });
+                    techGroups += '</div></div>';
+                }
+                
+                if (backendTags.length > 0) {
+                    techGroups += '<div class="tech-group"><span class="tech-label">Backend</span><div class="tech-tags">';
+                    backendTags.forEach(function(tag) {
+                        var tagClass = tag.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                        techGroups += '<span class="tech-tag ' + tagClass + '">' + tag + '</span>';
+                    });
+                    techGroups += '</div></div>';
+                }
+                
+                if (otherTags.length > 0) {
+                    techGroups += '<div class="tech-group"><span class="tech-label">Other</span><div class="tech-tags">';
+                    otherTags.forEach(function(tag) {
+                        var tagClass = tag.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                        techGroups += '<span class="tech-tag ' + tagClass + '">' + tag + '</span>';
+                    });
+                    techGroups += '</div></div>';
+                }
+                
+                // Generate features based on project type
+                var features = '';
+                if (p.name.toLowerCase().includes('investment')) {
+                    features = '<div class="feature-item"><span class="feature-icon">⚡</span><span>Real-time Pricing</span></div><div class="feature-item"><span class="feature-icon">🔒</span><span>Secure Transactions</span></div><div class="feature-item"><span class="feature-icon">📊</span><span>Portfolio Analytics</span></div>';
+                } else if (p.name.toLowerCase().includes('attendance')) {
+                    features = '<div class="feature-item"><span class="feature-icon">📱</span><span>QR Code Scanning</span></div><div class="feature-item"><span class="feature-icon">📍</span><span>Geolocation</span></div><div class="feature-item"><span class="feature-icon">📊</span><span>Analytics Dashboard</span></div>';
+                } else if (p.name.toLowerCase().includes('booking')) {
+                    features = '<div class="feature-item"><span class="feature-icon">📅</span><span>Real-time Booking</span></div><div class="feature-item"><span class="feature-icon">💳</span><span>Payment Integration</span></div><div class="feature-item"><span class="feature-icon">📊</span><span>Admin Dashboard</span></div>';
+                } else if (p.name.toLowerCase().includes('e-commerce')) {
+                    features = '<div class="feature-item"><span class="feature-icon">🛒</span><span>Shopping Cart</span></div><div class="feature-item"><span class="feature-icon">💳</span><span>Payment Gateway</span></div><div class="feature-item"><span class="feature-icon">📱</span><span>WhatsApp Integration</span></div>';
+                } else if (p.name.toLowerCase().includes('cooperative')) {
+                    features = '<div class="feature-item"><span class="feature-icon">📈</span><span>Real-time Analytics</span></div><div class="feature-item"><span class="feature-icon">📋</span><span>Automated Reporting</span></div><div class="feature-item"><span class="feature-icon">👥</span><span>User Management</span></div>';
+                } else {
+                    features = '<div class="feature-item"><span class="feature-icon">⚡</span><span>Modern Design</span></div><div class="feature-item"><span class="feature-icon">📱</span><span>Responsive</span></div><div class="feature-item"><span class="feature-icon">🔧</span><span>Customizable</span></div>';
+                }
+                
+                var linkButton = p.link ? '<a href="' + p.link + '" target="_blank" rel="noopener" class="btn-primary"><span>View Project</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg></a>' : '<a href="#" class="btn-primary"><span>View Project</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg></a>';
+                
+                return '<div class="project-card" style="--scroll-delay: ' + (index * 2) + 's">' +
+                    '<div class="project-image">' +
+                        '<div class="project-icon">' + (p.emoji || '💻') + '</div>' +
+                        '<div class="project-overlay">' +
+                            '<div class="project-links-overlay">' +
+                                '<a href="#" class="overlay-link" title="View Project">' +
+                                    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+                                        '<path d="M7 17L17 7M17 7H7M17 7V17"/>' +
+                                    '</svg>' +
+                                '</a>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="project-gradient"></div>' +
+                    '</div>' +
+                    '<div class="project-content">' +
+                        '<div class="project-meta">' +
+                            '<div class="project-category">' +
+                                '<span class="category-icon">' + categoryIcon + '</span>' +
+                                '<span>' + category + '</span>' +
+                            '</div>' +
+                            '<div class="project-year">2024</div>' +
+                        '</div>' +
+                        '<h3 class="project-title">' + p.name + '</h3>' +
+                        '<div class="project-features">' + features + '</div>' +
+                        '<div class="project-tech"><div class="tech-content">' + techGroups + '</div></div>' +
+                        '<div class="project-actions">' + linkButton + '</div>' +
+                    '</div>' +
+                '</div>';
             }).join('');
         }
         // Dynamic stats derived from data
@@ -710,10 +904,11 @@ async function renderData() {
             var months = (now.getFullYear() - earliest.getFullYear()) * 12 + (now.getMonth() - earliest.getMonth());
             years = Math.max(1, Math.floor(months / 12));
         }
-        var projectEl = document.querySelector('.stat-number[data-key="projects"]');
-        var yearsEl = document.querySelector('.stat-number[data-key="years"]');
-        if (projectEl) projectEl.textContent = String(projectsCount) + '+';
-        if (yearsEl && years) yearsEl.textContent = String(years) + '+';
+        
+        // Animate counters
+        animateCounter('.stat-number[data-key="projects"]', projectsCount, '+');
+        animateCounter('.stat-number[data-key="years"]', years, '+');
+        animateCounter('.stat-number[data-key="technologies"]', 15, '+');
 
         // Render skills summary and badges
         // Clean skill bars (we'll present badges only)
@@ -791,7 +986,143 @@ async function renderData() {
     }
 }
 
+// Animated Counter Function
+function animateCounter(selector, targetValue, suffix) {
+    var element = document.querySelector(selector);
+    if (!element) return;
+    
+    var startValue = 0;
+    var duration = 2000; // 2 seconds
+    var startTime = null;
+    
+    function updateCounter(currentTime) {
+        if (startTime === null) startTime = currentTime;
+        var progress = Math.min((currentTime - startTime) / duration, 1);
+        
+        var currentValue = Math.floor(progress * targetValue);
+        element.textContent = currentValue + suffix;
+        
+        if (progress < 1) {
+            requestAnimationFrame(updateCounter);
+        }
+    }
+    
+    requestAnimationFrame(updateCounter);
+}
+
 document.addEventListener('DOMContentLoaded', renderData);
+
+// Mobile-specific enhancements
+(function() {
+    // Detect mobile device
+    var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        document.body.classList.add('mobile-device');
+        
+        // Add mobile-specific loading indicator
+        var mobileLoader = document.createElement('div');
+        mobileLoader.className = 'loading-mobile';
+        mobileLoader.innerHTML = '<div class="loading-mobile-spinner"></div>';
+        document.body.appendChild(mobileLoader);
+        
+        // Show loader during slide transitions
+        var originalGoToSlide = window.goToSlide;
+        if (originalGoToSlide) {
+            window.goToSlide = function(slideIndex) {
+                mobileLoader.classList.add('active');
+                originalGoToSlide(slideIndex);
+                setTimeout(function() {
+                    mobileLoader.classList.remove('active');
+                }, 800);
+            };
+        }
+        
+        // Add mobile-specific touch feedback
+        document.addEventListener('touchstart', function(e) {
+            var target = e.target;
+            if (target.matches('button, .btn, .contact-button, .indicator, .nav-link')) {
+                target.style.transform = 'scale(0.95)';
+                target.style.transition = 'transform 0.1s ease';
+            }
+        }, { passive: true });
+        
+        document.addEventListener('touchend', function(e) {
+            var target = e.target;
+            if (target.matches('button, .btn, .contact-button, .indicator, .nav-link')) {
+                setTimeout(function() {
+                    target.style.transform = '';
+                    target.style.transition = '';
+                }, 100);
+            }
+        }, { passive: true });
+        
+        // Optimize animations for mobile
+        var style = document.createElement('style');
+        style.textContent = `
+            @media (max-width: 768px) {
+                .slide-container {
+                    -webkit-overflow-scrolling: touch;
+                }
+                
+                .slide-content {
+                    -webkit-overflow-scrolling: touch;
+                }
+                
+                .projects-scroll {
+                    -webkit-overflow-scrolling: touch;
+                }
+                
+                .experience-container {
+                    -webkit-overflow-scrolling: touch;
+                }
+                
+                .contact-container {
+                    -webkit-overflow-scrolling: touch;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Add mobile-specific viewport handling
+        var viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport) {
+            viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+        }
+        
+        // Add mobile-specific performance optimizations
+        var slides = document.querySelectorAll('.slide');
+        slides.forEach(function(slide) {
+            slide.style.willChange = 'transform, opacity';
+        });
+        
+        // Add mobile-specific error handling
+        window.addEventListener('error', function(e) {
+            console.log('Mobile error:', e.error);
+            // Hide any loading indicators on error
+            var loader = document.querySelector('.loading-mobile');
+            if (loader) {
+                loader.classList.remove('active');
+            }
+        });
+        
+        // Add mobile-specific orientation change handling
+        window.addEventListener('orientationchange', function() {
+            setTimeout(function() {
+                // Recalculate slide positions after orientation change
+                var slidesWrapper = document.querySelector('.slides-wrapper');
+                if (slidesWrapper) {
+                    var currentSlide = document.querySelector('.slide.active');
+                    if (currentSlide) {
+                        var slideIndex = Array.from(slides).indexOf(currentSlide);
+                        var translateX = -slideIndex * 16.666;
+                        slidesWrapper.style.transform = 'translateX(' + translateX + '%)';
+                    }
+                }
+            }, 100);
+        });
+    }
+})();
 
 // Avoid auto-scrolling to a hash on reload; ensure we start at top unless user navigated
 (function() {
