@@ -269,6 +269,9 @@ img, video { max-width: 100%; height: auto; display: block; }
 }
 
 @media (max-width: 480px) {
+    .section-title {
+        font-size: 30px;
+    }
     .splash-content {
         padding: 15px;
     }
@@ -367,7 +370,7 @@ nav.scrolled { padding: 16px 60px; background: rgba(0, 0, 0, 0.75); backdrop-fil
 
 .slides-wrapper {
     position: relative;
-    width: 500%;
+    width: 600%;
     height: 100%;
     transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform;
@@ -377,7 +380,7 @@ nav.scrolled { padding: 16px 60px; background: rgba(0, 0, 0, 0.75); backdrop-fil
 
 /* Debug and ensure slide visibility */
 .slide {
-    width: 20%;
+    width: 16.666%;
     height: 100%;
     position: absolute;
     top: 0;
@@ -391,18 +394,18 @@ nav.scrolled { padding: 16px 60px; background: rgba(0, 0, 0, 0.75); backdrop-fil
     isolation: isolate;
     contain: layout style paint;
     /* Ensure slides are always positioned */
-    min-width: 20%;
-    max-width: 20%;
+    min-width: 16.666%;
+    max-width: 16.666%;
     box-sizing: border-box;
 }
 
 /* Ensure all slides are properly positioned and visible */
 .slide:nth-child(1) { left: 0%; }
-.slide:nth-child(2) { left: 20%; }
-.slide:nth-child(3) { left: 40%; }
-.slide:nth-child(4) { left: 60%; }
-.slide:nth-child(5) { left: 80%; }
-.slide:nth-child(6) { left: 100%; }
+.slide:nth-child(2) { left: 16.666%; }
+.slide:nth-child(3) { left: 33.333%; }
+.slide:nth-child(4) { left: 50%; }
+.slide:nth-child(5) { left: 66.666%; }
+.slide:nth-child(6) { left: 83.333%; }
 
 /* Ensure slides are visible when active */
 .slide.active {
@@ -620,24 +623,136 @@ nav.scrolled { padding: 16px 60px; background: rgba(0, 0, 0, 0.75); backdrop-fil
     animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
 }
 
-/* Mobile Optimizations for Slides */
+/* Enhanced Mobile Optimizations for Slides */
 @media (max-width: 768px) {
+    /* Hide desktop cursor on mobile */
+    body.desktop { cursor: auto; }
+    .cursor, .cursor-follower { display: none; }
+    
+    /* Mobile navigation */
+    nav { 
+        padding: 16px 24px; 
+        height: 60px;
+    }
+    
+    nav.scrolled { 
+        padding: 12px 24px; 
+        background: rgba(0, 0, 0, 0.9); 
+        backdrop-filter: blur(20px);
+    }
+    
+    .nav-links { 
+        display: none; 
+        position: fixed; 
+        top: 60px; 
+        left: 0; 
+        right: 0; 
+        background: rgba(10,10,15,0.95); 
+        backdrop-filter: blur(20px);
+        padding: 20px 24px; 
+        flex-direction: column; 
+        gap: 8px; 
+        border-top: 1px solid rgba(255,255,255,0.1); 
+        transform: translateY(-100%); 
+        opacity: 0; 
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 999;
+    }
+    
+    .nav-links.open { 
+        display: flex; 
+        transform: translateY(0); 
+        opacity: 1; 
+    }
+    
+    .nav-links a { 
+        padding: 16px 20px; 
+        border-radius: 12px; 
+        font-size: 16px;
+        font-weight: 600;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+    }
+    
+    .nav-links a:hover { 
+        background: linear-gradient(135deg, rgba(102,126,234,0.2) 0%, rgba(118,75,162,0.2) 100%); 
+        border-color: rgba(102,126,234,0.3);
+        transform: translateX(5px);
+    }
+    
+    .mobile-menu { 
+        display: flex; 
+        margin-left: auto;
+        transition: transform 0.3s ease;
+    }
+    
+    /* Mobile slide indicators */
     .section-indicators {
         right: 15px;
         gap: 8px;
+        top: 50%;
+        transform: translateY(-50%);
     }
     
     .indicator {
         width: 10px;
         height: 10px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        background: transparent;
+        transition: all 0.3s ease;
     }
     
+    .indicator.active {
+        background: var(--primary);
+        border-color: var(--primary);
+        transform: scale(1.3);
+        box-shadow: 0 0 15px var(--primary);
+    }
+    
+    .indicator:hover {
+        background: var(--secondary);
+        border-color: var(--secondary);
+        transform: scale(1.2);
+    }
+    
+    /* Mobile slide content */
     .slide-content {
-        padding: 40px 20px;
+        padding: 20px 15px;
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
     
     .slide-indicator {
         bottom: 20px;
+        opacity: 0.8;
+    }
+    
+    /* Mobile slide container adjustments */
+    .slide-container {
+        height: calc(100vh - 60px);
+        margin-top: 60px;
+        margin-bottom: 0;
+    }
+    
+    /* Mobile footer */
+    .footer {
+        height: 60px;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Mobile progress bar */
+    .slide-progress {
+        height: 3px;
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .progress-bar {
+        background: var(--grad);
+        box-shadow: 0 0 10px var(--primary);
     }
 }
 
@@ -761,12 +876,15 @@ nav.scrolled { padding: 16px 60px; background: rgba(0, 0, 0, 0.75); backdrop-fil
     
     .footer {
         height: 50px;
+        background: rgba(0, 0, 0, 0.9);
+        backdrop-filter: blur(15px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
     
     .slide-container {
-        height: calc(100vh - 100px);
+        height: calc(100vh - 115px);
         margin-top: 50px;
-        margin-bottom: 50px;
+        margin-bottom: 0;
     }
     
     .slide-content {
@@ -1149,6 +1267,125 @@ body, .about-text, .project-info p, .job-meta, .job-points, .education-meta { ov
 /* Theme: coral/violet with cyan accent */
 :root { --primary:#0891b2; --secondary:#3b82f6; --accent:#6366f1; --line: rgba(8,145,178,0.03); --orb1: rgba(8,145,178,0.6); --orb2: rgba(59,130,246,0.5); --orb3: rgba(99,102,241,0.4); --grad: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 100%); }
 .social-link:hover { background: var(--grad); }
+
+/* Additional Mobile Enhancements */
+@media (max-width: 768px) {
+    /* Mobile-specific scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: var(--grad);
+        border-radius: 2px;
+    }
+    
+    /* Mobile-specific touch improvements */
+    * {
+        -webkit-tap-highlight-color: rgba(102, 126, 234, 0.2);
+        -webkit-touch-callout: none;
+    }
+    
+    /* Prevent pull-to-refresh and improve touch scrolling */
+    body {
+        overscroll-behavior-y: contain;
+    }
+    
+    .slide-container,
+    .projects-container,
+    .about-container,
+    .experience-container,
+    .education-container,
+    .contact-container {
+        overscroll-behavior: contain;
+    }
+    
+    /* Mobile-specific focus styles */
+    *:focus {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+    
+    /* Mobile-specific selection styles */
+    ::selection {
+        background: rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+    
+    /* Mobile-specific button improvements */
+    button, .btn, .contact-button {
+        -webkit-appearance: none;
+        appearance: none;
+        touch-action: manipulation;
+    }
+    
+    /* Mobile-specific input improvements */
+    input, textarea {
+        -webkit-appearance: none;
+        appearance: none;
+        border-radius: 8px;
+    }
+    
+    /* Mobile-specific animation optimizations */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+    
+    /* Mobile-specific performance optimizations */
+    .slide-container,
+    .slides-wrapper,
+    .slide {
+        will-change: transform;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        perspective: 1000px;
+    }
+    
+    /* Mobile-specific loading states */
+    .loading-mobile {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .loading-mobile.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .loading-mobile-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(102, 126, 234, 0.3);
+        border-top: 3px solid var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+}
 
 /* Lock scroll when mobile menu is open */
 body.menu-open { overflow: hidden; }

@@ -13,7 +13,7 @@
     max-height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
 }
 
@@ -25,7 +25,7 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     padding: 20px;
     position: relative;
     z-index: 1;
@@ -64,6 +64,7 @@
     box-sizing: border-box;
     height: fit-content;
     min-height: 400px;
+    justify-content: center;
 }
 
 .contact-form {
@@ -77,7 +78,7 @@
 }
 
 .contact-form h3 {
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 700;
     margin-bottom: 30px;
     color: white;
@@ -146,7 +147,7 @@
 }
 
 .contact-info h3 {
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 700;
     margin-bottom: 30px;
     color: white;
@@ -180,7 +181,7 @@
     background: rgba(102, 126, 234, 0.15);
     border-radius: 12px;
     border: 1px solid rgba(102, 126, 234, 0.3);
-    font-size: 20px;
+    font-size: 18px;
     color: var(--primary);
     flex-shrink: 0;
 }
@@ -190,7 +191,7 @@
 }
 
 .contact-label {
-    font-size: 12px;
+    font-size: 14px;
     color: #a0a0a0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -203,50 +204,32 @@
     font-weight: 600;
 }
 
-/* Mobile Responsiveness */
+/* Enhanced Mobile Responsiveness */
 @media (max-width: 768px) {
+    .contact-section {
+        border-radius: 16px;
+        margin: 10px;
+        height: calc(100% - 20px);
+    }
+    
     .contact-container {
         padding: 15px;
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
     
     .contact-content {
         grid-template-columns: 1fr;
         gap: 20px;
-    }
-    
-    .contact-info {
-        text-align: center;
-        height: auto;
-    }
-    
-    .contact-info h3 {
-        font-size: 20px;
-        margin-bottom: 20px;
-    }
-    
-    .contact-item {
-        padding: 15px;
-        margin-bottom: 15px;
-        gap: 12px;
-    }
-    
-    .contact-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 16px;
-    }
-    
-    .contact-label {
-        font-size: 11px;
-    }
-    
-    .contact-value {
-        font-size: 14px;
+        padding: 0 10px;
+        min-height: auto;
     }
     
     .contact-form {
-        padding: 30px 20px;
-        height: auto;
+        padding: 24px 20px;
+        border-radius: 16px;
+        order: 2;
     }
     
     .contact-form h3 {
@@ -255,22 +238,80 @@
     }
     
     .form-group {
-        margin-bottom: 15px;
+        margin-bottom: 16px;
     }
     
     .form-group input,
     .form-group textarea {
-        padding: 12px;
-        font-size: 14px;
+        padding: 14px;
+        font-size: 16px; /* Prevents zoom on iOS */
+        border-radius: 10px;
     }
     
     .form-group textarea {
-        min-height: 100px;
+        min-height: 120px;
     }
     
     .contact-button {
-        padding: 12px 20px;
-        font-size: 14px;
+        padding: 14px 20px;
+        font-size: 15px;
+        border-radius: 10px;
+    }
+    
+    .contact-info {
+        text-align: center;
+        height: auto;
+        order: 1;
+    }
+    
+    .contact-info h3 {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .contact-item {
+        padding: 16px;
+        margin-bottom: 12px;
+        gap: 12px;
+        border-radius: 12px;
+        flex-direction: row;
+        text-align: left;
+    }
+    
+    .contact-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+        border-radius: 10px;
+    }
+    
+    .contact-label {
+        font-size: 11px;
+        margin-bottom: 4px;
+    }
+    
+    .contact-value {
+        font-size: 15px;
+    }
+    
+    /* Mobile-specific contact animations */
+    .contact-form {
+        animation: slideInUpMobile 0.6s ease-out 0.2s both;
+    }
+    
+    .contact-info {
+        animation: slideInUpMobile 0.6s ease-out 0.1s both;
+    }
+    
+    @keyframes slideInUpMobile {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 }
 
