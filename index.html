@@ -1,462 +1,236 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>Muhammad Syafiq – Software Developer</title>
-    <meta name="description" content="Portfolio of Muhammad Syafiq, Software Developer specializing in Laravel, PHP, JavaScript, Flutter, and React Native.">
-    <meta name="theme-color" content="#000000">
+    <title>Muhammad Syafiq | Software Developer</title>
+    <meta name="description"
+        content="Portfolio of Muhammad Syafiq bin Md Asri, a Software Developer specializing in Website, Web System, and App Development.">
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
-    <meta property="og:title" content="Muhammad Syafiq – Software Developer">
-    <meta property="og:description" content="Full Stack Developer crafting elegant, performant digital experiences.">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="profile.jpg">
-    <meta property="og:url" content="./">
-    <link href="css/styles.css?v=6" rel="stylesheet">
-    <link href="css/sections.css?v=6" rel="stylesheet">
-    <script>
-        // Prevent any form submissions immediately
-        window.addEventListener('load', function() {
-            // Clear any cached form data
-            if (window.history && window.history.replaceState) {
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-            
-            // Prevent any POST requests
-            var originalFetch = window.fetch;
-            window.fetch = function() {
-                console.log('Fetch intercepted:', arguments);
-                return Promise.reject('Fetch blocked');
-            };
-        });
-    </script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Patrick+Hand&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <!-- Header -->
-    <header class="header">
-        <nav class="nav">
-            <div class="nav-brand">
-                <a href="#home" class="logo">PORTFOLIO</a>
-            </div>
-            <ul class="nav-links">
-                <li><a href="#about" class="nav-link">ABOUT</a></li>
-                <li><a href="#experience" class="nav-link">EXPERIENCE</a></li>
-                <li><a href="#education" class="nav-link">EDUCATION</a></li>
-                <li><a href="#projects" class="nav-link">PROJECTS</a></li>
-                <li><a href="#contact" class="nav-link">CONTACT</a></li>
-            </ul>
-            <div class="mobile-menu">
-                <span></span>
-                <span></span>
-                <span></span>
+    <!-- Custom Cursor Elements (Removed for performance) -->
+    <!-- <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div> -->
+
+    <div class="container">
+        <nav class="navbar">
+            <div class="container">
+                <a href="#" class="logo">Syafiq<span class="dot">.</span></a>
+                <div class="nav-links">
+                    <a href="#home">Home</a>
+                    <a href="#services">Services</a>
+                    <a href="#projects">Work</a>
+                    <a href="#contact">Contact</a>
+                </div>
+                <!-- Mobile Menu Btn handled by bottom nav -->
             </div>
         </nav>
-    </header>
 
-    <!-- Loading Splash Screen -->
-    <div class="splash-screen" id="splashScreen">
-        <div class="splash-content">
-            <div class="splash-logo">
-                <div class="logo-text">PORTFOLIO</div>
-                <div class="logo-subtitle">Muhammad Syafiq</div>
-            </div>
-            <div class="loading-animation">
-                <div class="loading-dots">
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="container">
+                <div class="hero-content centered">
+                    <div class="badge-container">
+                        <span class="badge">Available for Hire</span>
+                    </div>
+                    <h1 class="display-text">Turning Ideas into <br><span class="gradient-text">Digital Reality</span>
+                    </h1>
+                    <p class="lead-text">I build high-performance websites and applications that help businesses grow.
+                        Simple, effective, and built to scale.</p>
+                    <div class="hero-btns">
+                        <a href="#contact" class="btn-primary">Get in Touch <i class="fas fa-paper-plane"></i></a>
+                        <a href="#projects" class="btn-secondary">View Portfolio</a>
+                    </div>
+                    <div class="stats-row">
+                        <div class="stat-item">
+                            <span class="stat-number">3+</span>
+                            <span class="stat-label">Years Exp.</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">10+</span>
+                            <span class="stat-label">Projects Done</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">Satisfaction</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="loading-text">Loading Experience...</div>
             </div>
-            <div class="splash-orbs">
-                <div class="splash-orb splash-orb-1"></div>
-                <div class="splash-orb splash-orb-2"></div>
-                <div class="splash-orb splash-orb-3"></div>
+        </section>
+
+        <!-- Services Section (Bento Grid Style) -->
+        <section id="services" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">What I Can Do For You</h2>
+                    <p class="section-subtitle">Comprehensive digital solutions tailored to your needs.</p>
+                </div>
+
+                <div class="bento-grid scroll-container">
+                    <div class="bento-card large spotlight-card">
+                        <div class="card-icon"><i class="fas fa-laptop-code"></i></div>
+                        <h3>Website Development</h3>
+                        <p>I create stunning, responsive websites that not only look good but convert visitors into
+                            customers. SEO-optimized and built for speed.</p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check"></i> Landing Pages</li>
+                            <li><i class="fas fa-check"></i> Corporate Sites</li>
+                            <li><i class="fas fa-check"></i> Portfolios</li>
+                        </ul>
+                    </div>
+                    <div class="bento-card medium spotlight-card">
+                        <div class="card-icon"><i class="fas fa-server"></i></div>
+                        <h3>Web Systems</h3>
+                        <p>Streamline your operations with custom web-based management systems designed for efficiency.
+                        </p>
+                    </div>
+                    <div class="bento-card medium spotlight-card">
+                        <div class="card-icon"><i class="fas fa-mobile-alt"></i></div>
+                        <h3>App Development</h3>
+                        <p>Native and cross-platform mobile apps that provide seamless user experiences on iOS and
+                            Android.</p>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <div class="cursor" aria-hidden="true"></div>
-    <div class="cursor-follower" aria-hidden="true"></div>
-    <div class="bg-animation"></div>
-    <div class="orb orb1"></div>
-    <div class="orb orb2"></div>
-    <div class="orb orb3"></div>
+        <!-- Skills Section (Marquee/Ticker Style) -->
+        <section id="skills" class="section skills-section">
+            <div class="container">
+                <p class="tech-label">Technologies I Work With</p>
+                <div class="skills-wrapper">
+                    <div class="skill-pill">Laravel</div>
+                    <div class="skill-pill">Flutter</div>
+                    <div class="skill-pill">JavaScript</div>
+                    <div class="skill-pill">React Native</div>
+                    <div class="skill-pill">MySQL</div>
+                    <div class="skill-pill">Vue.js</div>
+                    <div class="skill-pill">HTML5</div>
+                    <div class="skill-pill">CSS3</div>
+                    <div class="skill-pill">Node.js</div>
+                    <div class="skill-pill">Tailwind</div>
+                    <div class="skill-pill">Git</div>
+                </div>
+            </div>
+        </section>
 
+        <!-- Projects Section (Stack of Cards) -->
+        <section id="projects" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Selected Work</h2>
+                    <p class="section-subtitle">Click on a card to view details.</p>
+                </div>
+                <div class="projects-stack-container">
+                    <div class="project-card-stack active" data-index="0">
+                        <div class="stack-header">
+                            <span class="stack-number">01</span>
+                            <h3>Event Management System</h3>
+                        </div>
+                        <div class="stack-content">
+                            <div class="project-visual gradient-1"></div>
+                            <div class="project-details">
+                                <span class="project-cat">Web System</span>
+                                <p>A comprehensive platform that simplified event organization, handling registration,
+                                    ticketing, and analytics for a major local organizer.</p>
+                                <a href="#" class="project-link">View Case Study <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-card-stack" data-index="1">
+                        <div class="stack-header">
+                            <span class="stack-number">02</span>
+                            <h3>Online Retail Store</h3>
+                        </div>
+                        <div class="stack-content">
+                            <div class="project-visual gradient-2"></div>
+                            <div class="project-details">
+                                <span class="project-cat">E-Commerce</span>
+                                <p>A full-featured e-commerce solution with secure payment integration, inventory
+                                    management, and a seamless checkout process.</p>
+                                <a href="#" class="project-link">View Case Study <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="project-card-stack" data-index="2">
+                        <div class="stack-header">
+                            <span class="stack-number">03</span>
+                            <h3>Investment Tracker</h3>
+                        </div>
+                        <div class="stack-content">
+                            <div class="project-visual gradient-3"></div>
+                            <div class="project-details">
+                                <span class="project-cat">FinTech App</span>
+                                <p>A secure mobile application allowing users to track their portfolio performance in
+                                    real-time with intuitive data visualization.</p>
+                                <a href="#" class="project-link">View Case Study <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <main class="slide-container">
-        <div class="slides-wrapper">
-            <section class="slide active" id="home" aria-label="Hero">
-                <div class="hero-content">
-                    <h1>Hello, I'm <span class="gradient-text">Muhammad Syafiq</span></h1>
-                    <div class="typewriter" aria-live="polite"><span id="typed-text"></span></div>
+        <!-- Contact Section -->
+        <section id="contact" class="section contact-section">
+            <div class="container">
+                <div class="cta-box spotlight-card">
+                    <h2>Ready to start your project?</h2>
+                    <p>Let's turn your vision into a reality. Contact me today for a free consultation.</p>
                     <div class="cta-buttons">
-                        <button class="btn btn-primary next-slide"><span>View My Work</span></button>
-                        <a href="./Muhammad Syafiq - Software Developer.pdf" class="btn btn-secondary" download>Download Resume</a>
+                        <a href="mailto:contact@example.com" class="btn-primary large-btn">
+                            <i class="fas fa-envelope"></i> Email Me
+                        </a>
+                        <a href="https://wa.me/601114648597?text=Hi%20Syafiq,%20I'm%20interested%20in%20your%20services."
+                            target="_blank" class="btn-whatsapp large-btn">
+                            <i class="fab fa-whatsapp"></i> WhatsApp Me
+                        </a>
                     </div>
                 </div>
-                <div class="slide-indicator" aria-hidden="true">
-                    <div class="mouse"></div>
-                    <span style="color: rgba(255,255,255,0.6); font-size: 12px; letter-spacing: 2px;">SWIPE</span>
-                </div>
-            </section>
-
-            <section class="slide" id="about" aria-label="About">
-                <div class="slide-content">
-                    <div class="about-section">
-                        <div class="about-container">
-                            <h2 class="section-title">About Me</h2>
-                            <div class="about-content">
-                                <div class="about-text">
-                                    <div class="about-intro">
-                                        <h3 class="about-subtitle">Crafting Digital Experiences</h3>
-                                        <p class="about-description">I'm a Full Stack Developer with 5+ years of experience building web and mobile applications. I blend clean design with robust engineering to deliver products that are delightful and reliable.</p>
-                                        <p class="about-focus">I work across Laravel/PHP, JavaScript, Flutter, and React Native—shaping ideas into scalable, maintainable systems.</p>
-                                    </div>
-                                </div>
-                                <div class="about-stats">
-                                    <div class="stat-card" data-stat="projects">
-                                        <div class="stat-icon">💻</div>
-                                        <span class="stat-number" data-key="projects">0+</span>
-                                        <span class="stat-label">Projects</span>
-                                    </div>
-                                    <div class="stat-card" data-stat="years">
-                                        <div class="stat-icon">⏱️</div>
-                                        <span class="stat-number" data-key="years">0+</span>
-                                        <span class="stat-label">Years</span>
-                                    </div>
-                                    <div class="stat-card" data-stat="technologies">
-                                        <div class="stat-icon">🛠️</div>
-                                        <span class="stat-number" data-key="technologies">15+</span>
-                                        <span class="stat-label">Technologies</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="skills-showcase">
-                                <h3>Technologies I Work With</h3>
-                                <div class="skills-container">
-                                    <div class="skill-group">
-                                        <div class="skill-group-header">
-                                            <div class="skill-group-icon">⚙️</div>
-                                            <h4>Backend</h4>
-                                        </div>
-                                        <div class="skill-items">
-                                            <div class="skill-item" data-skill="Laravel">
-                                                <span>Laravel</span>
-                                                <div class="skill-tooltip">PHP Framework</div>
-                                            </div>
-                                            <div class="skill-item" data-skill="PHP">
-                                                <span>PHP</span>
-                                                <div class="skill-tooltip">Server-side Language</div>
-                                            </div>
-                                            <div class="skill-item" data-skill="MySQL">
-                                                <span>MySQL</span>
-                                                <div class="skill-tooltip">Database</div>
-                                            </div>
-                                            <div class="skill-item" data-skill="REST API">
-                                                <span>REST API</span>
-                                                <div class="skill-tooltip">API Development</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="skill-group">
-                                        <div class="skill-group-header">
-                                            <div class="skill-group-icon">🎨</div>
-                                            <h4>Frontend</h4>
-                                        </div>
-                                        <div class="skill-items">
-                                            <div class="skill-item" data-skill="JavaScript">
-                                                <span>JavaScript</span>
-                                                <div class="skill-tooltip">Frontend Language</div>
-                                            </div>
-                                            <div class="skill-item" data-skill="React">
-                                                <span>React</span>
-                                                <div class="skill-tooltip">UI Library</div>
-                                            </div>
-                                            <div class="skill-item" data-skill="Next.js">
-                                                <span>Next.js</span>
-                                                <div class="skill-tooltip">React Framework</div>
-                                            </div>
-                                            <div class="skill-item" data-skill="Tailwind CSS">
-                                                <span>Tailwind CSS</span>
-                                                <div class="skill-tooltip">CSS Framework</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="skill-group">
-                                        <div class="skill-group-header">
-                                            <div class="skill-group-icon">📱</div>
-                                            <h4>Mobile</h4>
-                                        </div>
-                                        <div class="skill-items">
-                                            <div class="skill-item" data-skill="Flutter">
-                                                <span>Flutter</span>
-                                                <div class="skill-tooltip">Cross-platform Mobile</div>
-                                            </div>
-                                            <div class="skill-item" data-skill="React Native">
-                                                <span>React Native</span>
-                                                <div class="skill-tooltip">Mobile Framework</div>
-                                            </div>
-                                            <div class="skill-item" data-skill="Expo">
-                                                <span>Expo</span>
-                                                <div class="skill-tooltip">React Native Platform</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="skill-group">
-                                        <div class="skill-group-header">
-                                            <div class="skill-group-icon">🛠️</div>
-                                            <h4>Tools</h4>
-                                        </div>
-                                        <div class="skill-items">
-                                            <div class="skill-item" data-skill="Filament v3">
-                                                <span>Filament v3</span>
-                                                <div class="skill-tooltip">Laravel Admin Panel</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="slide" id="experience" aria-label="Experience">
-                <div class="slide-content">
-                    <div class="experience-section">
-                        <div class="experience-container">
-                            <h2 class="section-title">Experience</h2>
-                            <div class="experience-timeline">
-                                <div class="experience-item">
-                                    <div class="experience-header">
-                                        <div class="experience-title">Full Stack Developer</div>
-                                        <div class="experience-company">Murtadha Dakwah Center (MADAD)</div>
-                                        <div class="experience-meta">
-                                            <span class="experience-date">February 2024 – Present</span>
-                                            <span class="experience-location">Sungai Petani, Kedah</span>
-                                        </div>
-                                    </div>
-                                    <div class="experience-description">
-                                        Leading full-stack development initiatives with focus on mobile and web applications.
-                                    </div>
-                                    <div class="experience-highlights">
-                                        <ul>
-                                            <li>Developed attendance Android app and web system, improving efficiency by 40%</li>
-                                            <li>Built pet care management system with CRUD operations and reporting</li>
-                                            <li>Created educational management system for streamlined administration</li>
-                                            <li>Led migration of legacy systems to Laravel and implemented Filament v3</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="experience-item">
-                                    <div class="experience-header">
-                                        <div class="experience-title">Back End Developer</div>
-                                        <div class="experience-company">Applink Solutions</div>
-                                        <div class="experience-meta">
-                                            <span class="experience-date">November 2022 – May 2024</span>
-                                            <span class="experience-location">Alor Setar, Kedah</span>
-                                        </div>
-                                    </div>
-                                    <div class="experience-description">
-                                        Designed and developed scalable backend systems for mobile and web applications.
-                                    </div>
-                                    <div class="experience-highlights">
-                                        <ul>
-                                            <li>Designed RESTful APIs for mobile/web applications serving 1000+ users</li>
-                                            <li>Built scalable backend systems using Laravel and PHP</li>
-                                            <li>Developed cross-platform apps with React Native and Expo</li>
-                                            <li>Optimized MySQL databases reducing response time by 25%</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="experience-item">
-                                    <div class="experience-header">
-                                        <div class="experience-title">Assistant Executive Officer - IT</div>
-                                        <div class="experience-company">LEMBAGA HASIL DALAM NEGERI</div>
-                                        <div class="experience-meta">
-                                            <span class="experience-date">January 2020 – October 2022</span>
-                                            <span class="experience-location">Selangor, Malaysia</span>
-                                        </div>
-                                    </div>
-                                    <div class="experience-description">
-                                        Provided technical support and maintained company systems and websites.
-                                    </div>
-                                    <div class="experience-highlights">
-                                        <ul>
-                                            <li>Assisted in 5G technology research and implementation projects</li>
-                                            <li>Maintained network infrastructure ensuring 99.8% uptime</li>
-                                            <li>Supervised network installation projects across multiple locations</li>
-                                            <li>Developed Hasil Transformation System using OutSystems</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="experience-item">
-                                    <div class="experience-header">
-                                        <div class="experience-title">Mobile Application Developer</div>
-                                        <div class="experience-company">SKYNUE SDN BHD</div>
-                                        <div class="experience-meta">
-                                            <span class="experience-date">February 2019 – December 2019</span>
-                                            <span class="experience-location">Kedah, Malaysia</span>
-                                        </div>
-                                    </div>
-                                    <div class="experience-description">
-                                        Developed native Android applications and cross-platform mobile solutions.
-                                    </div>
-                                    <div class="experience-highlights">
-                                        <ul>
-                                            <li>Developed native Android applications using Java</li>
-                                            <li>Built React Native mobile solutions for cross-platform support</li>
-                                            <li>Implemented backend integration using PHP and MySQLi</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="slide" id="education" aria-label="Education">
-                <div class="slide-content">
-                    <div class="education-section">
-                        <div class="education-container">
-                            <h2 class="section-title">Education</h2>
-                            <div class="education-timeline">
-                                <div class="education-item">
-                                    <div class="education-header">
-                                        <div class="education-degree">Diploma in Information Technology</div>
-                                        <div class="education-school">Politeknik Tuanku Syed Sirajuddin</div>
-                                        <div class="education-meta">
-                                            <span class="education-date">2015 – 2019</span>
-                                            <span class="education-location">Perlis, Malaysia</span>
-                                        </div>
-                                    </div>
-                                    <div class="education-description">
-                                        Comprehensive study of software development, database management, and network administration.
-                                    </div>
-                                    <div class="education-highlights">
-                                        <ul>
-                                            <li>Specialized in web development and mobile application programming</li>
-                                            <li>Completed final year project on inventory management system</li>
-                                            <li>Maintained excellent academic performance throughout the program</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="slide" id="projects" aria-label="Projects">
-                <div class="slide-content">
-                    <div class="projects-section">
-                        <div class="projects-container">
-                            <div class="projects-header">
-                                <h2 class="section-title">Projects</h2>
-                            </div>
-                            
-                            <div class="projects-scroll" id="projects-container">
-                                <!-- Projects will be dynamically loaded here -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="slide" id="contact" aria-label="Contact">
-                <div class="slide-content">
-                    <div class="contact-section">
-                        <div class="contact-container">
-                            <h2 class="section-title">Contact</h2>
-                            <div class="contact-content">
-                                <div class="contact-form" id="contactForm">
-                                    <h3>Get In Touch</h3>
-                                    <div class="form-group">
-                                        <input aria-label="Name" id="contactName" type="text" placeholder="Your name" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <input aria-label="Email" id="contactEmail" type="email" placeholder="Your email" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <textarea aria-label="Message" id="contactMessage" placeholder="Your message" required></textarea>
-                                    </div>
-                                    <button type="button" class="contact-button" id="sendMessageBtn">Send Message</button>
-                                </div>
-                                <div class="contact-info">
-                                    <h3>Contact Information</h3>
-                                    <div class="contact-item">
-                                        <div class="contact-icon">📧</div>
-                                        <div class="contact-details">
-                                            <div class="contact-label">Email</div>
-                                            <div class="contact-value">muhammadsyafiq1102@gmail.com</div>
-                                        </div>
-                                    </div>
-                                    <div class="contact-item">
-                                        <div class="contact-icon">📱</div>
-                                        <div class="contact-details">
-                                            <div class="contact-label">Phone</div>
-                                            <div class="contact-value">+60 11-1464-8597</div>
-                                        </div>
-                                    </div>
-                                    <div class="contact-item">
-                                        <div class="contact-icon">💼</div>
-                                        <div class="contact-details">
-                                            <div class="contact-label">LinkedIn</div>
-                                            <div class="contact-value">muhammadsyafiq97</div>
-                                        </div>
-                                    </div>
-                                    <div class="contact-item">
-                                        <div class="contact-icon">🐙</div>
-                                        <div class="contact-details">
-                                            <div class="contact-label">GitHub</div>
-                                            <div class="contact-value">noobster97</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <p>&copy; 2025 Muhammad Syafiq. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <!-- Section Indicators -->
-    <div class="section-indicators">
-        <div class="indicator active" data-slide="0"></div>
-        <div class="indicator" data-slide="1"></div>
-        <div class="indicator" data-slide="2"></div>
-        <div class="indicator" data-slide="3"></div>
-        <div class="indicator" data-slide="4"></div>
-        <div class="indicator" data-slide="5"></div>
+            </div>
+        </section>
     </div>
 
-    <!-- Slide Progress -->
-    <div class="slide-progress">
-        <div class="progress-bar"></div>
-    </div>
+    <a href="https://wa.me/601114648597?text=Hi%20Syafiq,%20I'm%20interested%20in%20your%20services." target="_blank"
+        class="floating-whatsapp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
 
-    <!-- Cursor -->
-    <div class="cursor"></div>
-    <div class="cursor-follower"></div>
+    <!-- Bottom Navigation for Mobile -->
+    <nav class="bottom-nav">
+        <a href="#home" class="nav-item active">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="#services" class="nav-item">
+            <i class="fas fa-layer-group"></i>
+            <span>Services</span>
+        </a>
+        <a href="#projects" class="nav-item">
+            <i class="fas fa-briefcase"></i>
+            <span>Projects</span>
+        </a>
+        <a href="#contact" class="nav-item">
+            <i class="fas fa-envelope"></i>
+            <span>Contact</span>
+        </a>
+    </nav>
 
-    <script src="js/main.js?v=6"></script>
+    <script src="script.js"></script>
 </body>
+
 </html>
-
-
