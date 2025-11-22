@@ -1,3 +1,35 @@
+// --- Typing Animation ---
+const textPart1 = "Turning Ideas into ";
+const textPart2 = "Digital Reality";
+const typingElement = document.getElementById("typing-text");
+const typingDelay = 100;
+let charIndex = 0;
+let isPart1Done = false;
+
+function typeWriter() {
+    if (!typingElement) return;
+
+    if (!isPart1Done) {
+        if (charIndex < textPart1.length) {
+            typingElement.innerHTML += textPart1.charAt(charIndex);
+            charIndex++;
+            setTimeout(typeWriter, typingDelay);
+        } else {
+            isPart1Done = true;
+            charIndex = 0;
+            typingElement.innerHTML += "<br><span class='gradient-text' id='gradient-part'></span>";
+            setTimeout(typeWriter, typingDelay);
+        }
+    } else {
+        const gradientPart = document.getElementById('gradient-part');
+        if (gradientPart && charIndex < textPart2.length) {
+            gradientPart.innerHTML += textPart2.charAt(charIndex);
+            charIndex++;
+            setTimeout(typeWriter, typingDelay);
+        }
+    }
+}
+
 // --- Spotlight Effect ---
 const spotlightCards = document.querySelectorAll('.spotlight-card');
 document.addEventListener('mousemove', (e) => {
@@ -169,4 +201,9 @@ window.addEventListener('scroll', () => {
             item.classList.add('active');
         }
     });
+});
+
+// Initialize Typing Animation
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(typeWriter, 500);
 });
