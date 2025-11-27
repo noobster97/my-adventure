@@ -146,9 +146,36 @@
                             <h3>Event Management System</h3>
                         </div>
                         <div class="stack-content">
-                            <div class="project-visual gradient-1"></div>
+                            <div class="project-visual gradient-1 project-visual-carousel">
+                                <div class="carousel-container">
+                                    <div class="carousel-slide active">
+                                        <img src="event.jpeg" alt="Event Management System" data-index="0">
+                                        <span class="image-label">Event System</span>
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <img src="event.png" alt="Event Management Dashboard" data-index="1">
+                                        <span class="image-label">Dashboard</span>
+                                    </div>
+                                </div>
+                                <button class="carousel-btn carousel-prev" aria-label="Previous image">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="carousel-btn carousel-next" aria-label="Next image">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                                <div class="carousel-indicators">
+                                    <span class="indicator active" data-slide="0"></span>
+                                    <span class="indicator" data-slide="1"></span>
+                                </div>
+                                <div class="carousel-badge">
+                                    <i class="fas fa-images"></i> 2 Images
+                                </div>
+                            </div>
                             <div class="project-details">
-                                <span class="project-cat">Web System</span>
+                                <div class="project-meta">
+                                    <span class="project-cat">Web System</span>
+                                    <span class="project-industry">General</span>
+                                </div>
                                 <p>A comprehensive platform that simplified event organization, handling registration,
                                     ticketing, and analytics for a major local organizer.</p>
                                 <a href="#" class="project-link">View Case Study <i class="fas fa-arrow-right"></i></a>
@@ -161,9 +188,36 @@
                             <h3>Online Retail Store</h3>
                         </div>
                         <div class="stack-content">
-                            <div class="project-visual gradient-2"></div>
+                            <div class="project-visual gradient-2 project-visual-carousel">
+                                <div class="carousel-container">
+                                    <div class="carousel-slide active">
+                                        <img src="ecommerce.jpeg" alt="Online Retail Store" data-index="0">
+                                        <span class="image-label">E-Commerce Store</span>
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <img src="ecommerce.png" alt="E-Commerce Dashboard" data-index="1">
+                                        <span class="image-label">Dashboard</span>
+                                    </div>
+                                </div>
+                                <button class="carousel-btn carousel-prev" aria-label="Previous image">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="carousel-btn carousel-next" aria-label="Next image">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                                <div class="carousel-indicators">
+                                    <span class="indicator active" data-slide="0"></span>
+                                    <span class="indicator" data-slide="1"></span>
+                                </div>
+                                <div class="carousel-badge">
+                                    <i class="fas fa-images"></i> 2 Images
+                                </div>
+                            </div>
                             <div class="project-details">
-                                <span class="project-cat">E-Commerce</span>
+                                <div class="project-meta">
+                                    <span class="project-cat">E-Commerce</span>
+                                    <span class="project-industry">Retail</span>
+                                </div>
                                 <p>A full-featured e-commerce solution with secure payment integration, inventory
                                     management, and a seamless checkout process.</p>
                                 <a href="#" class="project-link">View Case Study <i class="fas fa-arrow-right"></i></a>
@@ -173,15 +227,41 @@
                     <div class="project-card-stack" data-index="2">
                         <div class="stack-header">
                             <span class="stack-number">03</span>
-                            <h3>Investment Tracker</h3>
+                            <h3>Cooperative Web System</h3>
                         </div>
                         <div class="stack-content">
-                            <div class="project-visual gradient-3"></div>
+                            <div class="project-visual gradient-3 project-visual-carousel">
+                                <div class="carousel-container">
+                                    <div class="carousel-slide active">
+                                        <img src="aimskoop.jpeg" alt="Koperasi AIMS Pulau Pinang Berhad Web System" data-index="0">
+                                        <span class="image-label">System View</span>
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <img src="aimskoopdashboard.png" alt="Koperasi AIMS Dashboard" data-index="1">
+                                        <span class="image-label">Dashboard</span>
+                                    </div>
+                                </div>
+                                <button class="carousel-btn carousel-prev" aria-label="Previous image">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="carousel-btn carousel-next" aria-label="Next image">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                                <div class="carousel-indicators">
+                                    <span class="indicator active" data-slide="0"></span>
+                                    <span class="indicator" data-slide="1"></span>
+                                </div>
+                                <div class="carousel-badge">
+                                    <i class="fas fa-images"></i> 2 Images
+                                </div>
+                            </div>
                             <div class="project-details">
-                                <span class="project-cat">FinTech App</span>
-                                <p>A secure mobile application allowing users to track their portfolio performance in
-                                    real-time with intuitive data visualization.</p>
-                                <a href="#" class="project-link">View Case Study <i class="fas fa-arrow-right"></i></a>
+                                <div class="project-meta">
+                                    <span class="project-cat">Web System</span>
+                                    <span class="project-industry">Club/Cooperative</span>
+                                </div>
+                                <p>A comprehensive cooperative management system developed for Koperasi AIMS Pulau Pinang Berhad, streamlining operations and member services with modern web technologies.</p>
+                                <a href="https://www.aimskoop.com.my" target="_blank" class="project-link">Visit Website <i class="fas fa-arrow-right"></i></a>
                             </div>
                         </div>
                     </div>
@@ -233,6 +313,25 @@
             <span>Contact</span>
         </a>
     </nav>
+
+    <!-- Image Modal Lightbox -->
+    <div class="image-modal" id="imageModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" aria-label="Close modal">
+                <i class="fas fa-times"></i>
+            </button>
+            <button class="modal-nav modal-prev" aria-label="Previous image">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="modal-nav modal-next" aria-label="Next image">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <img src="" alt="" id="modalImage">
+            <div class="modal-caption" id="modalCaption"></div>
+            <div class="modal-indicators" id="modalIndicators"></div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

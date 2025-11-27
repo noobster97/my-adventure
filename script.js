@@ -206,4 +206,173 @@ window.addEventListener('scroll', () => {
 // Initialize Typing Animation
 document.addEventListener("DOMContentLoaded", () => {
     setTimeout(typeWriter, 500);
+    initImageCarousel();
+    initImageModal();
 });
+
+// --- Image Carousel Functionality ---
+function initImageCarousel() {
+    const carousels = document.querySelectorAll('.project-visual-carousel');
+    
+    carousels.forEach(carousel => {
+        const slides = carousel.querySelectorAll('.carousel-slide');
+        const prevBtn = carousel.querySelector('.carousel-prev');
+        const nextBtn = carousel.querySelector('.carousel-next');
+        const indicators = carousel.querySelectorAll('.carousel-indicators .indicator');
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            indicators.forEach((indicator, i) => {
+                indicator.classList.toggle('active', i === index);
+            });
+            currentSlide = index;
+        }
+
+        function nextSlide() {
+            const next = (currentSlide + 1) % slides.length;
+            showSlide(next);
+        }
+
+        function prevSlide() {
+            const prev = (currentSlide - 1 + slides.length) % slides.length;
+            showSlide(prev);
+        }
+
+        if (nextBtn) nextBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            nextSlide();
+        });
+
+        if (prevBtn) prevBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            prevSlide();
+        });
+
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showSlide(index);
+            });
+        });
+
+        // Auto-play (optional - can be removed if not needed)
+        // setInterval(nextSlide, 5000);
+
+        // Click on carousel to open modal
+        carousel.addEventListener('click', (e) => {
+            if (!e.target.closest('.carousel-btn') && !e.target.closest('.carousel-indicators')) {
+                openModal(carousel, currentSlide);
+            }
+        });
+
+        // Touch/swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        carousel.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        carousel.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    nextSlide(); // Swipe left - next
+                } else {
+                    prevSlide(); // Swipe right - previous
+                }
+            }
+        }
+    });
+}
+
+// --- Image Modal Functionality ---
+function initImageModal() {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const modalCaption = document.getElementById('modalCaption');
+    const modalClose = modal.querySelector('.modal-close');
+    const modalPrev = modal.querySelector('.modal-prev');
+    const modalNext = modal.querySelector('.modal-next');
+    const modalIndicators = document.getElementById('modalIndicators');
+
+    let currentImages = [];
+    let currentIndex = 0;
+
+    function openModal(carousel, startIndex = 0) {
+        const slides = carousel.querySelectorAll('.carousel-slide img');
+        currentImages = Array.from(slides).map(slide => ({
+            src: slide.src,
+            alt: slide.alt,
+            label: slide.closest('.carousel-slide').querySelector('.image-label')?.textContent || ''
+        }));
+        currentIndex = startIndex;
+        updateModal();
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function updateModal() {
+        if (currentImages.length === 0) return;
+        
+        const current = currentImages[currentIndex];
+        modalImage.src = current.src;
+        modalImage.alt = current.alt;
+        modalCaption.textContent = current.label;
+
+        // Update indicators
+        modalIndicators.innerHTML = '';
+        currentImages.forEach((_, index) => {
+            const indicator = document.createElement('span');
+            indicator.className = `indicator ${index === currentIndex ? 'active' : ''}`;
+            indicator.addEventListener('click', () => {
+                currentIndex = index;
+                updateModal();
+            });
+            modalIndicators.appendChild(indicator);
+        });
+    }
+
+    function nextImage() {
+        currentIndex = (currentIndex + 1) % currentImages.length;
+        updateModal();
+    }
+
+    function prevImage() {
+        currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
+        updateModal();
+    }
+
+    if (modalClose) modalClose.addEventListener('click', closeModal);
+    if (modalPrev) modalPrev.addEventListener('click', prevImage);
+    if (modalNext) modalNext.addEventListener('click', nextImage);
+
+    modal.querySelector('.modal-overlay').addEventListener('click', closeModal);
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (!modal.classList.contains('active')) return;
+        
+        if (e.key === 'Escape') closeModal();
+        if (e.key === 'ArrowLeft') prevImage();
+        if (e.key === 'ArrowRight') nextImage();
+    });
+
+    // Make openModal available globally
+    window.openModal = openModal;
+}
