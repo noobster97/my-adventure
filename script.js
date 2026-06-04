@@ -160,7 +160,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // --- Reveal Animations ---
-const revealElements = document.querySelectorAll('.section-title, .bento-card, .project-card-stack, .skill-pill, .hero-content > *, .cta-box');
+const revealElements = document.querySelectorAll('.section-title, .bento-card, .experience-card, .achievement-strip, .work-card, .project-card-stack, .skill-pill, .hero-content > *, .cta-box');
 
 const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -224,6 +224,14 @@ function initImageCarousel() {
         function showSlide(index) {
             slides.forEach((slide, i) => {
                 slide.classList.toggle('active', i === index);
+                const video = slide.querySelector('video');
+                if (!video) return;
+
+                if (i === index) {
+                    video.play().catch(() => {});
+                } else {
+                    video.pause();
+                }
             });
             indicators.forEach((indicator, i) => {
                 indicator.classList.toggle('active', i === index);
@@ -293,6 +301,8 @@ function initImageCarousel() {
                 }
             }
         }
+
+        showSlide(0);
     });
 }
 
@@ -300,6 +310,7 @@ function initImageCarousel() {
 function initImageModal() {
     const modal = document.getElementById('imageModal');
     const modalImage = document.getElementById('modalImage');
+    const modalVideo = document.getElementById('modalVideo');
     const modalCaption = document.getElementById('modalCaption');
     const modalClose = modal.querySelector('.modal-close');
     const modalPrev = modal.querySelector('.modal-prev');
@@ -310,12 +321,15 @@ function initImageModal() {
     let currentIndex = 0;
 
     function openModal(carousel, startIndex = 0) {
-        const slides = carousel.querySelectorAll('.carousel-slide img');
-        currentImages = Array.from(slides).map(slide => ({
-            src: slide.src,
-            alt: slide.alt,
-            label: slide.closest('.carousel-slide').querySelector('.image-label')?.textContent || ''
+        const slides = carousel.querySelectorAll('.carousel-slide img, .carousel-slide video');
+        currentImages = Array.from(slides).map(media => ({
+            type: media.tagName.toLowerCase(),
+            src: media.currentSrc || media.src,
+            alt: media.alt || media.getAttribute('aria-label') || '',
+            label: media.closest('.carousel-slide').querySelector('.image-label')?.textContent || ''
         }));
+        if (currentImages.length === 0) return;
+
         currentIndex = startIndex;
         updateModal();
         modal.classList.add('active');
@@ -324,6 +338,7 @@ function initImageModal() {
 
     function closeModal() {
         modal.classList.remove('active');
+        modalVideo.pause();
         document.body.style.overflow = '';
     }
 
@@ -331,8 +346,22 @@ function initImageModal() {
         if (currentImages.length === 0) return;
         
         const current = currentImages[currentIndex];
-        modalImage.src = current.src;
-        modalImage.alt = current.alt;
+        if (current.type === 'video') {
+            modalImage.hidden = true;
+            modalImage.removeAttribute('src');
+            modalVideo.hidden = false;
+            modalVideo.src = current.src;
+            modalVideo.setAttribute('aria-label', current.alt);
+            modalVideo.load();
+            modalVideo.play().catch(() => {});
+        } else {
+            modalVideo.pause();
+            modalVideo.hidden = true;
+            modalVideo.removeAttribute('src');
+            modalImage.hidden = false;
+            modalImage.src = current.src;
+            modalImage.alt = current.alt;
+        }
         modalCaption.textContent = current.label;
 
         // Update indicators
