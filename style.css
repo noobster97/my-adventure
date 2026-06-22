@@ -439,15 +439,31 @@ body {
 }
 
 .skill-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
     background: var(--bg-card);
     border: 2px solid var(--primary);
-    padding: 0.5rem 1.5rem;
+    padding: 0.5rem 1.25rem;
     border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
     font-size: 1.1rem;
     color: var(--text-light);
     font-family: var(--font-heading);
     transition: all 0.3s ease;
     box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+}
+
+.skill-ico {
+    width: 1.05em;
+    height: 1.05em;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+.skill-ico-fa {
+    font-size: 1em;
+    color: var(--primary);
+    flex-shrink: 0;
 }
 
 .skill-pill:hover {
