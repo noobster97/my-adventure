@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Muhammad Syafiq | Software Developer</title>
     <meta name="description"
         content="Portfolio and rate card of Muhammad Syafiq bin Md Asri, a Malaysian Software Developer with 6+ years building business systems, SaaS platforms, websites, and mobile apps.">
@@ -52,19 +52,27 @@
     <div class="container">
         <nav class="navbar">
             <div class="container">
-                    <a href="#home" class="logo">Syafiq<span class="dot">.</span></a>
+                <a href="#/" class="logo">Syafiq<span class="dot">.</span></a>
                 <div class="nav-links">
-                    <a href="#home">Home</a>
-                    <a href="#services">Services</a>
-                    <a href="#experience">Experience</a>
-                    <a href="#projects">Work</a>
-                    <a href="#rates">Rates</a>
-                    <a href="#contact">Contact</a>
+                    <a href="#/" data-nav="home">Home</a>
+                    <a href="#/work" data-nav="work">Work</a>
+                    <a href="#/rates" data-nav="rates">Rates</a>
+                    <a href="#/about" data-nav="about">About</a>
+                    <a href="#/contact" data-nav="contact" class="nav-cta">Let's Talk</a>
                 </div>
                 <!-- Mobile Menu Btn handled by bottom nav -->
             </div>
         </nav>
 
+
+
+
+
+
+
+
+        <main id="app">
+            <div class="view" data-view="home" data-title="Muhammad Syafiq | Software Developer">
         <!-- Hero Section -->
         <section id="home" class="hero">
             <div class="container">
@@ -79,11 +87,10 @@
                         systems. I build business systems, SaaS platforms, mobile apps, and payment-ready websites
                         with Laravel, PHP, and modern JavaScript, practical, polished, and built to scale.</p>
                     <div class="hero-btns">
-                        <a href="#contact" class="btn-primary">Get in Touch <i class="fas fa-paper-plane"></i></a>
-                        <a href="#projects" class="btn-secondary">View Portfolio</a>
-                        <a href="#rates" class="btn-secondary">See Rates <i class="fas fa-tags"></i></a>
-                        <a href="muhammad-syafiq-resume.pdf" class="btn-secondary" download>Download Resume <i class="fas fa-download"></i></a>
+                        <a href="#/rates" class="btn-primary">See Rates &amp; Get a Quote <i class="fas fa-arrow-right"></i></a>
+                        <a href="#/work" class="btn-secondary">View My Work</a>
                     </div>
+                    <a href="muhammad-syafiq-resume.pdf" class="hero-resume" download><i class="fas fa-file-arrow-down"></i> Download resume (PDF)</a>
                     <div class="stats-row">
                         <div class="stat-item">
                             <span class="stat-number">6+</span>
@@ -98,6 +105,29 @@
                             <span class="stat-label">Users Served</span>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick links: one tap to every page -->
+        <section class="section quick-section" aria-label="Explore">
+            <div class="container">
+                <div class="quick-grid">
+                    <a href="#/work" class="quick-card">
+                        <span class="quick-icon"><i class="fas fa-briefcase"></i></span>
+                        <span class="quick-text"><strong>My Work</strong><small>SaaS, web systems &amp; apps I've shipped</small></span>
+                        <i class="fas fa-arrow-right quick-arrow"></i>
+                    </a>
+                    <a href="#/rates" class="quick-card is-hot">
+                        <span class="quick-icon"><i class="fas fa-tags"></i></span>
+                        <span class="quick-text"><strong>Rate Card</strong><small>Websites from RM 800 &middot; instant estimate</small></span>
+                        <i class="fas fa-arrow-right quick-arrow"></i>
+                    </a>
+                    <a href="#/about" class="quick-card">
+                        <span class="quick-icon"><i class="fas fa-id-badge"></i></span>
+                        <span class="quick-text"><strong>About Me</strong><small>Experience, results &amp; resume</small></span>
+                        <i class="fas fa-arrow-right quick-arrow"></i>
+                    </a>
                 </div>
             </div>
         </section>
@@ -177,61 +207,9 @@
                 </div>
             </div>
         </section>
-
-        <!-- Experience Section -->
-        <section id="experience" class="section experience-section">
-            <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">Experience Snapshot</h2>
-                    <p class="section-subtitle">Resume-backed work across web systems, APIs, mobile apps, and infrastructure.</p>
-                </div>
-
-                <div class="experience-grid">
-                    <div class="experience-card spotlight-card current">
-                        <span class="experience-period"><span class="live-dot" aria-hidden="true"></span> Jul 2026 - Present</span>
-                        <h3>Software Developer</h3>
-                        <p class="experience-company">GEITNA Network Sdn Bhd</p>
-                        <p>Building a marketing &amp; sales team management system (pure PHP + PostgreSQL) with role-based
-                            access and payment gateway collection, plus queue management for a clinic/panel system used by
-                            clinics across Malaysia, on Microsoft Azure and local servers.</p>
-                    </div>
-                    <div class="experience-card spotlight-card">
-                        <span class="experience-period">2024 - 2026</span>
-                        <h3>Full Stack Developer</h3>
-                        <p class="experience-company">Murtadha Dakwah Center (MADAD)</p>
-                        <p>Migrated legacy systems to Laravel with Filament v3 admin panels; built attendance (Android +
-                            web), hall and restaurant booking, pet care, and education management systems.</p>
-                    </div>
-                    <div class="experience-card spotlight-card">
-                        <span class="experience-period">2022 - 2024</span>
-                        <h3>Back End Developer</h3>
-                        <p class="experience-company">Applink Solutions</p>
-                        <p>Built Laravel/PHP backends and RESTful APIs for web and mobile apps, optimized MySQL queries,
-                            and shipped React Native + Expo apps.</p>
-                    </div>
-                    <div class="experience-card spotlight-card">
-                        <span class="experience-period">2020 - 2022</span>
-                        <h3>Assistant Executive Officer - IT</h3>
-                        <p class="experience-company">Lembaga Hasil Dalam Negeri</p>
-                        <p>Developed the Hasil Transformation System on OutSystems, maintained network infrastructure,
-                            and supported 5G research and rollout projects.</p>
-                    </div>
-                    <div class="experience-card spotlight-card">
-                        <span class="experience-period">2019</span>
-                        <h3>Mobile App Developer</h3>
-                        <p class="experience-company">Skynue Sdn Bhd</p>
-                        <p>Developed native Android (Java) and React Native apps integrated with PHP + MySQLi backends.</p>
-                    </div>
-                </div>
-
-                <div class="achievement-strip">
-                    <span><strong>40%</strong> efficiency improvement from attendance system work</span>
-                    <span><strong>99.9%</strong> API uptime target in backend delivery</span>
-                    <span><strong>15+</strong> full stack projects delivered end to end</span>
-                </div>
             </div>
-        </section>
 
+            <div class="view" data-view="work" data-title="Work | Muhammad Syafiq" hidden>
         <!-- Projects Section -->
         <section id="projects" class="section">
             <div class="container">
@@ -505,7 +483,12 @@
                 </div>
             </div>
         </section>
+        <div class="container">
+            <a href="#/rates" class="next-page"><span><small>Like what you see?</small>See rates &amp; get a quote</span><i class="fas fa-arrow-right"></i></a>
+        </div>
+            </div>
 
+            <div class="view" data-view="rates" data-title="Rate Card | Muhammad Syafiq" hidden>
         <!-- Rate Card Section (content rendered from data/rate-card.json by rate-card.js) -->
         <section id="rates" class="section rates-section">
             <span class="rc-doodle d1" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 4l5.5 12.5L43 18l-10 9.5 2.8 13.5L24 34.5 12.2 41l2.8-13.5L5 18l13.5-1.5z"/></svg></span>
@@ -519,7 +502,69 @@
                 </noscript>
             </div>
         </section>
+            </div>
 
+            <div class="view" data-view="about" data-title="About | Muhammad Syafiq" hidden>
+        <!-- Experience Section -->
+        <section id="experience" class="section experience-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Experience Snapshot</h2>
+                    <p class="section-subtitle">6+ years across government, private sector, healthcare, and NGO systems.</p>
+                    <a href="muhammad-syafiq-resume.pdf" class="btn-secondary section-action" download><i class="fas fa-file-arrow-down"></i> Download Resume</a>
+                </div>
+
+                <div class="experience-grid">
+                    <div class="experience-card spotlight-card current">
+                        <span class="experience-period"><span class="live-dot" aria-hidden="true"></span> Jul 2026 - Present</span>
+                        <h3>Software Developer</h3>
+                        <p class="experience-company">GEITNA Network Sdn Bhd</p>
+                        <p>Building a marketing &amp; sales team management system (pure PHP + PostgreSQL) with role-based
+                            access and payment gateway collection, plus queue management for a clinic/panel system used by
+                            clinics across Malaysia, on Microsoft Azure and local servers.</p>
+                    </div>
+                    <div class="experience-card spotlight-card">
+                        <span class="experience-period">2024 - 2026</span>
+                        <h3>Full Stack Developer</h3>
+                        <p class="experience-company">Murtadha Dakwah Center (MADAD)</p>
+                        <p>Migrated legacy systems to Laravel with Filament v3 admin panels; built attendance (Android +
+                            web), hall and restaurant booking, pet care, and education management systems.</p>
+                    </div>
+                    <div class="experience-card spotlight-card">
+                        <span class="experience-period">2022 - 2024</span>
+                        <h3>Back End Developer</h3>
+                        <p class="experience-company">Applink Solutions</p>
+                        <p>Built Laravel/PHP backends and RESTful APIs for web and mobile apps, optimized MySQL queries,
+                            and shipped React Native + Expo apps.</p>
+                    </div>
+                    <div class="experience-card spotlight-card">
+                        <span class="experience-period">2020 - 2022</span>
+                        <h3>Assistant Executive Officer - IT</h3>
+                        <p class="experience-company">Lembaga Hasil Dalam Negeri</p>
+                        <p>Developed the Hasil Transformation System on OutSystems, maintained network infrastructure,
+                            and supported 5G research and rollout projects.</p>
+                    </div>
+                    <div class="experience-card spotlight-card">
+                        <span class="experience-period">2019</span>
+                        <h3>Mobile App Developer</h3>
+                        <p class="experience-company">Skynue Sdn Bhd</p>
+                        <p>Developed native Android (Java) and React Native apps integrated with PHP + MySQLi backends.</p>
+                    </div>
+                </div>
+
+                <div class="achievement-strip">
+                    <span><strong>40%</strong> efficiency improvement from attendance system work</span>
+                    <span><strong>99.9%</strong> API uptime target in backend delivery</span>
+                    <span><strong>15+</strong> full stack projects delivered end to end</span>
+                </div>
+            </div>
+        </section>
+        <div class="container">
+            <a href="#/contact" class="next-page"><span><small>Next</small>Let's talk about your project</span><i class="fas fa-arrow-right"></i></a>
+        </div>
+            </div>
+
+            <div class="view" data-view="contact" data-title="Contact | Muhammad Syafiq" hidden>
         <!-- Contact Section -->
         <section id="contact" class="section contact-section">
             <div class="container">
@@ -530,7 +575,7 @@
                         <a href="mailto:muhammadsyafiq1102@gmail.com" class="btn-primary large-btn">
                             <i class="fas fa-envelope"></i> Email Me
                         </a>
-                        <a href="#rates" class="btn-secondary large-btn">
+                        <a href="#/rates" class="btn-secondary large-btn">
                             <i class="fas fa-tags"></i> View Rate Card
                         </a>
                         <a href="muhammad-syafiq-resume.pdf" class="btn-secondary large-btn" download>
@@ -541,9 +586,16 @@
                             <i class="fab fa-whatsapp"></i> WhatsApp Me
                         </a>
                     </div>
+                    <ul class="contact-facts">
+                        <li><i class="fas fa-location-dot"></i> Sungai Petani, Kedah &middot; remote across Malaysia</li>
+                        <li><i class="fas fa-clock"></i> Usually replies within 24 hours</li>
+                        <li><i class="fas fa-comments"></i> Bahasa Melayu &amp; English</li>
+                    </ul>
                 </div>
             </div>
         </section>
+            </div>
+        </main>
 
         <footer class="site-footer">
             <p>&copy; <span id="year">2026</span> Muhammad Syafiq Md Asri &middot; Sungai Petani, Kedah</p>
@@ -561,29 +613,26 @@
     </a>
 
     <!-- Bottom Navigation for Mobile -->
-    <nav class="bottom-nav">
-        <a href="#home" class="nav-item active">
-            <i class="fas fa-home"></i>
+    <nav class="bottom-nav" aria-label="Pages">
+        <span class="nav-indicator" aria-hidden="true"></span>
+        <a href="#/" class="nav-item" data-nav="home">
+            <i class="fas fa-house"></i>
             <span>Home</span>
         </a>
-        <a href="#services" class="nav-item">
-            <i class="fas fa-layer-group"></i>
-            <span>Services</span>
-        </a>
-        <a href="#experience" class="nav-item">
-            <i class="fas fa-id-badge"></i>
-            <span>Exp.</span>
-        </a>
-        <a href="#projects" class="nav-item">
+        <a href="#/work" class="nav-item" data-nav="work">
             <i class="fas fa-briefcase"></i>
             <span>Work</span>
         </a>
-        <a href="#rates" class="nav-item">
+        <a href="#/rates" class="nav-item" data-nav="rates">
             <i class="fas fa-tags"></i>
             <span>Rates</span>
         </a>
-        <a href="#contact" class="nav-item">
-            <i class="fas fa-envelope"></i>
+        <a href="#/about" class="nav-item" data-nav="about">
+            <i class="fas fa-user"></i>
+            <span>About</span>
+        </a>
+        <a href="#/contact" class="nav-item" data-nav="contact">
+            <i class="fas fa-paper-plane"></i>
             <span>Contact</span>
         </a>
     </nav>
@@ -608,6 +657,7 @@
         </div>
     </div>
 
+    <script type="module" src="router.js"></script>
     <script type="module" src="script.js"></script>
     <script type="module" src="rate-card.js"></script>
 </body>

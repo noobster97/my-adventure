@@ -1,6 +1,7 @@
 // --- Rate Card PDF ---
-// Draws a vector A4 rate card with jsPDF (loaded on demand from cdnjs), using
+// Draws a clean A4 price list with jsPDF (loaded on demand from cdnjs), using
 // the same JSON as the page so the download never drifts from the website.
+// Page 1 is the price list; a visitor's estimate gets its own quote page.
 
 import { convert, formatDate, formatNumber, isRecurring, unitOf } from './rate-card.js';
 
@@ -9,9 +10,11 @@ const JSPDF_URL = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.
 const INK = [44, 62, 80];
 const RED = [231, 76, 60];
 const YELLOW = [241, 196, 15];
-const STICKY = [254, 249, 195];
-const DIM = [127, 140, 141];
-const LINE = [214, 219, 223];
+const HIGHLIGHT = [255, 251, 219];
+const DIM = [118, 130, 140];
+const LINE = [225, 229, 233];
+const HEAD_BG = [244, 246, 248];
+const WHITE = [255, 255, 255];
 
 let jsPdfPromise;
 function loadJsPdf() {
@@ -40,253 +43,279 @@ export async function downloadRateCardPdf(data, { currency, summary } = {}) {
     const meta = data.meta || {};
     const W = 210;
     const H = 297;
-    const M = 16;
-    const contentW = W - M * 2;
-    const money = (value) => `${currency.approx ? '~' : ''}${currency.symbol} ${formatNumber(convert(value, currency))}`;
+    const M = 15;
+    const CW = W - M * 2;
+    const BOTTOM = H - 13;
+    const approx = currency.approx ? '~' : '';
+    const money = (value) => `${approx}${currency.symbol} ${formatNumber(value)}`;
+    const phone = meta.whatsapp ? `+${meta.whatsapp.replace(/^(\d{2})(\d{2})(\d{4})(\d+)$/, '$1 $2-$3 $4')}` : '';
     let y = 0;
 
-    const setColor = (rgb) => doc.setTextColor(...rgb);
-    const font = (style = 'normal', size = 9) => { doc.setFont('helvetica', style); doc.setFontSize(size); };
-    const ensure = (needed) => {
-        if (y + needed > H - 18) {
-            doc.addPage();
-            y = 18;
-        }
+    const font = (style, size, color = INK) => {
+        doc.setFont('helvetica', style);
+        doc.setFontSize(size);
+        doc.setTextColor(...color);
+    };
+    const textW = (text, size) => doc.getStringUnitWidth(text) * size / doc.internal.scaleFactor;
+    const hr = (yy, color = LINE, width = 0.25) => {
+        doc.setDrawColor(...color);
+        doc.setLineWidth(width);
+        doc.line(M, yy, W - M, yy);
     };
 
-    // Header band
-    doc.setFillColor(...INK);
-    doc.rect(0, 0, W, 40, 'F');
-    doc.setFillColor(...YELLOW);
-    doc.rect(0, 40, W, 2.2, 'F');
-    font('bold', 26);
-    setColor([255, 255, 255]);
-    doc.text(pdfText((meta.title || 'Rate Card').toUpperCase()), M, 19);
-    font('normal', 11);
-    doc.text(pdfText([meta.owner, meta.role].filter(Boolean).join('  |  ')), M, 27);
-    font('normal', 8.5);
-    doc.setTextColor(220, 226, 230);
-    const phone = meta.whatsapp ? `+${meta.whatsapp.replace(/^(\d{2})(\d{2})(\d{4})(\d+)$/, '$1 $2-$3 $4')}` : '';
-    [meta.email, phone, meta.website].filter(Boolean).forEach((line, i) => {
-        doc.text(pdfText(line), W - M, 15 + i * 5.5, { align: 'right' });
-    });
-    font('normal', 8);
-    doc.setTextColor(200, 208, 214);
-    const dates = [
-        meta.updated && `Updated ${formatDate(meta.updated)}`,
-        meta.validUntil && `Valid until ${formatDate(meta.validUntil)}`,
-        currency.approx && `Prices converted from ${meta.currency} at ${meta.secondaryCurrency.rate}`
-    ].filter(Boolean).join('   |   ');
-    doc.text(pdfText(dates), M, 34.5);
+    // Column layout for package tables
+    const COL = {
+        name: M + 3,
+        incl: M + 46,
+        inclW: 80,
+        time: M + 130,
+        price: W - M - 3
+    };
 
-    y = 50;
-    if (meta.subtitle) {
-        font('italic', 10);
-        setColor(DIM);
-        const lines = doc.splitTextToSize(pdfText(meta.subtitle), contentW);
-        doc.text(lines, M, y);
-        y += lines.length * 4.6 + 3;
+    function header(title, sub) {
+        doc.setFillColor(...INK);
+        doc.rect(0, 0, W, 27, 'F');
+        doc.setFillColor(...YELLOW);
+        doc.rect(0, 27, W, 1.5, 'F');
+        font('bold', 20, WHITE);
+        doc.text(pdfText(title), M, 13);
+        font('normal', 9.5, [214, 222, 228]);
+        doc.text(pdfText(sub), M, 20);
+        font('normal', 8.5, WHITE);
+        [meta.email, phone, meta.website].filter(Boolean).forEach((line, i) => {
+            doc.text(pdfText(line), W - M, 9.5 + i * 4.8, { align: 'right' });
+        });
+        y = 37;
     }
 
-    // Compact price list: categories in a 2-column grid, one row per package
-    const gap = 8;
-    const colW = (contentW - gap) / 2;
-    const categories = (data.categories || []).filter((c) => (c.packages || []).length);
+    function ensure(needed, onNewPage) {
+        if (y + needed <= BOTTOM) return;
+        doc.addPage();
+        y = 18;
+        onNewPage?.();
+    }
 
-    const layoutCategory = (category) => {
-        font('normal', 7.5);
-        const blurb = category.blurb ? doc.splitTextToSize(pdfText(category.blurb), colW) : [];
-        const rows = category.packages.map((pkg) => {
-            font('normal', 7.3);
-            const detail = doc.splitTextToSize(pdfText([pkg.tagline, ...(pkg.features || [])].filter(Boolean).join('  \u2022  ')), colW - 6);
-            return { pkg, detail, height: 11 + detail.length * 3.2 };
-        });
-        const height = 7 + blurb.length * 3.3 + 2 + rows.reduce((sum, r) => sum + r.height, 0);
-        return { category, blurb, rows, height };
-    };
-
-    const drawCategory = (layout, x, top, blurbLines) => {
-        let cy = top;
+    function sectionTitle(text) {
         doc.setFillColor(...RED);
-        doc.rect(x, cy - 3.4, 2.2, 4.4, 'F');
-        font('bold', 12);
-        setColor(INK);
-        doc.text(pdfText(layout.category.name), x + 4.5, cy);
-        cy += 4.6;
-        font('normal', 7.5);
-        setColor(DIM);
-        if (layout.blurb.length) {
-            doc.text(layout.blurb, x, cy);
+        doc.rect(M, y - 3.6, 1.6, 4.6, 'F');
+        font('bold', 12.5);
+        doc.text(pdfText(text), M + 4, y);
+        y += 4;
+    }
+
+    function tableHead(cols) {
+        doc.setFillColor(...HEAD_BG);
+        doc.rect(M, y, CW, 6.4, 'F');
+        font('bold', 6.8, DIM);
+        cols.forEach(([label, x, align]) => doc.text(label, x, y + 4.2, align ? { align } : undefined));
+        y += 6.4;
+    }
+
+    // ---------- Page 1: price list ----------
+    header('Rate Card', [meta.owner, meta.role].filter(Boolean).join('  |  '));
+
+    font('normal', 9.5, INK);
+    const intro = doc.splitTextToSize(pdfText(meta.subtitle || ''), CW);
+    if (intro.length && intro[0]) {
+        doc.text(intro, M, y);
+        y += intro.length * 4.4;
+    }
+    font('normal', 8, DIM);
+    const facts = [
+        `All prices in ${currency.code || currency.symbol}`,
+        meta.updated && `Updated ${formatDate(meta.updated)}`,
+        meta.validUntil && `Valid until ${formatDate(meta.validUntil)}`
+    ].filter(Boolean).join('   •   ');
+    doc.text(pdfText(facts), M, y + 0.6);
+    y += 6.5;
+
+    const packageCols = [
+        ['PACKAGE', COL.name],
+        ["WHAT'S INCLUDED", COL.incl],
+        ['TIMELINE', COL.time],
+        ['PRICE', COL.price, 'right']
+    ];
+
+    // One continuous table; each category is a slim band row
+    tableHead(packageCols);
+    (data.categories || []).filter((c) => (c.packages || []).length).forEach((category) => {
+        const rows = category.packages.map((pkg) => {
+            font('normal', 8);
+            const incl = doc.splitTextToSize(pdfText((pkg.features || []).join(', ')), COL.inclW);
+            const nameH = pkg.popular ? 8.8 : 5;
+            return { pkg, incl, h: Math.max(nameH, incl.length * 3.4 + 1.6) + 2.6 };
+        });
+        ensure(7 + rows.reduce((s, r) => s + r.h, 0), () => tableHead(packageCols));
+
+        doc.setFillColor(...INK);
+        doc.rect(M, y, CW, 6.6, 'F');
+        doc.setFillColor(...RED);
+        doc.rect(M, y, 1.4, 6.6, 'F');
+        font('bold', 9, WHITE);
+        doc.text(pdfText(category.name.toUpperCase()), M + 4, y + 4.5);
+        if (category.blurb) {
+            font('normal', 7.2, [190, 200, 208]);
+            const blurb = doc.splitTextToSize(pdfText(category.blurb), CW - textW(pdfText(category.name.toUpperCase()), 9) - 14)[0];
+            doc.text(blurb, M + 8 + textW(pdfText(category.name.toUpperCase()), 9), y + 4.5);
         }
-        cy += blurbLines * 3.3;
-        cy += 1.5;
+        y += 6.6;
 
-        layout.rows.forEach(({ pkg, detail, height }) => {
+        rows.forEach(({ pkg, incl, h }) => {
             if (pkg.popular) {
-                doc.setFillColor(...STICKY);
-                doc.setDrawColor(...INK);
-                doc.setLineWidth(0.4);
-                doc.roundedRect(x - 1.5, cy, colW + 3, height - 1.2, 1.5, 1.5, 'FD');
-            } else {
-                doc.setDrawColor(...LINE);
-                doc.setLineWidth(0.25);
-                doc.line(x, cy + height - 0.6, x + colW, cy + height - 0.6);
+                doc.setFillColor(...HIGHLIGHT);
+                doc.rect(M, y, CW, h, 'F');
             }
-            const base = cy + 5;
-            font('bold', 10);
-            setColor(INK);
-            doc.text(pdfText(pkg.name), x + 1.5, base);
+            const base = y + 4.5;
+
+            font('bold', 9.4);
+            doc.text(pdfText(pkg.name), COL.name, base);
             if (pkg.popular) {
-                const nameW = doc.getStringUnitWidth(pdfText(pkg.name)) * 10 / doc.internal.scaleFactor;
                 doc.setFillColor(...RED);
-                doc.roundedRect(x + 3.5 + nameW, base - 3.1, 15, 3.9, 0.8, 0.8, 'F');
-                font('bold', 5.6);
-                setColor([255, 255, 255]);
-                doc.text('POPULAR', x + 11 + nameW, base - 0.3, { align: 'center' });
+                doc.roundedRect(COL.name, base + 1.4, 17, 3.6, 0.9, 0.9, 'F');
+                font('bold', 5.6, WHITE);
+                doc.text('MOST POPULAR', COL.name + 8.5, base + 3.95, { align: 'center' });
             }
 
-            // Price block, right-aligned: [from] RM 1,800 [/month]
+            font('normal', 8, INK);
+            doc.text(incl, COL.incl, base);
+
+            font('normal', 8, DIM);
+            doc.text(pdfText(pkg.timeline || '-'), COL.time, base);
+
+            // Price, right-aligned: "from" + amount + unit
             const unit = unitOf(pkg);
-            const right = x + colW - 1.5;
-            let px = right;
+            let px = COL.price;
             if (unit) {
-                font('normal', 7.5);
-                setColor(DIM);
+                font('normal', 7.4, DIM);
                 doc.text(pdfText(unit), px, base, { align: 'right' });
-                px -= doc.getStringUnitWidth(pdfText(unit)) * 7.5 / doc.internal.scaleFactor + 0.6;
+                px -= textW(pdfText(unit), 7.4) + 0.5;
             }
-            font('bold', 11.5);
-            setColor(INK);
-            const price = pdfText(money(pkg.price));
+            const price = pdfText(money(convert(pkg.price, currency)));
+            font('bold', 10.2);
             doc.text(price, px, base, { align: 'right' });
-            px -= doc.getStringUnitWidth(price) * 11.5 / doc.internal.scaleFactor + 1.2;
             if (pkg.prefix) {
-                font('normal', 6.8);
-                setColor(DIM);
+                px -= textW(price, 10.2) + 1;
+                font('normal', 7, DIM);
                 doc.text(pdfText(pkg.prefix.toLowerCase()), px, base, { align: 'right' });
             }
 
-            if (pkg.timeline) {
-                font('normal', 6.8);
-                setColor(RED);
-                doc.text(pdfText(pkg.timeline), x + 1.5, base + 3.6);
-            }
-            font('normal', 7.3);
-            doc.setTextColor(85, 98, 112);
-            doc.text(detail, x + 1.5, base + 7.4);
-            cy += height;
+            y += h;
+            if (!pkg.popular) hr(y);
         });
-    };
+    });
+    y += 6.5;
 
-    for (let i = 0; i < categories.length; i += 2) {
-        const pair = categories.slice(i, i + 2).map(layoutCategory);
-        const blurbLines = Math.max(...pair.map((l) => l.blurb.length));
-        const rowH = Math.max(...pair.map((l) => l.height + (blurbLines - l.blurb.length) * 3.3));
-        ensure(rowH + 4);
-        pair.forEach((layout, col) => drawCategory(layout, M + col * (colW + gap), y, blurbLines));
-        y += rowH + 6;
-    }
-
-    // Add-ons
+    // Add-ons: two compact name/price columns
     const addons = data.addons || [];
     if (addons.length) {
-        ensure(14 + Math.ceil(addons.length / 2) * 9);
-        doc.setFillColor(...RED);
-        doc.rect(M, y - 3.4, 2.4, 4.4, 'F');
-        font('bold', 13);
-        setColor(INK);
-        doc.text('Add-ons', M + 5, y);
-        y += 6;
-        const addonW = (contentW - gap) / 2;
         const half = Math.ceil(addons.length / 2);
+        const colW = (CW - 10) / 2;
+        font('normal', 8.2);
+        const names = addons.map((a) => doc.splitTextToSize(pdfText(a.name), colW - 22).slice(0, 2));
+        const colH = (from, to) => names.slice(from, to).reduce((sum, n) => sum + n.length * 3.4 + 2.4, 0);
+        ensure(8 + Math.max(colH(0, half), colH(half)));
+        sectionTitle('Add-ons');
+        y += 0.5;
         const columnY = [y, y];
         addons.forEach((addon, i) => {
             const col = i < half ? 0 : 1;
-            const x = M + col * (addonW + gap);
+            const x = M + col * (colW + 10);
             const ry = columnY[col];
-            font('normal', 8.3);
-            setColor(INK);
-            const name = doc.splitTextToSize(pdfText(addon.name), addonW - 28).slice(0, 2);
-            doc.text(name, x, ry);
-            font('bold', 8.5);
-            doc.text(pdfText(`${money(addon.price)}${addon.unit || ''}`), x + addonW, ry, { align: 'right' });
-            const rowEnd = ry + (name.length - 1) * 3.5 + 2;
+            font('normal', 8.2);
+            doc.text(names[i], x + 1, ry + 3.4);
+            font('bold', 8.4);
+            doc.text(pdfText(`${money(convert(addon.price, currency))}${addon.unit || ''}`), x + colW - 1, ry + 3.4, { align: 'right' });
+            const end = ry + names[i].length * 3.4 + 2.4;
             doc.setDrawColor(...LINE);
-            doc.setLineWidth(0.2);
-            doc.setLineDashPattern([0.6, 0.8], 0);
-            doc.line(x, rowEnd, x + addonW, rowEnd);
-            doc.setLineDashPattern([], 0);
-            columnY[col] = rowEnd + 4.6;
+            doc.setLineWidth(0.25);
+            doc.line(x, end, x + colW, end);
+            columnY[col] = end;
         });
-        y = Math.max(...columnY) + 3;
+        y = Math.max(...columnY) + 6;
     }
 
-    // Visitor's estimate, if they built one
-    if (summary?.lines?.length) {
-        const rowsH = summary.lines.length * 5.2 + 22;
-        ensure(rowsH + 4);
-        doc.setFillColor(250, 248, 240);
-        doc.setDrawColor(...INK);
-        doc.setLineWidth(0.5);
-        doc.setLineDashPattern([1.5, 1.2], 0);
-        doc.roundedRect(M, y - 4, contentW, rowsH, 2, 2, 'FD');
-        doc.setLineDashPattern([], 0);
-        font('bold', 12);
-        setColor(INK);
-        doc.text('Your estimate', M + 5, y + 3);
-        let ey = y + 10;
-        summary.lines.forEach((line) => {
-            font('normal', 9);
-            setColor(INK);
-            const qty = line.qty > 1 ? `  x${line.qty}` : '';
-            const group = line.entry.category ? `  (${line.entry.category.name})` : '';
-            doc.text(pdfText(`${line.entry.item.name}${group}${qty}`), M + 5, ey);
-            const recurring = isRecurring(line.unit) ? line.unit : '';
-            doc.text(pdfText(`${currency.approx ? '~' : ''}${currency.symbol} ${formatNumber(line.amount)}${recurring}`), W - M - 5, ey, { align: 'right' });
-            ey += 5.2;
-        });
-        doc.setDrawColor(...INK);
-        doc.setLineWidth(0.3);
-        doc.line(M + 5, ey - 3, W - M - 5, ey - 3);
-        font('bold', 11);
-        const recurringText = Array.from(summary.recurring || [])
-            .map(([u, a]) => `  + ${currency.approx ? '~' : ''}${currency.symbol} ${formatNumber(a)}${u}`).join('');
-        doc.text('Estimated total', M + 5, ey + 3);
-        doc.text(pdfText(`${currency.approx ? '~' : ''}${currency.symbol} ${formatNumber(summary.total)}${recurringText}`), W - M - 5, ey + 3, { align: 'right' });
-        y += rowsH + 6;
-    }
-
-    // Notes
+    // Terms
     const notes = meta.notes || [];
     if (notes.length) {
-        font('normal', 8);
-        const wrapped = notes.map((n) => doc.splitTextToSize(pdfText(n), contentW - 5));
-        ensure(10 + wrapped.reduce((s, l) => s + l.length * 3.6 + 1.4, 0));
-        font('bold', 9.5);
-        setColor(INK);
+        font('normal', 7.8);
+        const wrapped = notes.map((n) => doc.splitTextToSize(pdfText(n), CW - 5));
+        ensure(8 + wrapped.reduce((s, l) => s + l.length * 3.3 + 0.9, 0));
+        font('bold', 8.8);
         doc.text('Good to know', M, y);
-        y += 5;
-        font('normal', 8);
-        setColor(DIM);
+        y += 4.2;
         wrapped.forEach((lines) => {
             doc.setFillColor(...RED);
-            doc.circle(M + 1, y - 1.1, 0.6, 'F');
+            doc.circle(M + 1, y - 1.1, 0.55, 'F');
+            font('normal', 7.8, DIM);
             doc.text(lines, M + 4, y);
-            y += lines.length * 3.6 + 1.4;
+            y += lines.length * 3.3 + 0.9;
         });
+        y += 1.5;
+    }
+
+    // Call to action
+    function cta() {
+        ensure(11);
+        doc.setFillColor(...RED);
+        doc.roundedRect(M, y, CW, 10, 2, 2, 'F');
+        font('bold', 9.6, WHITE);
+        doc.text('Ready to start? Free consultation.', M + 5, y + 6.4);
+        font('normal', 8.6, WHITE);
+        doc.text(pdfText(`WhatsApp ${phone}   |   ${meta.email || ''}`), W - M - 5, y + 6.4, { align: 'right' });
+        y += 14;
+    }
+    cta();
+
+    // ---------- Page 2: the visitor's estimate as a simple quote ----------
+    if (summary?.lines?.length) {
+        doc.addPage();
+        header('Your Estimate', `Prepared on ${formatDate(new Date().toISOString().slice(0, 10))} from the ${meta.owner || ''} rate card`);
+        const quoteCols = [['ITEM', M + 3], ['QTY', M + 128, 'right'], ['AMOUNT', W - M - 3, 'right']];
+        tableHead(quoteCols);
+        summary.lines.forEach((line) => {
+            ensure(10, () => tableHead(quoteCols));
+            const group = line.entry.category ? line.entry.category.name : 'Add-on';
+            font('bold', 9.4);
+            doc.text(pdfText(line.entry.item.name), M + 3, y + 5.2);
+            font('normal', 7.4, DIM);
+            doc.text(pdfText(group), M + 3, y + 8.6);
+            font('normal', 9, INK);
+            doc.text(String(line.qty), M + 128, y + 5.2, { align: 'right' });
+            const recurring = isRecurring(line.unit) ? line.unit : '';
+            font('bold', 9.4);
+            doc.text(pdfText(`${money(line.amount)}${recurring}`), W - M - 3, y + 5.2, { align: 'right' });
+            y += 11;
+            hr(y);
+        });
+
+        y += 4;
+        doc.setFillColor(...HIGHLIGHT);
+        doc.rect(M + CW / 2, y, CW / 2, 11, 'F');
+        font('bold', 9.5);
+        doc.text('Estimated total', M + CW / 2 + 4, y + 7);
+        font('bold', 13);
+        doc.text(pdfText(money(summary.total)), W - M - 3, y + 7.4, { align: 'right' });
+        y += 11;
+        Array.from(summary.recurring || []).forEach(([unit, amount]) => {
+            font('bold', 9, RED);
+            doc.text(pdfText(`+ ${money(amount)}${unit}`), W - M - 3, y + 5, { align: 'right' });
+            y += 5.5;
+        });
+        y += 8;
+        font('italic', 8, DIM);
+        doc.text(doc.splitTextToSize('This is an estimate based on published starting prices. The final quote is confirmed after a free consultation about your requirements.', CW), M, y);
+        y += 12;
+        cta();
     }
 
     // Footer on every page
     const pages = doc.getNumberOfPages();
     for (let p = 1; p <= pages; p += 1) {
         doc.setPage(p);
-        doc.setDrawColor(...LINE);
-        doc.setLineWidth(0.2);
-        doc.line(M, H - 12, W - M, H - 12);
-        font('normal', 7.5);
-        setColor(DIM);
-        doc.text(pdfText(`${meta.owner || ''}  |  ${meta.title || 'Rate Card'}  |  ${meta.website || ''}`), M, H - 7);
-        doc.text(`Page ${p} of ${pages}`, W - M, H - 7, { align: 'right' });
+        hr(H - 11, LINE, 0.2);
+        font('normal', 7.2, DIM);
+        doc.text(pdfText(`${meta.owner || ''}  |  ${meta.website || ''}`), M, H - 6.5);
+        doc.text(`Page ${p} of ${pages}`, W - M, H - 6.5, { align: 'right' });
     }
 
     const fileName = `${(meta.owner || 'Rate Card').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '')}-Rate-Card.pdf`;

@@ -649,6 +649,6 @@ if (autoRoot) {
         .catch((err) => {
             console.error(err);
             autoRoot.innerHTML = `<div class="rc-error"><h2 class="section-title">Rate Card</h2>
-                <p>The rate card couldn't load right now. <a href="#contact">Contact me</a> for current pricing.</p></div>`;
+                <p>The rate card couldn't load right now. <a href="#/contact">Contact me</a> for current pricing.</p></div>`;
         });
 }
