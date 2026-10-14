@@ -6,6 +6,7 @@
 const RATE_CARD_URL = 'data/rate-card.json';
 const STORAGE_KEY = 'rc-estimate-v1';
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isPhone = () => window.matchMedia('(max-width: 768px)').matches;
 const finePointer = () => window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({
@@ -234,7 +235,11 @@ export function mountRateCard(root, data, options = {}) {
                 <p class="rc-fineprint">${meta.notes.map(esc).join(' ')}</p>` : ''}
             </div>
 
-            <div class="rc-receipt-wrap">
+            <div class="rc-receipt-wrap" id="rc-sheet">
+                <div class="rc-sheet-handle">
+                    <span aria-hidden="true"></span>
+                    <button type="button" data-sheet-close aria-label="Close estimate"><i class="fas fa-xmark" aria-hidden="true"></i></button>
+                </div>
                 <div class="rc-printer" aria-hidden="true"><span class="rc-printer-led"></span><span class="rc-printer-slot"></span></div>
                 <div class="rc-receipt" aria-label="Your estimate">
                     <div class="rc-receipt-head">
@@ -263,6 +268,13 @@ export function mountRateCard(root, data, options = {}) {
                 </div>
             </div>
         </div>
+        <button type="button" class="rc-sheet-bar" data-sheet-open aria-controls="rc-sheet" aria-expanded="false">
+            <span class="rc-sheet-count"><i class="fas fa-receipt" aria-hidden="true"></i><b>0</b></span>
+            <span class="rc-sheet-label">Your estimate</span>
+            <strong class="rc-sheet-total"></strong>
+            <i class="fas fa-chevron-up" aria-hidden="true"></i>
+        </button>
+        <div class="rc-sheet-backdrop" data-sheet-close></div>
         <div class="rc-toast" role="status" aria-live="polite"></div>
     `;
 
@@ -473,15 +485,20 @@ export function mountRateCard(root, data, options = {}) {
     function flyToReceipt(fromEl) {
         if (!fromEl || reducedMotion()) return;
         const from = fromEl.getBoundingClientRect();
-        const to = receiptEl.getBoundingClientRect();
-        if (to.bottom < 0 || to.top > window.innerHeight) return; // receipt is off-screen
+        const target = isPhone() ? $('.rc-sheet-bar') : receiptEl;
+        let to = target.getBoundingClientRect();
+        if (isPhone() && to.top > window.innerHeight - 40) {
+            // The bar is still sliding in: aim for where it will land.
+            to = { left: 12, width: window.innerWidth - 24, top: window.innerHeight - 140 };
+        }
+        if (!isPhone() && (to.bottom < 0 || to.top > window.innerHeight)) return; // receipt is off-screen
         const dot = document.createElement('span');
         dot.className = 'rc-fly';
         dot.style.left = `${from.left + from.width / 2}px`;
         dot.style.top = `${from.top + from.height / 2}px`;
         document.body.appendChild(dot);
         const dx = to.left + to.width / 2 - (from.left + from.width / 2);
-        const dy = to.top + 60 - (from.top + from.height / 2);
+        const dy = to.top + (isPhone() ? 20 : 60) - (from.top + from.height / 2);
         dot.animate([
             { transform: 'translate(-50%, -50%) scale(1) rotate(0deg)', opacity: 1 },
             { transform: `translate(calc(-50% + ${dx * 0.5}px), calc(-50% + ${dy * 0.5 - 120}px)) scale(1.2) rotate(180deg)`, opacity: 1, offset: 0.5 },
@@ -534,6 +551,10 @@ export function mountRateCard(root, data, options = {}) {
 
         const count = summary.lines.length;
         receiptEl.classList.toggle('is-empty', count === 0);
+        root.classList.toggle('has-items', count > 0);
+        $('.rc-sheet-count b').textContent = count;
+        $('.rc-sheet-total').textContent = `${cur.approx ? '≈' : ''}${cur.symbol} ${formatNumber(summary.total)}${summary.recurring.size ? ' +' : ''}`;
+        if (count === 0) setSheet(false);
         const wasStamped = receiptEl.classList.contains('is-stamped');
         if (count > 0 && !wasStamped) {
             receiptEl.classList.add('is-stamped');
@@ -553,7 +574,11 @@ export function mountRateCard(root, data, options = {}) {
         wa.href = `https://wa.me/${encodeURIComponent(meta.whatsapp || '')}?text=${encodeURIComponent(message)}`;
         mail.href = `mailto:${meta.email || ''}?subject=${encodeURIComponent('Project quote request')}&body=${encodeURIComponent(message)}`;
 
-        if (bump) {
+        if (bump && isPhone()) {
+            animate($('.rc-sheet-bar'), [
+                { transform: 'scale(1)' }, { transform: 'scale(1.06)' }, { transform: 'scale(1)' }
+            ], { duration: 380, delay: 450, easing: 'ease-out' });
+        } else if (bump) {
             animate(receiptEl, [
                 { transform: 'translateY(-8px)' }, { transform: 'translateY(3px)' }, { transform: 'translateY(0)' }
             ], { duration: 380, easing: 'ease-out' });
@@ -563,6 +588,12 @@ export function mountRateCard(root, data, options = {}) {
             led.classList.add('is-blink');
         }
         onSelectionChange?.(summary);
+    }
+
+    function setSheet(open) {
+        root.classList.toggle('sheet-open', open);
+        $('.rc-sheet-bar').setAttribute('aria-expanded', open);
+        document.documentElement.classList.toggle('rc-sheet-lock', open);
     }
 
     function quoteMessage(summary, cur) {
@@ -604,6 +635,8 @@ export function mountRateCard(root, data, options = {}) {
     // --- Events ---
     root.addEventListener('click', async (e) => {
         if (signal.aborted) return;
+        if (e.target.closest('[data-sheet-open]')) return setSheet(true);
+        if (e.target.closest('[data-sheet-close]')) return setSheet(false);
         const add = e.target.closest('[data-add]');
         if (add) return toggleItem(add.dataset.add, add);
 
@@ -649,6 +682,11 @@ export function mountRateCard(root, data, options = {}) {
             }
         }
     }, { signal });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && root.classList.contains('sheet-open')) setSheet(false);
+    }, { signal });
+    window.addEventListener('hashchange', () => setSheet(false), { signal });
 
     // --- First reveal ---
     const reveal = () => {

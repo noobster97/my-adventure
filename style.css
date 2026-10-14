@@ -2799,3 +2799,99 @@ body[data-view="contact"] .floating-whatsapp {
         padding: .35rem .9rem;
     }
 }
+
+/* ==========================================================
+   Phone app shell: real 16px gutters, no overflow, tidy rhythm
+   ========================================================== */
+.next-page {
+    margin: 3rem auto;
+}
+
+@media (max-width: 768px) {
+    /* The page wraps every section in a second .container: drop the outer padding */
+    body > .container {
+        padding: 0;
+    }
+
+    .container {
+        padding: 0 16px;
+    }
+
+    .section {
+        padding: 2.5rem 0;
+    }
+
+    .view:not([data-view="home"]) > section:first-child {
+        padding-top: 1.75rem;
+    }
+
+    .section-header {
+        margin-bottom: 1.6rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+
+    .section-subtitle {
+        font-size: 1.05rem;
+    }
+
+    /* Projects: keep media inside the screen */
+    .work-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 1.4rem;
+    }
+
+    .work-card,
+    .work-card.featured {
+        min-width: 0;
+    }
+
+    .work-card.featured .work-media,
+    .work-media {
+        min-height: 0 !important;
+        width: 100%;
+    }
+
+    /* "Next page" card sits evenly between the dashed lines */
+    .next-page {
+        margin: 2rem 0;
+        padding: 1.1rem 1.2rem;
+        border-radius: 16px;
+        box-shadow: 4px 4px 0 var(--secondary);
+    }
+
+    .experience-section,
+    .skills-section {
+        border-left: 0;
+        border-right: 0;
+    }
+
+    .timeline {
+        max-width: none;
+    }
+
+    .cta-box {
+        border-radius: 18px;
+        box-shadow: 5px 5px 0 var(--primary);
+    }
+
+    .site-footer {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .skills-wrapper.is-marquee {
+        margin: 0 -16px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* The Contact tab already offers WhatsApp; keep the bubble only on Home */
+    body:not([data-view="home"]) .floating-whatsapp {
+        display: none;
+    }
+}
