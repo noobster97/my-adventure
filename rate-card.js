@@ -45,6 +45,13 @@ export function buildCatalog(data) {
     return catalog;
 }
 
+// Lowest-priced package, preferring one-off prices over hourly rates.
+export function startingPackage(category) {
+    const pkgs = category.packages || [];
+    const oneOff = pkgs.filter((p) => !/hour/i.test(unitOf(p)));
+    return (oneOff.length ? oneOff : pkgs).reduce((min, p) => (Number(p.price) < Number(min.price) ? p : min));
+}
+
 export function currencyFor(meta, mode) {
     const secondary = meta.secondaryCurrency;
     if (mode === 'secondary' && secondary && secondary.rate) {
@@ -154,7 +161,7 @@ export function mountRateCard(root, data, options = {}) {
     root.classList.add('rc-root');
     root.innerHTML = `
         <div class="rc-head">
-            <span class="rc-kicker"><i class="fas fa-tags" aria-hidden="true"></i> Pricing, no surprises</span>
+            <span class="rc-kicker"><i class="fas fa-tags" aria-hidden="true"></i> Honest pricing</span>
             <h2 class="section-title rc-title">${esc(meta.title || 'Rate Card')}${UNDERLINE_SVG}</h2>
             <p class="section-subtitle rc-subtitle">${esc(meta.subtitle)}</p>
             <div class="rc-toolbar">
@@ -171,19 +178,36 @@ export function mountRateCard(root, data, options = {}) {
             </div>
         </div>
 
-        <div class="rc-tabs-wrap">
-            <div class="rc-tabs" role="tablist" aria-label="Service categories">
-                <span class="rc-tab-ink" aria-hidden="true"></span>
-                ${categories.map((c, i) => `
-                    <button type="button" class="rc-tab" role="tab" id="rc-tab-${esc(c.id)}" aria-controls="rc-panel"
-                        aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}" data-index="${i}">
-                        <i class="fas ${esc(c.icon || 'fa-star')}" aria-hidden="true"></i><span>${esc(c.name)}</span>
-                    </button>`).join('')}
-            </div>
+        <h3 class="rc-ask">What do you need?</h3>
+        <div class="rc-tabs" role="tablist" aria-label="What do you need?">
+            ${categories.map((c, i) => {
+                const cheapest = startingPackage(c);
+                return `
+                <button type="button" class="rc-tab" role="tab" id="rc-tab-${esc(c.id)}" aria-controls="rc-panel"
+                    aria-selected="${i === state.cat}" tabindex="${i === state.cat ? 0 : -1}" data-index="${i}" style="--i:${i}">
+                    <span class="rc-tab-icon" aria-hidden="true"><i class="fas ${esc(c.icon || 'fa-star')}"></i></span>
+                    <span class="rc-tab-name">${esc(c.name)}</span>
+                    <span class="rc-tab-from" data-from="${esc(cheapest.id)}"></span>
+                </button>`;
+            }).join('')}
         </div>
 
         <p class="rc-blurb" aria-live="polite"></p>
         <div class="rc-cards" id="rc-panel" role="tabpanel"></div>
+        <div class="rc-dots" aria-hidden="true"></div>
+
+        ${(meta.process || []).length ? `
+        <div class="rc-process">
+            <h3 class="rc-h3 rc-h3-center">How it works</h3>
+            <ol class="rc-steps-visual">
+                ${meta.process.map((step, i) => `
+                    <li style="--i:${i}">
+                        <span class="rc-step-icon" aria-hidden="true"><i class="fas ${esc(step.icon || 'fa-circle')}"></i><b>${i + 1}</b></span>
+                        <strong>${esc(step.title)}</strong>
+                        <small>${esc(step.text)}</small>
+                    </li>`).join('')}
+            </ol>
+        </div>` : ''}
 
         <div class="rc-builder">
             <div class="rc-addons-panel">
@@ -198,14 +222,16 @@ export function mountRateCard(root, data, options = {}) {
                     ${addons.map((a) => `
                         <button type="button" class="rc-chip" data-add="${esc(a.id)}" aria-pressed="false">
                             <span class="rc-chip-box" aria-hidden="true">${CHECK_SVG}</span>
-                            <span class="rc-chip-name">${esc(a.name)}</span>
+                            <span class="rc-chip-name">${a.icon ? `<i class="fas ${esc(a.icon)}" aria-hidden="true"></i> ` : ''}${esc(a.name)}</span>
                             <span class="rc-chip-price" data-price="${esc(a.id)}"></span>
                         </button>`).join('')}
                 </div>` : ''}
-                ${(meta.notes || []).length ? `
-                <ul class="rc-notes">
-                    ${meta.notes.map((n) => `<li><i class="fas fa-circle-info" aria-hidden="true"></i><span>${esc(n)}</span></li>`).join('')}
+                ${(meta.perks || []).length ? `
+                <ul class="rc-perks">
+                    ${meta.perks.map((perk, i) => `<li style="--i:${i}"><i class="fas ${esc(perk.icon || 'fa-check')}" aria-hidden="true"></i><span>${esc(perk.text)}</span></li>`).join('')}
                 </ul>` : ''}
+                ${(meta.notes || []).length ? `
+                <p class="rc-fineprint">${meta.notes.map(esc).join(' ')}</p>` : ''}
             </div>
 
             <div class="rc-receipt-wrap">
@@ -243,7 +269,7 @@ export function mountRateCard(root, data, options = {}) {
     const $ = (sel) => root.querySelector(sel);
     const $$ = (sel) => Array.from(root.querySelectorAll(sel));
     const tabsEl = $('.rc-tabs');
-    const inkEl = $('.rc-tab-ink');
+    const dotsEl = $('.rc-dots');
     const cardsEl = $('.rc-cards');
     const blurbEl = $('.rc-blurb');
     const linesEl = $('.rc-lines');
@@ -253,16 +279,7 @@ export function mountRateCard(root, data, options = {}) {
 
     const currency = () => currencyFor(meta, state.currencyMode);
 
-    // --- Tabs ---
-    function moveInk() {
-        const active = tabsEl.querySelector('.rc-tab[aria-selected="true"]');
-        if (!active) return;
-        inkEl.style.width = `${active.offsetWidth}px`;
-        inkEl.style.transform = `translateX(${active.offsetLeft}px)`;
-        const target = active.offsetLeft - (tabsEl.clientWidth - active.offsetWidth) / 2;
-        tabsEl.scrollTo({ left: target, behavior: reducedMotion() ? 'auto' : 'smooth' });
-    }
-
+    // --- Picker ---
     function selectTab(index, { focus = false } = {}) {
         if (index === state.cat && cardsEl.children.length) return;
         const forward = index > state.cat;
@@ -273,8 +290,10 @@ export function mountRateCard(root, data, options = {}) {
             tab.tabIndex = on ? 0 : -1;
             if (on && focus) tab.focus();
         });
-        animate(inkEl, [{ scale: '1 1' }, { scale: '1.15 0.8' }, { scale: '1 1' }], { duration: 450, easing: 'ease-out' });
-        moveInk();
+        const tile = $$('.rc-tab')[index];
+        animate(tile?.querySelector('.rc-tab-icon'), [
+            { transform: 'scale(1) rotate(0deg)' }, { transform: 'scale(1.25) rotate(-12deg)' }, { transform: 'scale(1) rotate(0deg)' }
+        ], { duration: 500, easing: 'ease-out' });
         renderCards(forward);
     }
 
@@ -292,7 +311,7 @@ export function mountRateCard(root, data, options = {}) {
     });
 
     // --- Cards ---
-    function cardMarkup(pkg, i) {
+    function cardMarkup(pkg, i, category) {
         const unit = unitOf(pkg);
         const selected = state.selection.has(pkg.id);
         return `
@@ -300,14 +319,15 @@ export function mountRateCard(root, data, options = {}) {
                 <div class="rc-card-inner">
                     <span class="rc-glare" aria-hidden="true"></span>
                     ${pkg.popular ? `<span class="rc-ribbon">Most popular${SCRIBBLE_SVG}</span>` : ''}
+                    <span class="rc-card-icon" aria-hidden="true"><i class="fas ${esc(pkg.icon || category.icon || 'fa-star')}"></i></span>
                     <h3 class="rc-card-name">${esc(pkg.name)}</h3>
-                    <p class="rc-tagline">${esc(pkg.tagline)}</p>
+                    ${pkg.bestFor || pkg.tagline ? `<p class="rc-bestfor"><span>Best for</span>${esc(pkg.bestFor || pkg.tagline)}</p>` : ''}
                     <div class="rc-price">
                         ${pkg.prefix ? `<span class="rc-prefix">${esc(pkg.prefix)}</span>` : ''}
                         <span class="rc-amount"><span class="rc-sym"></span><span class="rc-num" data-value="${Number(pkg.price) || 0}">0</span></span>
                         ${unit ? `<span class="rc-suffix">${esc(unit)}</span>` : ''}
                     </div>
-                    ${pkg.timeline ? `<p class="rc-timeline"><i class="far fa-clock" aria-hidden="true"></i> ${esc(pkg.timeline)}</p>` : ''}
+                    ${pkg.timeline ? `<p class="rc-timeline"><i class="fas fa-clock" aria-hidden="true"></i> ${esc(pkg.timeline)}</p>` : ''}
                     <ul class="rc-features">
                         ${(pkg.features || []).map((f, fi) => `<li style="--i:${fi}">${CHECK_SVG}<span>${esc(f)}</span></li>`).join('')}
                     </ul>
@@ -334,10 +354,35 @@ export function mountRateCard(root, data, options = {}) {
         blurbEl.textContent = category.blurb || '';
         cardsEl.setAttribute('aria-labelledby', `rc-tab-${category.id}`);
         cardsEl.style.setProperty('--cols', Math.min(category.packages.length, 3));
-        cardsEl.innerHTML = category.packages.map(cardMarkup).join('');
+        cardsEl.innerHTML = category.packages.map((pkg, i) => cardMarkup(pkg, i, category)).join('');
+        setupSwipe(category);
         paintPrices({ fromZero: true, animateNumbers: state.seen });
         bindTilt();
         if (state.seen && deal) dealIn(forward);
+    }
+
+    // On phones the cards become a swipeable row; start on the popular one.
+    function setupSwipe(category) {
+        const cards = Array.from(cardsEl.children);
+        dotsEl.innerHTML = cards.map((_, i) => `<span data-dot="${i}"></span>`).join('');
+        const popular = Math.max(0, category.packages.findIndex((p) => p.popular));
+        const swipeMode = () => cardsEl.scrollWidth > cardsEl.clientWidth + 4;
+        const markDot = (index) => dotsEl.querySelectorAll('span').forEach((d, i) => d.classList.toggle('is-on', i === index));
+        requestAnimationFrame(() => {
+            if (!swipeMode()) return markDot(-1);
+            const card = cards[popular];
+            cardsEl.scrollLeft = card.offsetLeft - (cardsEl.clientWidth - card.offsetWidth) / 2;
+            markDot(popular);
+        });
+        cardsEl.onscroll = () => {
+            const center = cardsEl.scrollLeft + cardsEl.clientWidth / 2;
+            let best = 0;
+            cards.forEach((card, i) => {
+                const mid = card.offsetLeft + card.offsetWidth / 2;
+                if (Math.abs(mid - center) < Math.abs(cards[best].offsetLeft + cards[best].offsetWidth / 2 - center)) best = i;
+            });
+            markDot(best);
+        };
     }
 
     function dealIn(forward = true) {
@@ -377,6 +422,10 @@ export function mountRateCard(root, data, options = {}) {
             const target = convert(el.dataset.value, cur);
             if (animateNumbers) countTo(el, target, { from: fromZero ? 0 : undefined, duration: 900 + i * 150 });
             else { el.textContent = formatNumber(target); el.dataset.current = target; }
+        });
+        root.querySelectorAll('.rc-tab-from').forEach((el) => {
+            const entry = catalog.get(el.dataset.from);
+            el.textContent = `from ${cur.approx ? '≈' : ''}${cur.symbol} ${formatNumber(convert(entry.item.price, cur))}${entry.unit || ''}`;
         });
         root.querySelectorAll('.rc-chip-price').forEach((el) => {
             const entry = catalog.get(el.dataset.price);
@@ -609,6 +658,18 @@ export function mountRateCard(root, data, options = {}) {
         dealIn(true);
         paintPrices({ fromZero: true, animateNumbers: true });
     };
+    // Steps and perks animate in when they scroll into view.
+    const extras = root.querySelectorAll('.rc-process, .rc-perks');
+    if (intro && 'IntersectionObserver' in window && !reducedMotion()) {
+        const io2 = new IntersectionObserver((entries) => entries.forEach((en) => {
+            if (en.isIntersecting) { en.target.classList.add('is-in'); io2.unobserve(en.target); }
+        }), { threshold: 0.3 });
+        extras.forEach((el) => io2.observe(el));
+        signal.addEventListener('abort', () => io2.disconnect());
+    } else {
+        extras.forEach((el) => el.classList.add('is-in', 'no-anim'));
+    }
+
     if (intro && 'IntersectionObserver' in window && !reducedMotion()) {
         const io = new IntersectionObserver((entries) => {
             if (entries.some((en) => en.isIntersecting)) { reveal(); io.disconnect(); }
@@ -620,15 +681,8 @@ export function mountRateCard(root, data, options = {}) {
         root.classList.add('is-revealed');
     }
 
-    if ('ResizeObserver' in window) {
-        const ro = new ResizeObserver(() => moveInk());
-        ro.observe(tabsEl);
-        signal.addEventListener('abort', () => ro.disconnect());
-    }
-    document.fonts?.ready.then(moveInk);
 
     renderCards(true, intro);
-    moveInk();
     syncSelectedUI();
     renderReceipt();
 
@@ -644,8 +698,16 @@ export function mountRateCard(root, data, options = {}) {
 // --- Auto-mount on the portfolio page ---
 const autoRoot = document.querySelector('[data-rate-card]');
 if (autoRoot) {
+    // Deep links like #/rates/systems open that category.
+    const categoryFromHash = () => (location.hash.match(/^#\/rates\/([\w-]+)/) || [])[1];
     loadRateCard()
-        .then((data) => mountRateCard(autoRoot, data))
+        .then((data) => {
+            const card = mountRateCard(autoRoot, data, { initialCategory: categoryFromHash() });
+            window.addEventListener('hashchange', () => {
+                const id = categoryFromHash();
+                if (id) card.selectCategory(id);
+            });
+        })
         .catch((err) => {
             console.error(err);
             autoRoot.innerHTML = `<div class="rc-error"><h2 class="section-title">Rate Card</h2>
