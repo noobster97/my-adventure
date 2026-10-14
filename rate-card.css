@@ -1375,7 +1375,7 @@
 }
 
 .rc-receipt.is-empty .rc-receipt-actions {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
 }
 
 .rc-barcode {
@@ -1627,7 +1627,7 @@
         display: none;
     }
 
-    /* Header: title + one-line subtitle + small PDF pill */
+    /* Header: title + one-line subtitle + small download pill */
     .rc-head {
         text-align: left;
         margin-bottom: 1rem;
@@ -2165,4 +2165,9 @@
 html.rc-sheet-lock,
 html.rc-sheet-lock body {
     overflow: hidden;
+}
+
+/* The quote can only be saved once something is in it */
+.rc-receipt.is-empty .rc-save-quote {
+    display: none;
 }

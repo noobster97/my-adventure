@@ -79,6 +79,16 @@ export function formatDate(iso) {
     return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
+// Short reference for an estimate: same items on the same day give the same ref,
+// so the saved quote image and the WhatsApp message always match.
+export function quoteRef(summary, date = new Date()) {
+    const ymd = `${String(date.getFullYear()).slice(2)}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+    const key = `${summary.lines.map((l) => `${l.id}x${l.qty}`).join('|')}@${ymd}`;
+    let hash = 7;
+    for (const ch of key) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+    return `Q-${ymd}-${hash.toString(36).toUpperCase().slice(-4).padStart(4, '0')}`;
+}
+
 export function summarizeEstimate(selection, catalog, currency) {
     const lines = [];
     let total = 0;
@@ -151,7 +161,6 @@ export function mountRateCard(root, data, options = {}) {
         renderToken: 0
     };
 
-    const quoteNo = `Q-${(meta.updated || '').replace(/-/g, '').slice(2) || '000000'}`;
 
     // Re-mounting (editor preview) must drop the previous instance's listeners.
     root._rcAbort?.abort();
@@ -172,8 +181,8 @@ export function mountRateCard(root, data, options = {}) {
                     <button type="button" role="radio" data-cur="primary">${esc(meta.currency || 'RM')}</button>
                     <button type="button" role="radio" data-cur="secondary">${esc(meta.secondaryCurrency.code)}</button>
                 </div>` : ''}
-                <button type="button" class="rc-btn rc-btn-ink rc-download" data-pdf>
-                    <i class="fas fa-file-arrow-down" aria-hidden="true"></i> <span>Download PDF</span>
+                <button type="button" class="rc-btn rc-btn-ink rc-download" data-download="card">
+                    <i class="fas fa-image" aria-hidden="true"></i> <span>Download rate card</span>
                 </button>
                 ${meta.updated ? `<span class="rc-updated"><i class="far fa-calendar-check" aria-hidden="true"></i> Updated ${esc(formatDate(meta.updated))}</span>` : ''}
             </div>
@@ -245,7 +254,7 @@ export function mountRateCard(root, data, options = {}) {
                     <div class="rc-receipt-head">
                         <strong>${esc(meta.owner || 'Estimate')}</strong>
                         <span>${esc(meta.role || '')}</span>
-                        <span class="rc-receipt-meta">${quoteNo} · ${esc(formatDate(new Date().toISOString().slice(0, 10)))}</span>
+                        <span class="rc-receipt-meta">${esc(formatDate(new Date().toISOString().slice(0, 10)))}</span>
                     </div>
                     <p class="rc-empty">Nothing here yet. Pick a package to start your estimate.</p>
                     <ul class="rc-lines"></ul>
@@ -260,7 +269,7 @@ export function mountRateCard(root, data, options = {}) {
                     <div class="rc-receipt-actions">
                         <a class="rc-btn rc-btn-wa" data-wa target="_blank" rel="noopener"><i class="fab fa-whatsapp" aria-hidden="true"></i> Send on WhatsApp</a>
                         <a class="rc-btn rc-btn-ghost" data-mail><i class="fas fa-envelope" aria-hidden="true"></i> Email</a>
-                        <button type="button" class="rc-btn rc-btn-ghost" data-pdf><i class="fas fa-file-pdf" aria-hidden="true"></i> PDF</button>
+                        <button type="button" class="rc-btn rc-btn-ghost rc-save-quote" data-download="quote"><i class="fas fa-receipt" aria-hidden="true"></i> Save quote</button>
                         <button type="button" class="rc-btn rc-btn-ghost rc-clear" data-clear><i class="fas fa-rotate-left" aria-hidden="true"></i> Clear</button>
                     </div>
                     <div class="rc-barcode" aria-hidden="true"></div>
@@ -552,6 +561,7 @@ export function mountRateCard(root, data, options = {}) {
         const count = summary.lines.length;
         receiptEl.classList.toggle('is-empty', count === 0);
         root.classList.toggle('has-items', count > 0);
+        $('.rc-receipt-meta').textContent = [count ? quoteRef(summary) : '', formatDate(new Date().toISOString().slice(0, 10))].filter(Boolean).join(' · ');
         $('.rc-sheet-count b').textContent = count;
         $('.rc-sheet-total').textContent = `${cur.approx ? '≈' : ''}${cur.symbol} ${formatNumber(summary.total)}${summary.recurring.size ? ' +' : ''}`;
         if (count === 0) setSheet(false);
@@ -615,6 +625,7 @@ export function mountRateCard(root, data, options = {}) {
             ...rows,
             '',
             `Estimated total: ${money(summary.total)}${recurring}`,
+            `Ref: ${quoteRef(summary)}`,
             '',
             'About my project: '
         ].join('\n');
@@ -664,21 +675,24 @@ export function mountRateCard(root, data, options = {}) {
             return save();
         }
 
-        const pdf = e.target.closest('[data-pdf]');
-        if (pdf) {
-            pdf.classList.add('is-busy');
-            pdf.disabled = true;
+        const download = e.target.closest('[data-download]');
+        if (download) {
+            const kind = download.dataset.download;
+            download.classList.add('is-busy');
+            download.disabled = true;
             try {
-                const { downloadRateCardPdf } = await import('./rate-card-pdf.js');
+                const images = await import('./rate-card-image.js');
                 const summary = summarizeEstimate(state.selection, catalog, currency());
-                await downloadRateCardPdf(data, { currency: currency(), summary });
-                toast('Rate card downloaded ✓');
+                const result = kind === 'quote'
+                    ? await images.downloadQuoteImage(data, { currency: currency(), summary, quoteRef: quoteRef(summary) })
+                    : await images.downloadRateCardImage(data, { currency: currency() });
+                if (result === 'downloaded') toast(kind === 'quote' ? 'Quote saved ✓' : 'Rate card saved ✓');
             } catch (err) {
                 console.error(err);
-                toast('Could not create the PDF. Please check your connection and try again.');
+                toast('Could not create the image. Please try again.');
             } finally {
-                pdf.classList.remove('is-busy');
-                pdf.disabled = false;
+                download.classList.remove('is-busy');
+                download.disabled = false;
             }
         }
     }, { signal });
