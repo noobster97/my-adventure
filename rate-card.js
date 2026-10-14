@@ -181,7 +181,7 @@ export function mountRateCard(root, data, options = {}) {
                     <button type="button" role="radio" data-cur="primary">${esc(meta.currency || 'RM')}</button>
                     <button type="button" role="radio" data-cur="secondary">${esc(meta.secondaryCurrency.code)}</button>
                 </div>` : ''}
-                <button type="button" class="rc-btn rc-btn-ink rc-download" data-download="card">
+                <button type="button" class="rc-btn rc-btn-ink rc-download" data-rc-download="card">
                     <i class="fas fa-image" aria-hidden="true"></i> <span>Download rate card</span>
                 </button>
                 ${meta.updated ? `<span class="rc-updated"><i class="far fa-calendar-check" aria-hidden="true"></i> Updated ${esc(formatDate(meta.updated))}</span>` : ''}
@@ -269,7 +269,7 @@ export function mountRateCard(root, data, options = {}) {
                     <div class="rc-receipt-actions">
                         <a class="rc-btn rc-btn-wa" data-wa target="_blank" rel="noopener"><i class="fab fa-whatsapp" aria-hidden="true"></i> Send on WhatsApp</a>
                         <a class="rc-btn rc-btn-ghost" data-mail><i class="fas fa-envelope" aria-hidden="true"></i> Email</a>
-                        <button type="button" class="rc-btn rc-btn-ghost rc-save-quote" data-download="quote"><i class="fas fa-receipt" aria-hidden="true"></i> Save quote</button>
+                        <button type="button" class="rc-btn rc-btn-ghost rc-save-quote" data-rc-download="quote"><i class="fas fa-receipt" aria-hidden="true"></i> Save quote</button>
                         <button type="button" class="rc-btn rc-btn-ghost rc-clear" data-clear><i class="fas fa-rotate-left" aria-hidden="true"></i> Clear</button>
                     </div>
                     <div class="rc-barcode" aria-hidden="true"></div>
@@ -675,9 +675,9 @@ export function mountRateCard(root, data, options = {}) {
             return save();
         }
 
-        const download = e.target.closest('[data-download]');
+        const download = e.target.closest('[data-rc-download]');
         if (download) {
-            const kind = download.dataset.download;
+            const kind = download.dataset.rcDownload;
             download.classList.add('is-busy');
             download.disabled = true;
             try {
