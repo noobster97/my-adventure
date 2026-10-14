@@ -188,8 +188,11 @@ export function mountRateCard(root, data, options = {}) {
         <div class="rc-builder">
             <div class="rc-addons-panel">
                 <h3 class="rc-h3">Build your estimate</h3>
-                <p class="rc-hint">Tap <strong>Add to estimate</strong> on any package, then mix in extras below.
-                    Your receipt updates live.</p>
+                <ol class="rc-steps">
+                    <li><b>1</b> Pick a package</li>
+                    <li><b>2</b> Add extras</li>
+                    <li><b>3</b> Send it on WhatsApp</li>
+                </ol>
                 ${addons.length ? `
                 <div class="rc-addons">
                     ${addons.map((a) => `
@@ -221,8 +224,8 @@ export function mountRateCard(root, data, options = {}) {
                             <strong><span class="rc-approx"></span><span class="rc-sym"></span> <span class="rc-num rc-total" data-current="0">0</span></strong>
                         </div>
                         <div class="rc-recurring"></div>
+                        <div class="rc-stamp" aria-hidden="true">Quote<br>Ready</div>
                     </div>
-                    <div class="rc-stamp" aria-hidden="true">Quote<br>Ready</div>
                     <div class="rc-receipt-actions">
                         <a class="rc-btn rc-btn-wa" data-wa target="_blank" rel="noopener"><i class="fab fa-whatsapp" aria-hidden="true"></i> Send on WhatsApp</a>
                         <a class="rc-btn rc-btn-ghost" data-mail><i class="fas fa-envelope" aria-hidden="true"></i> Email</a>

@@ -103,7 +103,6 @@ async function start() {
 
     function renderForm() {
         const meta = data.meta ||= {};
-        meta.secondaryCurrency ||= { code: 'USD', symbol: '$', rate: 0.21 };
         data.categories ||= [];
         data.addons ||= [];
 
@@ -130,8 +129,9 @@ async function start() {
             </details>
 
             <details class="ed-group">
-                <summary>Second currency</summary>
+                <summary>Second currency (optional)</summary>
                 <div class="ed-body">
+                    ${meta.secondaryCurrency ? `
                     <p class="ed-help" style="margin:0">Visitors can switch to this currency. Prices are converted with the rate below
                         (1 ${esc(meta.currency || 'RM')} = rate) and rounded.</p>
                     <div class="ed-grid three">
@@ -139,6 +139,9 @@ async function start() {
                         ${field('Symbol', 'meta.secondaryCurrency.symbol')}
                         ${field('Rate', 'meta.secondaryCurrency.rate', { type: 'number', kind: 'number' })}
                     </div>
+                    <button type="button" class="ed-add" data-act="cur-del"><i class="fas fa-trash"></i> Remove second currency</button>` : `
+                    <p class="ed-help" style="margin:0">Off - prices show in ${esc(meta.currency || 'RM')} only.</p>
+                    <button type="button" class="ed-add" data-act="cur-add"><i class="fas fa-plus"></i> Add a currency toggle (e.g. USD)</button>`}
                 </div>
             </details>
 
@@ -292,6 +295,12 @@ async function start() {
                 break;
             case 'pkg-up': move(cat.packages, pi, pi - 1); openCats.add(ci); break;
             case 'pkg-down': move(cat.packages, pi, pi + 1); openCats.add(ci); break;
+            case 'cur-add':
+                data.meta.secondaryCurrency = { code: 'USD', symbol: '$', rate: 0.21 };
+                break;
+            case 'cur-del':
+                delete data.meta.secondaryCurrency;
+                break;
             case 'addon-add':
                 data.addons.push({ id: uniqueId('addon'), name: 'New add-on', price: 0, unit: '' });
                 break;

@@ -69,7 +69,7 @@ Field reference:
 | `prefix` | Small text above the price, e.g. `"From"` (or `""`) |
 | `suffix` / `unit` | Text after the price. `/month` or `/year` = recurring. Anything else (e.g. `/page`, `/hour`) gets a quantity stepper in the estimate |
 | `popular` | `true` highlights the card as "Most popular" |
-| `meta.secondaryCurrency.rate` | Conversion used for the RM ⇄ USD toggle |
+| `meta.secondaryCurrency` | Optional. Add `{ "code": "USD", "symbol": "$", "rate": 0.21 }` to show a currency toggle (off by default, RM only) |
 | `meta.updated` | "Updated" date shown on the page and PDF |
 
 The PDF download is generated in the browser from the same JSON, so it always matches the site.

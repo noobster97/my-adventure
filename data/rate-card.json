@@ -1,22 +1,20 @@
 {
   "meta": {
     "title": "Rate Card",
-    "subtitle": "Clear starting prices. Every quote is tailored after a free 30-minute discovery call.",
+    "subtitle": "Simple, honest pricing for Malaysian businesses. Free consultation before every quote.",
     "owner": "Muhammad Syafiq Md Asri",
     "nickname": "Syafiq",
-    "role": "Full Stack Developer",
+    "role": "Software Developer",
     "email": "muhammadsyafiq1102@gmail.com",
     "whatsapp": "601114648597",
     "website": "noobster97.github.io/my-adventure",
     "currency": "RM",
-    "secondaryCurrency": { "code": "USD", "symbol": "$", "rate": 0.21 },
     "updated": "2026-10-14",
-    "validUntil": "2027-03-31",
+    "validUntil": "2027-06-30",
     "notes": [
-      "Prices are starting points and exclude third-party fees (domain, hosting, paid APIs, payment gateway charges).",
-      "Standard payment terms: 50% deposit, 30% at staging review, 20% on launch.",
-      "Every project includes source code handover and a free 30-day bug-fix warranty.",
-      "Rush delivery (under half the usual timeline) adds 25%."
+      "Payment: 50% deposit to start, 50% on launch. Monthly instalments available for projects above RM 5,000.",
+      "Includes source code handover and 30 days of free bug fixes after launch.",
+      "Third-party costs (domain, hosting, payment gateway fees, paid APIs) are paid directly by you."
     ]
   },
   "categories": [
@@ -24,114 +22,104 @@
       "id": "websites",
       "name": "Websites",
       "icon": "fa-globe",
-      "blurb": "Fast, responsive sites that look sharp and convert visitors.",
+      "blurb": "Fast, mobile-friendly websites for your business.",
       "packages": [
         {
-          "id": "web-starter",
-          "name": "Starter",
-          "tagline": "One-page landing for a launch or campaign",
-          "price": 1500,
+          "id": "web-landing",
+          "name": "Landing Page",
+          "tagline": "One page to promote a product, event or service",
+          "price": 800,
           "prefix": "",
           "suffix": "",
-          "timeline": "1 - 2 weeks",
+          "timeline": "5 - 7 days",
           "popular": false,
           "features": [
-            "1-page responsive landing",
-            "Contact form + WhatsApp button",
-            "Basic SEO + social preview",
-            "Deploy to your domain"
+            "1 page, mobile-friendly",
+            "WhatsApp + contact form",
+            "Basic SEO + Google Maps"
           ]
         },
         {
           "id": "web-business",
-          "name": "Business",
-          "tagline": "Multi-page company website with real content structure",
-          "price": 3500,
+          "name": "Business Website",
+          "tagline": "A complete company website that builds trust",
+          "price": 1800,
           "prefix": "",
           "suffix": "",
-          "timeline": "2 - 4 weeks",
+          "timeline": "2 - 3 weeks",
           "popular": true,
           "features": [
-            "Up to 6 pages",
-            "Custom design + motion",
-            "Bilingual BM / EN ready",
-            "Google Analytics + Search Console",
-            "1 round of design revisions"
+            "Up to 5 pages",
+            "Custom design + animation",
+            "SEO, Analytics + 2 revisions"
           ]
         },
         {
-          "id": "web-premium",
-          "name": "Premium CMS",
-          "tagline": "Content you can update yourself, without calling me",
-          "price": 6500,
+          "id": "web-cms",
+          "name": "Website + Admin",
+          "tagline": "Update your own content, products or news",
+          "price": 3500,
           "prefix": "From",
           "suffix": "",
-          "timeline": "4 - 6 weeks",
+          "timeline": "3 - 5 weeks",
           "popular": false,
           "features": [
-            "Up to 12 pages + blog/news",
+            "Up to 10 pages + blog/catalogue",
             "Admin panel to edit content",
-            "Image optimisation + caching",
-            "On-page SEO for every page",
-            "Training session included"
+            "Training + user guide"
           ]
         }
       ]
     },
     {
       "id": "systems",
-      "name": "Web Systems & SaaS",
+      "name": "Web Systems",
       "icon": "fa-laptop-code",
-      "blurb": "Booking, attendance, billing and admin systems built for real operations.",
+      "blurb": "Booking, attendance, registration and management systems - built to run your operations.",
       "packages": [
         {
-          "id": "sys-custom",
-          "name": "Custom System",
-          "tagline": "Booking, attendance, inventory or internal tools",
-          "price": 8000,
+          "id": "sys-starter",
+          "name": "Starter System",
+          "tagline": "Booking, registration, attendance or records",
+          "price": 4500,
           "prefix": "From",
           "suffix": "",
-          "timeline": "4 - 8 weeks",
+          "timeline": "3 - 5 weeks",
           "popular": false,
           "features": [
-            "Laravel backend + MySQL",
-            "Role-based admin dashboard",
-            "Reports + CSV / PDF export",
+            "Laravel + MySQL / PostgreSQL",
+            "Admin dashboard + reports",
             "Email notifications"
           ]
         },
         {
-          "id": "sys-saas-mvp",
-          "name": "SaaS MVP",
-          "tagline": "Launch a subscription product and start charging",
-          "price": 18000,
+          "id": "sys-business",
+          "name": "Business System",
+          "tagline": "Multi-role system with online payments",
+          "price": 9000,
           "prefix": "From",
           "suffix": "",
-          "timeline": "8 - 12 weeks",
+          "timeline": "6 - 10 weeks",
           "popular": true,
           "features": [
-            "Multi-tenant architecture",
-            "Stripe subscriptions + invoices",
-            "Tenant dashboard + super admin",
-            "OTP / email auth flows",
-            "Landing page included"
+            "Roles + permissions",
+            "Payment gateway included",
+            "Reports, export + audit log"
           ]
         },
         {
-          "id": "sys-scale",
-          "name": "Scale Platform",
-          "tagline": "Complex platforms, integrations and legacy migrations",
-          "price": 35000,
+          "id": "sys-saas",
+          "name": "SaaS Platform",
+          "tagline": "Sell your software by monthly subscription",
+          "price": 18000,
           "prefix": "From",
           "suffix": "",
-          "timeline": "12+ weeks",
+          "timeline": "10 - 14 weeks",
           "popular": false,
           "features": [
-            "Architecture + technical planning",
-            "Third-party API integrations",
-            "Legacy migration to Laravel",
-            "Performance + security hardening",
-            "Priority support for 3 months"
+            "Multi-tenant accounts",
+            "Subscription billing",
+            "Landing page + super admin"
           ]
         }
       ]
@@ -140,178 +128,115 @@
       "id": "mobile",
       "name": "Mobile Apps",
       "icon": "fa-mobile-screen",
-      "blurb": "Cross-platform Android & iOS apps with a solid API behind them.",
+      "blurb": "Android & iOS apps with a reliable backend behind them.",
       "packages": [
         {
           "id": "mob-pwa",
-          "name": "PWA App",
-          "tagline": "Installable web app - no app store needed",
-          "price": 6000,
+          "name": "Web App (PWA)",
+          "tagline": "Installs on any phone - no app store needed",
+          "price": 4000,
           "prefix": "From",
           "suffix": "",
-          "timeline": "3 - 5 weeks",
+          "timeline": "3 - 4 weeks",
           "popular": false,
           "features": [
-            "Installs on any phone",
-            "Offline-ready screens",
+            "Works on Android + iPhone",
             "Push notifications",
-            "Shares one codebase with web"
+            "Shares one system with web"
           ]
         },
         {
-          "id": "mob-mvp",
-          "name": "App MVP",
+          "id": "mob-app",
+          "name": "Mobile App",
           "tagline": "React Native / Flutter app for Android + iOS",
-          "price": 14000,
+          "price": 10000,
           "prefix": "From",
           "suffix": "",
           "timeline": "6 - 10 weeks",
           "popular": true,
           "features": [
-            "Android + iOS from one codebase",
-            "Up to 10 core screens",
-            "REST API + admin backend",
-            "Store submission support"
+            "Up to 10 screens",
+            "API + admin backend",
+            "Play Store / App Store help"
           ]
         },
         {
           "id": "mob-pro",
-          "name": "App Pro",
-          "tagline": "Payments, real-time data and heavier logic",
-          "price": 24000,
+          "name": "App + System",
+          "tagline": "App with payments, QR scan and full back office",
+          "price": 16000,
           "prefix": "From",
           "suffix": "",
           "timeline": "10 - 14 weeks",
           "popular": false,
           "features": [
             "In-app payments",
-            "Real-time updates",
-            "Scan / QR / camera features",
-            "Analytics + crash reporting",
-            "Post-launch iteration sprint"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "ai",
-      "name": "AI Tools",
-      "icon": "fa-wand-magic-sparkles",
-      "blurb": "Practical AI features that save time - not gimmicks.",
-      "packages": [
-        {
-          "id": "ai-feature",
-          "name": "AI Feature",
-          "tagline": "Add AI to an existing product",
-          "price": 3000,
-          "prefix": "From",
-          "suffix": "",
-          "timeline": "1 - 3 weeks",
-          "popular": false,
-          "features": [
-            "Gemini / Claude / OpenAI integration",
-            "Smart forms, summaries or tagging",
-            "Usage limits + cost controls"
-          ]
-        },
-        {
-          "id": "ai-assistant",
-          "name": "AI Assistant",
-          "tagline": "Chatbot trained on your business content",
-          "price": 6500,
-          "prefix": "From",
-          "suffix": "",
-          "timeline": "3 - 5 weeks",
-          "popular": true,
-          "features": [
-            "Answers from your own docs / FAQ",
-            "Website or WhatsApp channel",
-            "Handover to human staff",
-            "Conversation dashboard"
-          ]
-        },
-        {
-          "id": "ai-tool",
-          "name": "AI Product",
-          "tagline": "A standalone AI-powered tool or SaaS",
-          "price": 12000,
-          "prefix": "From",
-          "suffix": "",
-          "timeline": "6 - 10 weeks",
-          "popular": false,
-          "features": [
-            "Custom prompts + guardrails",
-            "Generation history + previews",
-            "Billing-ready user accounts",
-            "Deployed on Vercel / VPS"
+            "QR / scan features",
+            "Full web management system"
           ]
         }
       ]
     },
     {
       "id": "care",
-      "name": "Care Plans",
+      "name": "Support",
       "icon": "fa-shield-heart",
-      "blurb": "Keep it updated, secure and improving after launch.",
+      "blurb": "Keep your website or system safe, updated and improving after launch.",
       "packages": [
         {
           "id": "care-basic",
-          "name": "Keep Alive",
+          "name": "Basic Care",
           "tagline": "Updates, backups and peace of mind",
-          "price": 250,
+          "price": 150,
           "prefix": "",
           "suffix": "/month",
           "timeline": "Monthly",
           "popular": false,
           "features": [
-            "Security + dependency updates",
-            "Weekly backups",
+            "Security updates + backups",
             "Uptime monitoring",
             "1 hour of small edits"
           ]
         },
         {
-          "id": "care-growth",
-          "name": "Growth",
-          "tagline": "A developer on call for your product",
-          "price": 800,
+          "id": "care-pro",
+          "name": "Pro Care",
+          "tagline": "A developer on standby for your business",
+          "price": 450,
           "prefix": "",
           "suffix": "/month",
           "timeline": "Monthly",
           "popular": true,
           "features": [
-            "Everything in Keep Alive",
-            "Up to 8 hours of dev work",
-            "Monthly performance report",
-            "Priority response in 24h"
+            "Everything in Basic Care",
+            "Up to 5 hours of dev work",
+            "Reply within 24 hours"
           ]
         },
         {
           "id": "care-hourly",
           "name": "Hourly",
-          "tagline": "Ad-hoc fixes, features and consulting",
-          "price": 90,
+          "tagline": "One-off fixes, features or consultation",
+          "price": 70,
           "prefix": "",
           "suffix": "/hour",
           "timeline": "On demand",
           "popular": false,
           "features": [
             "Bug fixes + small features",
-            "Code review / audits",
-            "Minimum 2 hours per request"
+            "Code review / server setup",
+            "Minimum 2 hours"
           ]
         }
       ]
     }
   ],
   "addons": [
-    { "id": "addon-payment", "name": "Payment gateway (Stripe / ToyyibPay / Billplz)", "price": 800, "unit": "" },
-    { "id": "addon-bilingual", "name": "Extra language (BM / EN / more)", "price": 600, "unit": "" },
-    { "id": "addon-admin", "name": "Filament admin panel", "price": 1500, "unit": "" },
-    { "id": "addon-notify", "name": "WhatsApp / email notifications", "price": 500, "unit": "" },
-    { "id": "addon-ai-chat", "name": "AI chatbot widget", "price": 1500, "unit": "" },
-    { "id": "addon-seo", "name": "Advanced SEO setup", "price": 500, "unit": "" },
-    { "id": "addon-page", "name": "Extra page", "price": 200, "unit": "/page" },
-    { "id": "addon-hosting", "name": "Domain, hosting + email setup", "price": 250, "unit": "" }
+    { "id": "addon-payment", "name": "Payment gateway (ToyyibPay / Billplz / CHIP / Stripe)", "price": 600, "unit": "" },
+    { "id": "addon-ai", "name": "AI feature (chatbot, smart forms, summaries)", "price": 1500, "unit": "" },
+    { "id": "addon-notify", "name": "WhatsApp / email notifications", "price": 400, "unit": "" },
+    { "id": "addon-language", "name": "Extra language (BM / EN)", "price": 400, "unit": "" },
+    { "id": "addon-page", "name": "Extra page", "price": 150, "unit": "/page" },
+    { "id": "addon-hosting", "name": "Domain, hosting + email setup", "price": 200, "unit": "" }
   ]
 }

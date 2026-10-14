@@ -56,19 +56,19 @@ export async function downloadRateCardPdf(data, { currency, summary } = {}) {
 
     // Header band
     doc.setFillColor(...INK);
-    doc.rect(0, 0, W, 44, 'F');
+    doc.rect(0, 0, W, 40, 'F');
     doc.setFillColor(...YELLOW);
-    doc.rect(0, 44, W, 2.2, 'F');
+    doc.rect(0, 40, W, 2.2, 'F');
     font('bold', 26);
     setColor([255, 255, 255]);
-    doc.text(pdfText((meta.title || 'Rate Card').toUpperCase()), M, 21);
+    doc.text(pdfText((meta.title || 'Rate Card').toUpperCase()), M, 19);
     font('normal', 11);
-    doc.text(pdfText([meta.owner, meta.role].filter(Boolean).join('  |  ')), M, 30);
+    doc.text(pdfText([meta.owner, meta.role].filter(Boolean).join('  |  ')), M, 27);
     font('normal', 8.5);
     doc.setTextColor(220, 226, 230);
     const phone = meta.whatsapp ? `+${meta.whatsapp.replace(/^(\d{2})(\d{2})(\d{4})(\d+)$/, '$1 $2-$3 $4')}` : '';
     [meta.email, phone, meta.website].filter(Boolean).forEach((line, i) => {
-        doc.text(pdfText(line), W - M, 17 + i * 5.5, { align: 'right' });
+        doc.text(pdfText(line), W - M, 15 + i * 5.5, { align: 'right' });
     });
     font('normal', 8);
     doc.setTextColor(200, 208, 214);
@@ -77,163 +77,153 @@ export async function downloadRateCardPdf(data, { currency, summary } = {}) {
         meta.validUntil && `Valid until ${formatDate(meta.validUntil)}`,
         currency.approx && `Prices converted from ${meta.currency} at ${meta.secondaryCurrency.rate}`
     ].filter(Boolean).join('   |   ');
-    doc.text(pdfText(dates), M, 38);
+    doc.text(pdfText(dates), M, 34.5);
 
-    y = 56;
+    y = 50;
     if (meta.subtitle) {
         font('italic', 10);
         setColor(DIM);
         const lines = doc.splitTextToSize(pdfText(meta.subtitle), contentW);
         doc.text(lines, M, y);
-        y += lines.length * 4.6 + 4;
+        y += lines.length * 4.6 + 3;
     }
 
-    // Package grid per category
-    const gap = 5;
-    (data.categories || []).forEach((category) => {
-        const packages = category.packages || [];
-        if (!packages.length) return;
-        const cols = Math.min(3, packages.length);
-        const colW = (contentW - gap * (cols - 1)) / cols;
-        const pad = 4;
-        const innerW = colW - pad * 2;
+    // Compact price list: categories in a 2-column grid, one row per package
+    const gap = 8;
+    const colW = (contentW - gap) / 2;
+    const categories = (data.categories || []).filter((c) => (c.packages || []).length);
 
-        const layouts = packages.map((pkg) => {
-            font('normal', 8);
-            const tagline = doc.splitTextToSize(pdfText(pkg.tagline), innerW);
-            const features = (pkg.features || []).map((f) => doc.splitTextToSize(pdfText(f), innerW - 4));
-            const featureH = features.reduce((sum, lines) => sum + lines.length * 3.6 + 1, 0);
-            const height = pad + 8.4 + (tagline.length - 1) * 3.6 + 11.5 + 4.4 + (pkg.timeline ? 5 : 0) + featureH + pad - 2;
-            return { pkg, tagline, features, height };
+    const layoutCategory = (category) => {
+        font('normal', 7.5);
+        const blurb = category.blurb ? doc.splitTextToSize(pdfText(category.blurb), colW) : [];
+        const rows = category.packages.map((pkg) => {
+            font('normal', 7.3);
+            const detail = doc.splitTextToSize(pdfText([pkg.tagline, ...(pkg.features || [])].filter(Boolean).join('  \u2022  ')), colW - 6);
+            return { pkg, detail, height: 11 + detail.length * 3.2 };
         });
+        const height = 7 + blurb.length * 3.3 + 2 + rows.reduce((sum, r) => sum + r.height, 0);
+        return { category, blurb, rows, height };
+    };
 
-        for (let start = 0; start < layouts.length; start += cols) {
-            const row = layouts.slice(start, start + cols);
-            const rowH = Math.max(...row.map((l) => l.height));
-            const titleH = start === 0 ? 11 : 0;
-            ensure(titleH + rowH + 4);
+    const drawCategory = (layout, x, top, blurbLines) => {
+        let cy = top;
+        doc.setFillColor(...RED);
+        doc.rect(x, cy - 3.4, 2.2, 4.4, 'F');
+        font('bold', 12);
+        setColor(INK);
+        doc.text(pdfText(layout.category.name), x + 4.5, cy);
+        cy += 4.6;
+        font('normal', 7.5);
+        setColor(DIM);
+        if (layout.blurb.length) {
+            doc.text(layout.blurb, x, cy);
+        }
+        cy += blurbLines * 3.3;
+        cy += 1.5;
 
-            if (start === 0) {
+        layout.rows.forEach(({ pkg, detail, height }) => {
+            if (pkg.popular) {
+                doc.setFillColor(...STICKY);
+                doc.setDrawColor(...INK);
+                doc.setLineWidth(0.4);
+                doc.roundedRect(x - 1.5, cy, colW + 3, height - 1.2, 1.5, 1.5, 'FD');
+            } else {
+                doc.setDrawColor(...LINE);
+                doc.setLineWidth(0.25);
+                doc.line(x, cy + height - 0.6, x + colW, cy + height - 0.6);
+            }
+            const base = cy + 5;
+            font('bold', 10);
+            setColor(INK);
+            doc.text(pdfText(pkg.name), x + 1.5, base);
+            if (pkg.popular) {
+                const nameW = doc.getStringUnitWidth(pdfText(pkg.name)) * 10 / doc.internal.scaleFactor;
                 doc.setFillColor(...RED);
-                doc.rect(M, y - 3.4, 2.4, 4.4, 'F');
-                font('bold', 13);
-                setColor(INK);
-                doc.text(pdfText(category.name), M + 5, y);
-                if (category.blurb) {
-                    font('normal', 8.5);
-                    setColor(DIM);
-                    const nameW = doc.getStringUnitWidth(pdfText(category.name)) * 13 / doc.internal.scaleFactor;
-                    const blurb = doc.splitTextToSize(pdfText(category.blurb), contentW - nameW - 10)[0];
-                    doc.text(blurb, M + 5 + nameW + 4, y);
-                }
-                y += 5;
+                doc.roundedRect(x + 3.5 + nameW, base - 3.1, 15, 3.9, 0.8, 0.8, 'F');
+                font('bold', 5.6);
+                setColor([255, 255, 255]);
+                doc.text('POPULAR', x + 11 + nameW, base - 0.3, { align: 'center' });
             }
 
-            row.forEach((layout, i) => {
-                const { pkg } = layout;
-                const x = M + i * (colW + gap);
-                let cy = y + pad;
-                if (pkg.popular) {
-                    doc.setFillColor(...STICKY);
-                    doc.setDrawColor(...INK);
-                    doc.setLineWidth(0.6);
-                    doc.roundedRect(x, y, colW, rowH, 2, 2, 'FD');
-                    doc.setFillColor(...RED);
-                    doc.roundedRect(x + colW - 26, y - 2.6, 23, 5.2, 1, 1, 'F');
-                    font('bold', 6.5);
-                    setColor([255, 255, 255]);
-                    doc.text('MOST POPULAR', x + colW - 14.5, y + 0.8, { align: 'center' });
-                } else {
-                    doc.setDrawColor(...LINE);
-                    doc.setLineWidth(0.35);
-                    doc.roundedRect(x, y, colW, rowH, 2, 2, 'S');
-                }
-
-                font('bold', 11);
-                setColor(INK);
-                cy += 4;
-                doc.text(pdfText(pkg.name), x + pad, cy);
-                font('normal', 8);
+            // Price block, right-aligned: [from] RM 1,800 [/month]
+            const unit = unitOf(pkg);
+            const right = x + colW - 1.5;
+            let px = right;
+            if (unit) {
+                font('normal', 7.5);
                 setColor(DIM);
-                cy += 4.4;
-                doc.text(layout.tagline, x + pad, cy);
-                cy += (layout.tagline.length - 1) * 3.6;
-                if (pkg.prefix) {
-                    font('normal', 7);
-                    setColor(DIM);
-                    doc.text(pdfText(pkg.prefix.toUpperCase()), x + pad, cy + 5);
-                }
-                cy += 11.5;
-                font('bold', 15);
-                setColor(INK);
-                const price = money(pkg.price);
-                doc.text(pdfText(price), x + pad, cy);
-                const unit = unitOf(pkg);
-                if (unit) {
-                    const priceW = doc.getStringUnitWidth(pdfText(price)) * 15 / doc.internal.scaleFactor;
-                    font('normal', 8.5);
-                    setColor(DIM);
-                    doc.text(pdfText(unit), x + pad + priceW + 1, cy);
-                }
-                cy += 4.4;
+                doc.text(pdfText(unit), px, base, { align: 'right' });
+                px -= doc.getStringUnitWidth(pdfText(unit)) * 7.5 / doc.internal.scaleFactor + 0.6;
+            }
+            font('bold', 11.5);
+            setColor(INK);
+            const price = pdfText(money(pkg.price));
+            doc.text(price, px, base, { align: 'right' });
+            px -= doc.getStringUnitWidth(price) * 11.5 / doc.internal.scaleFactor + 1.2;
+            if (pkg.prefix) {
+                font('normal', 6.8);
+                setColor(DIM);
+                doc.text(pdfText(pkg.prefix.toLowerCase()), px, base, { align: 'right' });
+            }
 
-                if (pkg.timeline) {
-                    font('normal', 7.5);
-                    setColor(RED);
-                    doc.text(pdfText(`Timeline: ${pkg.timeline}`), x + pad, cy);
-                    cy += 5;
-                }
+            if (pkg.timeline) {
+                font('normal', 6.8);
+                setColor(RED);
+                doc.text(pdfText(pkg.timeline), x + 1.5, base + 3.6);
+            }
+            font('normal', 7.3);
+            doc.setTextColor(85, 98, 112);
+            doc.text(detail, x + 1.5, base + 7.4);
+            cy += height;
+        });
+    };
 
-                font('normal', 8);
-                setColor(INK);
-                layout.features.forEach((lines) => {
-                    doc.setDrawColor(...RED);
-                    doc.setLineWidth(0.45);
-                    doc.line(x + pad, cy - 1.2, x + pad + 0.9, cy - 0.3);
-                    doc.line(x + pad + 0.9, cy - 0.3, x + pad + 2.4, cy - 2.2);
-                    doc.text(lines, x + pad + 4, cy);
-                    cy += lines.length * 3.6 + 1;
-                });
-            });
-            y += rowH + 8;
-        }
-    });
+    for (let i = 0; i < categories.length; i += 2) {
+        const pair = categories.slice(i, i + 2).map(layoutCategory);
+        const blurbLines = Math.max(...pair.map((l) => l.blurb.length));
+        const rowH = Math.max(...pair.map((l) => l.height + (blurbLines - l.blurb.length) * 3.3));
+        ensure(rowH + 4);
+        pair.forEach((layout, col) => drawCategory(layout, M + col * (colW + gap), y, blurbLines));
+        y += rowH + 6;
+    }
 
     // Add-ons
     const addons = data.addons || [];
     if (addons.length) {
-        ensure(14 + Math.ceil(addons.length / 2) * 6.5);
+        ensure(14 + Math.ceil(addons.length / 2) * 9);
         doc.setFillColor(...RED);
         doc.rect(M, y - 3.4, 2.4, 4.4, 'F');
         font('bold', 13);
         setColor(INK);
         doc.text('Add-ons', M + 5, y);
         y += 6;
-        const colW = (contentW - 8) / 2;
+        const addonW = (contentW - gap) / 2;
         const half = Math.ceil(addons.length / 2);
+        const columnY = [y, y];
         addons.forEach((addon, i) => {
             const col = i < half ? 0 : 1;
-            const row = i % half;
-            const x = M + col * (colW + 8);
-            const ry = y + row * 6.5;
-            font('normal', 8.5);
+            const x = M + col * (addonW + gap);
+            const ry = columnY[col];
+            font('normal', 8.3);
             setColor(INK);
-            const name = doc.splitTextToSize(pdfText(addon.name), colW - 30)[0];
+            const name = doc.splitTextToSize(pdfText(addon.name), addonW - 28).slice(0, 2);
             doc.text(name, x, ry);
             font('bold', 8.5);
-            doc.text(pdfText(`${money(addon.price)}${addon.unit || ''}`), x + colW, ry, { align: 'right' });
+            doc.text(pdfText(`${money(addon.price)}${addon.unit || ''}`), x + addonW, ry, { align: 'right' });
+            const rowEnd = ry + (name.length - 1) * 3.5 + 2;
             doc.setDrawColor(...LINE);
             doc.setLineWidth(0.2);
             doc.setLineDashPattern([0.6, 0.8], 0);
-            doc.line(x, ry + 2, x + colW, ry + 2);
+            doc.line(x, rowEnd, x + addonW, rowEnd);
             doc.setLineDashPattern([], 0);
+            columnY[col] = rowEnd + 4.6;
         });
-        y += half * 6.5 + 6;
+        y = Math.max(...columnY) + 3;
     }
 
     // Visitor's estimate, if they built one
     if (summary?.lines?.length) {
-        const rowsH = summary.lines.length * 6 + 24;
+        const rowsH = summary.lines.length * 5.2 + 22;
         ensure(rowsH + 4);
         doc.setFillColor(250, 248, 240);
         doc.setDrawColor(...INK);
@@ -253,7 +243,7 @@ export async function downloadRateCardPdf(data, { currency, summary } = {}) {
             doc.text(pdfText(`${line.entry.item.name}${group}${qty}`), M + 5, ey);
             const recurring = isRecurring(line.unit) ? line.unit : '';
             doc.text(pdfText(`${currency.approx ? '~' : ''}${currency.symbol} ${formatNumber(line.amount)}${recurring}`), W - M - 5, ey, { align: 'right' });
-            ey += 6;
+            ey += 5.2;
         });
         doc.setDrawColor(...INK);
         doc.setLineWidth(0.3);

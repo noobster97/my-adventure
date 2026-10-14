@@ -4,7 +4,7 @@
 
 .rates-section {
     position: relative;
-    padding: 6rem 0 5rem;
+    padding: 5rem 0 4rem;
     --rc-paper: #fffef8;
     --rc-ink: var(--primary);
     --rc-red: var(--secondary);
@@ -49,7 +49,7 @@
 /* --- Header --- */
 .rc-head {
     text-align: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
 }
 
 .rc-kicker {
@@ -300,7 +300,7 @@
     font-family: var(--font-heading);
     font-size: 1.25rem;
     color: var(--text-dim);
-    margin: 1.2rem auto 2.8rem;
+    margin: 1rem auto 2.2rem;
     min-height: 1.6em;
 }
 
@@ -308,11 +308,11 @@
 .rc-cards {
     display: grid;
     grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
-    gap: 2.2rem;
-    max-width: 1100px;
+    gap: 2rem;
+    max-width: 1040px;
     margin: 0 auto;
     align-items: stretch;
-    min-height: 420px;
+    min-height: 340px;
 }
 
 .rc-card {
@@ -342,7 +342,7 @@
     color: var(--rc-ink);
     border: 2px solid var(--rc-ink);
     border-radius: 18px 6px 20px 8px / 8px 20px 6px 18px;
-    padding: 2rem 1.6rem 1.6rem;
+    padding: 1.6rem 1.4rem 1.3rem;
     box-shadow: 6px 6px 0 var(--rc-ink);
     transform-style: preserve-3d;
     transition: transform .18s ease-out, box-shadow .3s ease;
@@ -460,7 +460,7 @@
 
 .rc-card-name {
     font-family: var(--font-heading);
-    font-size: 2rem;
+    font-size: 1.8rem;
     line-height: 1.1;
     margin-bottom: .3rem;
     position: relative;
@@ -482,7 +482,7 @@
     flex-wrap: wrap;
     align-items: baseline;
     gap: .15rem .4rem;
-    margin: 1.2rem 0 .3rem;
+    margin: .9rem 0 .2rem;
     position: relative;
     z-index: 1;
     transform: translateZ(40px);
@@ -500,7 +500,7 @@
 
 .rc-amount {
     font-family: var(--font-heading);
-    font-size: 3.3rem;
+    font-size: 3rem;
     line-height: 1;
     color: var(--rc-ink);
     font-variant-numeric: tabular-nums;
@@ -573,8 +573,8 @@
 .rc-features {
     list-style: none;
     display: grid;
-    gap: .55rem;
-    margin-bottom: 1.6rem;
+    gap: .4rem;
+    margin-bottom: 1.3rem;
     position: relative;
     z-index: 1;
 }
@@ -585,7 +585,7 @@
     gap: .6rem;
     align-items: start;
     font-family: var(--font-heading);
-    font-size: 1.15rem;
+    font-size: 1.12rem;
     line-height: 1.3;
 }
 
@@ -698,7 +698,7 @@
     grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
     gap: 3.5rem;
     max-width: 1100px;
-    margin: 5.5rem auto 0;
+    margin: 4rem auto 0;
     align-items: start;
 }
 
@@ -727,21 +727,40 @@
     50% { transform: translate(6px, 4px); }
 }
 
-.rc-hint {
+.rc-steps {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1.2rem;
+    margin: .7rem 0 1.4rem;
     font-family: var(--font-heading);
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     color: var(--text-dim);
-    margin: .6rem 0 1.6rem;
 }
 
-.rc-hint strong {
+.rc-steps li {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+}
+
+.rc-steps b {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--rc-ink);
+    background: var(--rc-yellow);
     color: var(--rc-ink);
+    font-family: var(--font-main);
+    font-size: .75rem;
 }
 
 .rc-addons {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: .85rem;
+    gap: .7rem;
 }
 
 .rc-chip {
@@ -754,7 +773,7 @@
     background: #fff;
     border: 2px solid var(--rc-ink);
     border-radius: 12px 4px 14px 6px / 6px 14px 4px 12px;
-    padding: .75rem .9rem;
+    padding: .6rem .8rem;
     cursor: pointer;
     color: var(--rc-ink);
     box-shadow: 3px 3px 0 rgba(44, 62, 80, .85);
@@ -817,10 +836,10 @@
 
 .rc-notes {
     list-style: none;
-    margin-top: 2rem;
+    margin-top: 1.4rem;
     display: grid;
-    gap: .55rem;
-    padding: 1.2rem 1.3rem;
+    gap: .4rem;
+    padding: 1rem 1.1rem;
     border: 2px dashed rgba(44, 62, 80, .4);
     border-radius: 14px 6px 16px 8px / 8px 16px 6px 14px;
     background: rgba(255, 255, 255, .6);
@@ -830,9 +849,9 @@
     display: grid;
     grid-template-columns: 16px 1fr;
     gap: .6rem;
-    font-size: .9rem;
+    font-size: .85rem;
     color: var(--text-dim);
-    line-height: 1.5;
+    line-height: 1.45;
 }
 
 .rc-notes i {
@@ -891,7 +910,7 @@
     position: relative;
     z-index: 1;
     margin: -10px 14px 0;
-    padding: 2rem 1.4rem 1.6rem;
+    padding: 1.6rem 1.3rem 1.3rem;
     background: var(--rc-paper);
     color: var(--rc-ink);
     font-family: var(--rc-mono);
@@ -1026,6 +1045,8 @@
 }
 
 .rc-totals {
+    position: relative;
+    min-height: 7.2rem;
     margin-top: 1rem;
     padding-top: .9rem;
     border-top: 3px double var(--rc-ink);
@@ -1071,8 +1092,8 @@
 
 .rc-stamp {
     position: absolute;
-    right: .6rem;
-    top: 1.4rem;
+    left: .1rem;
+    top: 3.6rem;
     font-family: var(--font-main);
     font-weight: 800;
     font-size: .85rem;
@@ -1137,9 +1158,9 @@
 }
 
 .rc-barcode {
-    height: 34px;
-    margin: 1.4rem auto .4rem;
-    width: 80%;
+    height: 26px;
+    margin: 1.1rem auto .35rem;
+    width: 70%;
     background: repeating-linear-gradient(90deg,
             var(--rc-ink) 0 2px, transparent 2px 4px,
             var(--rc-ink) 4px 5px, transparent 5px 8px,
