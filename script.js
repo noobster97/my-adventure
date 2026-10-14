@@ -149,13 +149,13 @@ if (navbar) {
 // --- Smooth Scrolling ---
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        const target = href.length > 1 ? document.querySelector(href) : null;
+        if (!target) return;
         e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth'
-            });
-        }
+        target.scrollIntoView({
+            behavior: 'smooth'
+        });
     });
 });
 
@@ -205,6 +205,8 @@ window.addEventListener('scroll', () => {
 
 // Initialize Typing Animation
 document.addEventListener("DOMContentLoaded", () => {
+    const year = document.getElementById('year');
+    if (year) year.textContent = new Date().getFullYear();
     setTimeout(typeWriter, 500);
     initImageCarousel();
     initImageModal();

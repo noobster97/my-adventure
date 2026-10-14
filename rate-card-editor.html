@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Rate Card Editor</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Patrick+Hand&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="rate-card.css">
+    <style>
+        body { padding-bottom: 0; }
+
+        .ed-bar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: .75rem;
+            padding: .9rem 1.5rem;
+            background: var(--primary);
+            color: #fff;
+            border-bottom: 3px solid var(--accent);
+        }
+
+        .ed-bar h1 {
+            font-family: var(--font-heading);
+            font-size: 1.7rem;
+            font-weight: 400;
+            margin-right: auto;
+        }
+
+        .ed-bar h1 small {
+            font-family: var(--font-main);
+            font-size: .8rem;
+            opacity: .7;
+            margin-left: .6rem;
+        }
+
+        .ed-status {
+            font-size: .85rem;
+            opacity: .85;
+        }
+
+        .ed-status.is-dirty { color: var(--accent); opacity: 1; }
+
+        .ed-bar button, .ed-bar label.ed-toggle {
+            font-family: var(--font-main);
+            font-size: .85rem;
+            font-weight: 600;
+            border: 2px solid #fff;
+            background: transparent;
+            color: #fff;
+            border-radius: 999px;
+            padding: .45rem .95rem;
+            cursor: pointer;
+            display: inline-flex;
+            gap: .4rem;
+            align-items: center;
+        }
+
+        .ed-bar button.primary { background: var(--accent); color: var(--primary); border-color: var(--accent); }
+        .ed-bar button:hover { transform: translateY(-1px); }
+
+        .ed-layout {
+            display: grid;
+            grid-template-columns: minmax(380px, 520px) 1fr;
+            min-height: calc(100vh - 66px);
+        }
+
+        .ed-form {
+            background: #fff;
+            border-right: 2px solid var(--primary);
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: calc(100vh - 66px);
+            position: sticky;
+            top: 66px;
+        }
+
+        .ed-preview { padding: 3rem 0 6rem; overflow: hidden; }
+
+        .ed-group {
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            margin-bottom: 1.2rem;
+            background: #fdfbf7;
+        }
+
+        .ed-group > summary {
+            cursor: pointer;
+            padding: .8rem 1rem;
+            font-family: var(--font-heading);
+            font-size: 1.35rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            list-style: none;
+        }
+
+        .ed-group > summary::-webkit-details-marker { display: none; }
+        .ed-group > summary::before { content: '\25B8'; transition: transform .2s; }
+        .ed-group[open] > summary::before { transform: rotate(90deg); }
+        .ed-group > summary .ed-actions { margin-left: auto; }
+        .ed-body { padding: 0 1rem 1rem; display: grid; gap: .75rem; }
+
+        .ed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+        .ed-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+
+        .ed-field { display: grid; gap: .25rem; font-size: .78rem; font-weight: 600; color: var(--text-dim); }
+        .ed-field.full { grid-column: 1 / -1; }
+
+        .ed-field input, .ed-field textarea, .ed-field select {
+            font: 500 .92rem var(--font-main);
+            color: var(--primary);
+            border: 1.5px solid #c9d0d6;
+            border-radius: 8px;
+            padding: .5rem .6rem;
+            background: #fff;
+            width: 100%;
+        }
+
+        .ed-field textarea { min-height: 92px; resize: vertical; line-height: 1.45; }
+        .ed-field input:focus, .ed-field textarea:focus { outline: 2px solid var(--accent); border-color: var(--primary); }
+
+        .ed-check { display: flex; gap: .5rem; align-items: center; font-size: .85rem; font-weight: 600; }
+
+        .ed-pkg {
+            border: 1.5px dashed #9aa5ae;
+            border-radius: 10px;
+            padding: .8rem;
+            display: grid;
+            gap: .65rem;
+            background: #fff;
+        }
+
+        .ed-pkg-head { display: flex; align-items: center; gap: .5rem; font-family: var(--font-heading); font-size: 1.2rem; }
+        .ed-pkg-head .ed-actions { margin-left: auto; }
+
+        .ed-actions { display: inline-flex; gap: .25rem; }
+
+        .ed-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            border: 1.5px solid #c9d0d6;
+            background: #fff;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .ed-icon:hover { background: var(--accent); border-color: var(--primary); }
+        .ed-icon.danger:hover { background: var(--secondary); color: #fff; }
+
+        .ed-add {
+            border: 2px dashed var(--primary);
+            background: transparent;
+            border-radius: 10px;
+            padding: .6rem;
+            font: 600 .9rem var(--font-main);
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .ed-add:hover { background: #fef9c3; }
+
+        .ed-addon { display: grid; grid-template-columns: 1fr 90px 80px auto; gap: .5rem; align-items: end; }
+
+        .ed-help { font-size: .82rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 1rem; }
+        .ed-help code { background: #f1f3f5; padding: .05rem .3rem; border-radius: 4px; }
+
+        .ed-locked {
+            max-width: 560px;
+            margin: 12vh auto;
+            text-align: center;
+            background: #fff;
+            border: 2px solid var(--primary);
+            border-radius: var(--border-radius-sketch);
+            box-shadow: 8px 8px 0 var(--primary);
+            padding: 3rem 2rem;
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+        }
+
+        .ed-locked h1 { font-size: 2.4rem; margin-bottom: .5rem; }
+        .ed-locked p { color: var(--text-dim); margin-bottom: 1.5rem; }
+        .ed-locked a { margin: .3rem; }
+
+        .ed-error { color: var(--secondary); font-size: .85rem; }
+
+        @media (max-width: 1000px) {
+            .ed-layout { grid-template-columns: 1fr; }
+            .ed-form { position: static; max-height: none; border-right: 0; border-bottom: 2px solid var(--primary); }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="editor-app"><p class="rc-loading">Loading editor&hellip;</p></div>
+    <script type="module" src="rate-card-editor.js"></script>
+</body>
+
+</html>

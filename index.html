@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Muhammad Syafiq | Software Developer</title>
     <meta name="description"
-        content="Portfolio of Muhammad Syafiq bin Md Asri, a Software Developer with 6+ years of experience building SaaS platforms, web systems, websites, and AI-assisted tools.">
+        content="Portfolio and rate card of Muhammad Syafiq bin Md Asri, a Malaysian Software Developer with 6+ years building business systems, SaaS platforms, websites, and mobile apps.">
 
     <!-- Favicon -->
     <meta name="theme-color" content="#fdfbf7">
@@ -41,6 +41,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="rate-card.css">
 </head>
 
 <body>
@@ -51,12 +52,13 @@
     <div class="container">
         <nav class="navbar">
             <div class="container">
-                    <a href="#" class="logo">Syafiq<span class="dot">.</span></a>
+                    <a href="#home" class="logo">Syafiq<span class="dot">.</span></a>
                 <div class="nav-links">
                     <a href="#home">Home</a>
                     <a href="#services">Services</a>
                     <a href="#experience">Experience</a>
                     <a href="#projects">Work</a>
+                    <a href="#rates">Rates</a>
                     <a href="#contact">Contact</a>
                 </div>
                 <!-- Mobile Menu Btn handled by bottom nav -->
@@ -68,17 +70,18 @@
             <div class="container">
                 <div class="hero-content centered">
                     <div class="badge-container">
-                        <span class="badge">Available for SaaS & Web System Work</span>
+                        <span class="badge">Open for Freelance Projects</span>
                     </div>
                     <h1 class="display-text">
                         <span id="typing-text"></span><span class="cursor-blink">|</span>
                     </h1>
-                    <p class="lead-text">Full stack developer with 6+ years across government, private sector, and NGO
-                        systems. I build SaaS platforms, business web systems, mobile apps, and AI-assisted tools that
-                        are practical, polished, and built to scale.</p>
+                    <p class="lead-text">Software developer with 6+ years across government, private sector, healthcare, and NGO
+                        systems. I build business systems, SaaS platforms, mobile apps, and payment-ready websites
+                        with Laravel, PHP, and modern JavaScript, practical, polished, and built to scale.</p>
                     <div class="hero-btns">
                         <a href="#contact" class="btn-primary">Get in Touch <i class="fas fa-paper-plane"></i></a>
                         <a href="#projects" class="btn-secondary">View Portfolio</a>
+                        <a href="#rates" class="btn-secondary">See Rates <i class="fas fa-tags"></i></a>
                         <a href="muhammad-syafiq-resume.pdf" class="btn-secondary" download>Download Resume <i class="fas fa-download"></i></a>
                     </div>
                     <div class="stats-row">
@@ -115,8 +118,9 @@
                             operations organized and reliable.</p>
                         <ul class="feature-list">
                             <li><i class="fas fa-check"></i> Laravel + React SaaS</li>
-                            <li><i class="fas fa-check"></i> Booking & Billing Flows</li>
-                            <li><i class="fas fa-check"></i> Admin Dashboards</li>
+                            <li><i class="fas fa-check"></i> Booking, Queue & Registration Flows</li>
+                            <li><i class="fas fa-check"></i> ToyyibPay, Billplz, CHIP & Stripe</li>
+                            <li><i class="fas fa-check"></i> Admin Dashboards & Role Access</li>
                         </ul>
                     </div>
                     <div class="bento-card medium spotlight-card">
@@ -158,6 +162,10 @@
                     <div class="skill-pill"><img class="skill-ico" src="assets/icons/flutter.svg" alt="" aria-hidden="true"> Flutter</div>
                     <div class="skill-pill"><i class="fab fa-java skill-ico-fa" aria-hidden="true"></i> Java</div>
                     <div class="skill-pill"><img class="skill-ico" src="assets/icons/mysql.svg" alt="" aria-hidden="true"> MySQL</div>
+                    <div class="skill-pill"><i class="fas fa-database skill-ico-fa" aria-hidden="true"></i> PostgreSQL</div>
+                    <div class="skill-pill"><i class="fab fa-microsoft skill-ico-fa" aria-hidden="true"></i> Azure</div>
+                    <div class="skill-pill"><i class="fab fa-bootstrap skill-ico-fa" aria-hidden="true"></i> Bootstrap</div>
+                    <div class="skill-pill"><i class="fas fa-credit-card skill-ico-fa" aria-hidden="true"></i> Payment Gateways</div>
                     <div class="skill-pill"><i class="fas fa-plug skill-ico-fa" aria-hidden="true"></i> REST APIs</div>
                     <div class="skill-pill"><img class="skill-ico" src="assets/icons/pwa.svg" alt="" aria-hidden="true"> PWA</div>
                     <div class="skill-pill"><img class="skill-ico" src="assets/icons/vercel.svg" alt="" aria-hidden="true"> Vercel</div>
@@ -179,33 +187,40 @@
                 </div>
 
                 <div class="experience-grid">
+                    <div class="experience-card spotlight-card current">
+                        <span class="experience-period"><span class="live-dot" aria-hidden="true"></span> Jul 2026 - Present</span>
+                        <h3>Software Developer</h3>
+                        <p class="experience-company">GEITNA Network Sdn Bhd</p>
+                        <p>Building a marketing &amp; sales team management system (pure PHP + PostgreSQL) with role-based
+                            access and payment gateway collection, plus queue management for a clinic/panel system used by
+                            clinics across Malaysia, on Microsoft Azure and local servers.</p>
+                    </div>
                     <div class="experience-card spotlight-card">
                         <span class="experience-period">2024 - 2026</span>
                         <h3>Full Stack Developer</h3>
                         <p class="experience-company">Murtadha Dakwah Center (MADAD)</p>
-                        <p>Built attendance, hall booking, restaurant booking, pet care, and education management
-                            systems; led legacy migrations to Laravel and implemented Filament v3 admin panels.</p>
+                        <p>Migrated legacy systems to Laravel with Filament v3 admin panels; built attendance (Android +
+                            web), hall and restaurant booking, pet care, and education management systems.</p>
                     </div>
                     <div class="experience-card spotlight-card">
                         <span class="experience-period">2022 - 2024</span>
                         <h3>Back End Developer</h3>
-                        <p class="experience-company">Skynue Sdn Bhd</p>
-                        <p>Designed REST APIs for 1000+ users, built Laravel/PHP backends, optimized MySQL databases,
-                            and supported React Native plus Expo mobile applications.</p>
+                        <p class="experience-company">Applink Solutions</p>
+                        <p>Built Laravel/PHP backends and RESTful APIs for web and mobile apps, optimized MySQL queries,
+                            and shipped React Native + Expo apps.</p>
                     </div>
                     <div class="experience-card spotlight-card">
                         <span class="experience-period">2020 - 2022</span>
-                        <h3>Mobile App Developer</h3>
-                        <p class="experience-company">Applink Solutions</p>
-                        <p>Developed native Android apps using Java, built React Native cross-platform solutions, and
-                            integrated mobile backends with PHP and MySQLi.</p>
+                        <h3>Assistant Executive Officer - IT</h3>
+                        <p class="experience-company">Lembaga Hasil Dalam Negeri</p>
+                        <p>Developed the Hasil Transformation System on OutSystems, maintained network infrastructure,
+                            and supported 5G research and rollout projects.</p>
                     </div>
                     <div class="experience-card spotlight-card">
                         <span class="experience-period">2019</span>
-                        <h3>Assistant Executive Officer - IT</h3>
-                        <p class="experience-company">Lembaga Hasil Dalam Negeri</p>
-                        <p>Assisted 5G technology research, maintained network infrastructure with 99.8% uptime, and
-                            contributed to Hasil Transformation System work using OutSystems.</p>
+                        <h3>Mobile App Developer</h3>
+                        <p class="experience-company">Skynue Sdn Bhd</p>
+                        <p>Developed native Android (Java) and React Native apps integrated with PHP + MySQLi backends.</p>
                     </div>
                 </div>
 
@@ -491,15 +506,32 @@
             </div>
         </section>
 
+        <!-- Rate Card Section (content rendered from data/rate-card.json by rate-card.js) -->
+        <section id="rates" class="section rates-section">
+            <span class="rc-doodle d1" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 4l5.5 12.5L43 18l-10 9.5 2.8 13.5L24 34.5 12.2 41l2.8-13.5L5 18l13.5-1.5z"/></svg></span>
+            <span class="rc-doodle d2" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18"/><circle cx="24" cy="24" r="13" stroke-dasharray="3 4"/><path d="M19 30V18h5a4 4 0 010 8h-5m5 0l5 4"/></svg></span>
+            <span class="rc-doodle d3" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M6 30c8-14 18-16 26-6s10 8 12-2"/><path d="M38 14l6 8-9 2"/></svg></span>
+            <div class="container" data-rate-card>
+                <p class="rc-loading">Sharpening pencils&hellip; loading rates</p>
+                <noscript>
+                    <p class="rc-loading">Enable JavaScript to view the rate card, or
+                        <a href="data/rate-card.json">view the raw price list</a>.</p>
+                </noscript>
+            </div>
+        </section>
+
         <!-- Contact Section -->
         <section id="contact" class="section contact-section">
             <div class="container">
                 <div class="cta-box spotlight-card">
                     <h2>Ready to start your project?</h2>
-                    <p>Let's turn your vision into a reality. Contact me today for a free consultation.</p>
+                    <p>Let's turn your vision into a reality. Free consultation, clear pricing, no surprises.</p>
                     <div class="cta-buttons">
                         <a href="mailto:muhammadsyafiq1102@gmail.com" class="btn-primary large-btn">
                             <i class="fas fa-envelope"></i> Email Me
+                        </a>
+                        <a href="#rates" class="btn-secondary large-btn">
+                            <i class="fas fa-tags"></i> View Rate Card
                         </a>
                         <a href="muhammad-syafiq-resume.pdf" class="btn-secondary large-btn" download>
                             <i class="fas fa-download"></i> Download Resume
@@ -512,6 +544,15 @@
                 </div>
             </div>
         </section>
+
+        <footer class="site-footer">
+            <p>&copy; <span id="year">2026</span> Muhammad Syafiq Md Asri &middot; Sungai Petani, Kedah</p>
+            <div class="footer-links">
+                <a href="https://www.linkedin.com/in/muhammadsyafiq97" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/noobster97" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="mailto:muhammadsyafiq1102@gmail.com" aria-label="Email"><i class="fas fa-envelope"></i></a>
+            </div>
+        </footer>
     </div>
 
     <a href="https://wa.me/601114648597?text=Hi%20Syafiq,%20I'm%20interested%20in%20your%20services." target="_blank"
@@ -535,7 +576,11 @@
         </a>
         <a href="#projects" class="nav-item">
             <i class="fas fa-briefcase"></i>
-            <span>Projects</span>
+            <span>Work</span>
+        </a>
+        <a href="#rates" class="nav-item">
+            <i class="fas fa-tags"></i>
+            <span>Rates</span>
         </a>
         <a href="#contact" class="nav-item">
             <i class="fas fa-envelope"></i>
@@ -564,6 +609,7 @@
     </div>
 
     <script type="module" src="script.js"></script>
+    <script type="module" src="rate-card.js"></script>
 </body>
 
 </html>
