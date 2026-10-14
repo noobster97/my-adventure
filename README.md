@@ -59,7 +59,7 @@ Old one-page links (`#projects`, `#experience`, `#rates`, ...) still redirect to
 
 The rate card page (`#/rates`) is built from one file: **`data/rate-card.json`**.
 There is no database. Visitors can build an estimate, send it on WhatsApp/email and
-download a PDF, but they can't change prices. Only someone with write access to this
+download the rate card as an image, but they can't change prices. Only someone with write access to this
 GitHub repo can publish changes.
 
 ### Edit prices: option A, visual editor (on your computer)
@@ -85,6 +85,22 @@ Field reference:
 | `suffix` / `unit` | Text after the price. `/month` or `/year` = recurring. Anything else (e.g. `/page`, `/hour`) gets a quantity stepper in the estimate |
 | `popular` | `true` highlights the card as "Most popular" |
 | `meta.secondaryCurrency` | Optional. Add `{ "code": "USD", "symbol": "$", "rate": 0.21 }` to show a currency toggle (off by default, RM only) |
-| `meta.updated` | "Updated" date shown on the page and PDF |
+| `meta.updated` | "Updated" date shown on the page and in the rate card image's reference |
 
-The PDF download is generated in the browser from the same JSON, so it always matches the site.
+The **Download rate card** button makes a one-page PNG in the browser from the same JSON, so it
+always matches the site. A visitor's estimate is saved separately with **Save quote** (a PNG marked
+"ESTIMATE" with a reference number that also appears in their WhatsApp message). Both images carry a
+faint website watermark and a footer with a reference and the `validUntil` date.
+
+## Resume watermark
+
+The resume download carries a faint name watermark (embedded as an image, so ATS resume readers
+ignore it), a footer with a link to the official copy, and proper PDF details. When you update your
+resume, run the script on the new, un-watermarked file:
+
+```bash
+pip install pypdf reportlab pillow
+python3 scripts/watermark-resume.py path/to/new-resume.pdf
+```
+
+It writes both `muhammad-syafiq-resume.pdf` and `public/muhammad-syafiq-resume.pdf`.
