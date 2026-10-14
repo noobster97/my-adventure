@@ -681,11 +681,13 @@ export function mountRateCard(root, data, options = {}) {
             download.classList.add('is-busy');
             download.disabled = true;
             try {
-                const images = await import('./rate-card-image.js');
+                // Same ?v= as this file, so a new release never mixes with a cached copy.
+                const images = await import(`./rate-card-image.js${new URL(import.meta.url).search}`);
+                const helpers = { convert, formatDate, formatNumber, isRecurring, unitOf };
                 const summary = summarizeEstimate(state.selection, catalog, currency());
                 const result = kind === 'quote'
-                    ? await images.downloadQuoteImage(data, { currency: currency(), summary, quoteRef: quoteRef(summary) })
-                    : await images.downloadRateCardImage(data, { currency: currency() });
+                    ? await images.downloadQuoteImage(data, { helpers, currency: currency(), summary, quoteRef: quoteRef(summary) })
+                    : await images.downloadRateCardImage(data, { helpers, currency: currency() });
                 if (result === 'downloaded') toast(kind === 'quote' ? 'Quote saved ✓' : 'Rate card saved ✓');
             } catch (err) {
                 console.error(err);

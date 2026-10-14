@@ -104,3 +104,15 @@ python3 scripts/watermark-resume.py path/to/new-resume.pdf
 ```
 
 It writes both `muhammad-syafiq-resume.pdf` and `public/muhammad-syafiq-resume.pdf`.
+
+## Releasing changes (cache-busting)
+
+Browsers, especially on phones, keep old copies of the site's CSS/JS for a while. Every CSS, JS
+and resume link in `index.html` carries a `?v=` version so a new release is picked up straight
+away. After changing any `.css`, `.js` or the resume PDF, run this before committing:
+
+```bash
+python3 scripts/bump-version.py
+```
+
+(Price changes in `data/rate-card.json` don't need it; that file is always fetched fresh.)
