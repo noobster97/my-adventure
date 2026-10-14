@@ -5,7 +5,14 @@
 // Both carry a faint website watermark plus a reference and validity footer,
 // so an edited or out-of-date copy is easy to spot.
 
-import { convert, formatDate, formatNumber, isRecurring, startingPackage, unitOf } from './rate-card.js';
+// Helpers come from rate-card.js at call time (see useHelpers) instead of a
+// static import, so this file never loads a second, unversioned copy of it.
+let convert;
+let formatDate;
+let formatNumber;
+let isRecurring;
+let unitOf;
+const useHelpers = (helpers) => ({ convert, formatDate, formatNumber, isRecurring, unitOf } = helpers);
 
 const INK = '#2c3e50';
 const RED = '#e74c3c';
@@ -216,7 +223,8 @@ async function deliver(canvas, fileName, title) {
 const slug = (value) => String(value || 'Rate-Card').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '');
 
 // ================= Rate card (one page) =================
-export async function downloadRateCardImage(data, { currency }) {
+export async function downloadRateCardImage(data, { helpers, currency }) {
+    useHelpers(helpers);
     await ensureFonts();
     const meta = data.meta || {};
     const categories = (data.categories || []).filter((c) => (c.packages || []).length);
@@ -355,7 +363,8 @@ export async function downloadRateCardImage(data, { currency }) {
 }
 
 // ================= Quote (visitor's estimate) =================
-export async function downloadQuoteImage(data, { currency, summary, quoteRef }) {
+export async function downloadQuoteImage(data, { helpers, currency, summary, quoteRef }) {
+    useHelpers(helpers);
     await ensureFonts();
     const meta = data.meta || {};
     const lines = summary.lines;
