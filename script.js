@@ -147,7 +147,7 @@ if (navbar) {
 }
 
 // --- Reveal Animations ---
-const revealElements = document.querySelectorAll('.section-title, .bento-card, .experience-card, .achievement-strip, .work-card, .project-card-stack, .skill-pill, .hero-content > *, .cta-box');
+const revealElements = document.querySelectorAll('.section-title, .bento-card, .experience-card, .achievement-strip, .work-card, .project-card-stack, .hero-content > *, .cta-box');
 
 const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -372,3 +372,75 @@ function initImageModal() {
     // Make openModal available globally
     window.openModal = openModal;
 }
+
+// --- Count-up numbers & timeline reveal ---
+(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced || !('IntersectionObserver' in window)) return;
+    document.documentElement.classList.add('js-anim');
+
+    const countUp = (el) => {
+        const target = parseFloat(el.dataset.count);
+        const decimals = (el.dataset.count.split('.')[1] || '').length;
+        const suffix = el.dataset.suffix || '';
+        const start = performance.now();
+        const tick = (now) => {
+            const t = Math.min(1, (now - start) / 1400);
+            const eased = 1 - Math.pow(1 - t, 4);
+            el.textContent = `${(target * eased).toLocaleString('en-MY', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${suffix}`;
+            if (t < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+    };
+
+    const io = new IntersectionObserver((entries) => entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        countUp(entry.target);
+        io.unobserve(entry.target);
+    }), { threshold: 0.35 });
+
+    document.querySelectorAll('[data-count]').forEach((el) => io.observe(el));
+
+    // Timeline line grows as you scroll through it
+    const timeline = document.querySelector('.timeline');
+    if (timeline) {
+        const items = timeline.querySelectorAll('.tl-item');
+        const update = () => {
+            items.forEach((item) => {
+                const top = item.getBoundingClientRect().top;
+                if (top && top < window.innerHeight * 0.88) item.classList.add('is-in');
+            });
+            const rect = timeline.getBoundingClientRect();
+            const progress = Math.min(1, Math.max(0, (window.innerHeight * 0.75 - rect.top) / rect.height));
+            timeline.style.setProperty('--tl-progress', progress.toFixed(3));
+        };
+        window.addEventListener('scroll', update, { passive: true });
+        window.addEventListener('hashchange', () => setTimeout(update, 450));
+        update();
+    }
+})();
+
+// --- Skills marquee: two rows sliding in opposite directions ---
+(() => {
+    const wrapper = document.querySelector('.skills-wrapper');
+    if (!wrapper || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const pills = Array.from(wrapper.children);
+    const half = Math.ceil(pills.length / 2);
+    wrapper.innerHTML = '';
+    wrapper.classList.add('is-marquee');
+    [pills.slice(0, half), pills.slice(half)].forEach((group, row) => {
+        const lane = document.createElement('div');
+        lane.className = `marquee-lane${row ? ' is-reverse' : ''}`;
+        const track = document.createElement('div');
+        track.className = 'marquee-track';
+        group.forEach((pill) => track.appendChild(pill));
+        // A duplicate copy makes the loop seamless; hide it from screen readers.
+        group.forEach((pill) => {
+            const copy = pill.cloneNode(true);
+            copy.setAttribute('aria-hidden', 'true');
+            track.appendChild(copy);
+        });
+        lane.appendChild(track);
+        wrapper.appendChild(lane);
+    });
+})();

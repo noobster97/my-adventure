@@ -83,9 +83,7 @@
                     <h1 class="display-text">
                         <span id="typing-text"></span><span class="cursor-blink">|</span>
                     </h1>
-                    <p class="lead-text">Software developer with 6+ years across government, private sector, healthcare, and NGO
-                        systems. I build business systems, SaaS platforms, mobile apps, and payment-ready websites
-                        with Laravel, PHP, and modern JavaScript, practical, polished, and built to scale.</p>
+                    <p class="lead-text">I build websites, business systems and mobile apps for Malaysian businesses. Clear prices, no tech jargon.</p>
                     <div class="hero-btns">
                         <a href="#/rates" class="btn-primary">See Rates &amp; Get a Quote <i class="fas fa-arrow-right"></i></a>
                         <a href="#/work" class="btn-secondary">View My Work</a>
@@ -93,15 +91,15 @@
                     <a href="muhammad-syafiq-resume.pdf" class="hero-resume" download><i class="fas fa-file-arrow-down"></i> Download resume (PDF)</a>
                     <div class="stats-row">
                         <div class="stat-item">
-                            <span class="stat-number">6+</span>
+                            <span class="stat-number" data-count="6" data-suffix="+">6+</span>
                             <span class="stat-label">Years Exp.</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-number">15+</span>
+                            <span class="stat-number" data-count="15" data-suffix="+">15+</span>
                             <span class="stat-label">Projects Shipped</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-number">1000+</span>
+                            <span class="stat-number" data-count="1000" data-suffix="+">1000+</span>
                             <span class="stat-label">Users Served</span>
                         </div>
                     </div>
@@ -132,41 +130,47 @@
             </div>
         </section>
 
-        <!-- Services Section (Bento Grid Style) -->
+        <!-- Services: picture tiles that open the matching prices -->
         <section id="services" class="section">
             <div class="container">
                 <div class="section-header">
-                    <h2 class="section-title">What I Can Do For You</h2>
-                    <p class="section-subtitle">Comprehensive digital solutions tailored to your needs.</p>
+                    <h2 class="section-title">What I Build</h2>
+                    <p class="section-subtitle">Tap one to see prices.</p>
                 </div>
 
-                <div class="bento-grid scroll-container">
-                    <div class="bento-card large spotlight-card">
-                        <div class="card-icon"><i class="fas fa-laptop-code"></i></div>
-                        <h3>SaaS & Web Systems</h3>
-                        <p>I build dashboards, booking flows, admin tools, and multi-tenant systems that keep business
-                            operations organized and reliable.</p>
-                        <ul class="feature-list">
-                            <li><i class="fas fa-check"></i> Laravel + React SaaS</li>
-                            <li><i class="fas fa-check"></i> Booking, Queue & Registration Flows</li>
-                            <li><i class="fas fa-check"></i> ToyyibPay, Billplz, CHIP & Stripe</li>
-                            <li><i class="fas fa-check"></i> Admin Dashboards & Role Access</li>
-                        </ul>
-                    </div>
-                    <div class="bento-card medium spotlight-card">
-                        <div class="card-icon"><i class="fas fa-server"></i></div>
-                        <h3>Business Websites</h3>
-                        <p>Fast, responsive websites with clear content, strong visuals, and conversion-focused sections
-                            for real users.
-                        </p>
-                    </div>
-                    <div class="bento-card medium spotlight-card">
-                        <div class="card-icon"><i class="fas fa-wand-magic-sparkles"></i></div>
-                        <h3>AI Design Tools</h3>
-                        <p>Focused AI-assisted interfaces for generating, previewing, and refining design directions
-                            without losing control.</p>
-                    </div>
+                <div class="service-tiles">
+                    <a href="#/rates/websites" class="service-tile" style="--i:0">
+                        <span class="service-art" aria-hidden="true"><i class="fas fa-globe"></i></span>
+                        <strong>Websites</strong>
+                        <small>Get found on Google</small>
+                        <span class="service-price">from RM 800 <i class="fas fa-arrow-right"></i></span>
+                    </a>
+                    <a href="#/rates/systems" class="service-tile" style="--i:1">
+                        <span class="service-art" aria-hidden="true"><i class="fas fa-laptop-code"></i></span>
+                        <strong>Business Systems</strong>
+                        <small>Bookings, staff &amp; reports</small>
+                        <span class="service-price">from RM 4,500 <i class="fas fa-arrow-right"></i></span>
+                    </a>
+                    <a href="#/rates/mobile" class="service-tile" style="--i:2">
+                        <span class="service-art" aria-hidden="true"><i class="fas fa-mobile-screen"></i></span>
+                        <strong>Mobile Apps</strong>
+                        <small>Android &amp; iPhone</small>
+                        <span class="service-price">from RM 4,000 <i class="fas fa-arrow-right"></i></span>
+                    </a>
+                    <a href="#/rates/care" class="service-tile" style="--i:3">
+                        <span class="service-art" aria-hidden="true"><i class="fas fa-shield-heart"></i></span>
+                        <strong>Care &amp; Support</strong>
+                        <small>Updates, backups, fixes</small>
+                        <span class="service-price">from RM 150/mo <i class="fas fa-arrow-right"></i></span>
+                    </a>
                 </div>
+
+                <ul class="trust-row" aria-label="Also included">
+                    <li><i class="fas fa-credit-card"></i> Online payments</li>
+                    <li><i class="fas fa-robot"></i> AI features</li>
+                    <li><i class="fas fa-language"></i> BM &amp; English</li>
+                    <li><i class="fas fa-mobile-screen-button"></i> Mobile-friendly</li>
+                </ul>
             </div>
         </section>
 
@@ -215,7 +219,7 @@
             <div class="container">
                 <div class="section-header">
                     <h2 class="section-title">Selected Work</h2>
-                    <p class="section-subtitle">A broader look at SaaS, web systems, APIs, mobile apps, and AI-assisted product work.</p>
+                    <p class="section-subtitle">Real products, used by real businesses.</p>
                 </div>
 
                 <div class="work-grid">
@@ -256,8 +260,8 @@
                                 <span class="project-industry">Photography Booking</span>
                             </div>
                             <h3>MaiGambar.my</h3>
-                            <p>Multi-tenant photography booking platform for Malaysian photographers with tenant dashboards, bilingual public pages, subscription billing, booking payments, OTP, email flows, and branded profiles.</p>
-                            <div class="work-impact">Built for real business operations: discovery, booking, payment, tenant admin, and public customer flows.</div>
+                            <p>Photographers get their own booking page, take payments and manage clients in one place.</p>
+                            <div class="work-impact">Live product with real paying users.</div>
                             <div class="tech-tags">
                                 <span>Laravel</span><span>React</span><span>TypeScript</span><span>Stripe</span><span>MySQL</span>
                             </div>
@@ -297,8 +301,8 @@
                                 <span class="project-industry">Personal Finance</span>
                             </div>
                             <h3>maispend</h3>
-                            <p>AI personal-finance SaaS built around a payday-cycle survival view. Logs expenses by natural language, reserves bill money, forecasts safe-to-spend per day, and runs an AI insight agent that flags spending patterns. Receipt scanning, multi-currency Stripe subscriptions, and a full admin console.</p>
-                            <div class="work-impact">Live product with subscription billing, AI-assisted insights, and an installable PWA experience.</div>
+                            <p>A money app that tells you how much you can safely spend each day until payday, with AI tips.</p>
+                            <div class="work-impact">Live product with monthly subscriptions.</div>
                             <div class="tech-tags">
                                 <span>Laravel</span><span>Next.js</span><span>React</span><span>TypeScript</span><span>Tailwind</span><span>Stripe</span><span>Gemini AI</span>
                             </div>
@@ -338,8 +342,8 @@
                                 <span class="project-industry">Product Design</span>
                             </div>
                             <h3>Design Web Visualizer</h3>
-                            <p>AI-assisted palette and font preview tool for websites, dashboards, SaaS products, e-commerce, portfolios, and mobile apps with controlled templates and local generation history.</p>
-                            <div class="work-impact">Helps users compare design directions quickly without generating full production code.</div>
+                            <p>Preview colours and fonts for a new website in seconds before building it.</p>
+                            <div class="work-impact">Saves hours of design back-and-forth.</div>
                             <div class="tech-tags">
                                 <span>React</span><span>TypeScript</span><span>Vite</span><span>Gemini</span><span>AI APIs</span>
                             </div>
@@ -357,7 +361,7 @@
                                 <span class="project-industry">Cooperative</span>
                             </div>
                             <h3>Cooperative Web System</h3>
-                            <p>Website and dashboard for Koperasi AIMS Pulau Pinang Berhad, supporting member-facing content and operational workflows.</p>
+                            <p>Website and member dashboard for Koperasi AIMS Pulau Pinang Berhad.</p>
                             <div class="tech-tags">
                                 <span>Laravel</span><span>PHP</span><span>MySQL</span><span>Dashboard</span>
                             </div>
@@ -397,8 +401,8 @@
                                 <span class="project-industry">Attendance</span>
                             </div>
                             <h3>Student Attendance Management System</h3>
-                            <p>Android attendance app and companion web system for real-time tracking, reporting, and student scan-based attendance workflows.</p>
-                            <div class="work-impact">Improved operational efficiency by 40%.</div>
+                            <p>Students scan in with a phone app; staff see live attendance and reports.</p>
+                            <div class="work-impact">40% less time spent on attendance.</div>
                             <div class="tech-tags">
                                 <span>Flutter</span><span>Laravel</span><span>PHP</span><span>MySQL</span>
                             </div>
@@ -437,7 +441,7 @@
                                 <span class="project-industry">Facilities</span>
                             </div>
                             <h3>Hall Booking System</h3>
-                            <p>Web-based booking platform for hall reservations, scheduling, and capacity management at MADAD.</p>
+                            <p>Online hall booking with a live calendar, so double bookings never happen.</p>
                             <div class="tech-tags">
                                 <span>Laravel</span><span>PHP</span><span>MySQL</span><span>Admin Panel</span>
                             </div>
@@ -455,7 +459,7 @@
                                 <span class="project-industry">Restaurant</span>
                             </div>
                             <h3>Restaurant Booking System</h3>
-                            <p>Restaurant reservation system with table management, order tracking, and admin workflows for day-to-day operations.</p>
+                            <p>Table bookings and orders managed from one simple dashboard.</p>
                             <div class="tech-tags">
                                 <span>Laravel</span><span>PHP</span><span>MySQL</span><span>CRUD</span>
                             </div>
@@ -473,7 +477,7 @@
                                 <span class="project-industry">Investment</span>
                             </div>
                             <h3>Gold NOW Investment Application</h3>
-                            <p>Gold investment mobile app concept with real-time pricing, user portfolio management, and investment tracking flows.</p>
+                            <p>Buy and track gold with live prices, right from your phone.</p>
                             <div class="tech-tags">
                                 <span>React Native</span><span>API</span><span>Mobile UX</span>
                             </div>
@@ -510,52 +514,62 @@
             <div class="container">
                 <div class="section-header">
                     <h2 class="section-title">Experience Snapshot</h2>
-                    <p class="section-subtitle">6+ years across government, private sector, healthcare, and NGO systems.</p>
+                    <p class="section-subtitle">6+ years building real systems people use every day.</p>
                     <a href="muhammad-syafiq-resume.pdf" class="btn-secondary section-action" download><i class="fas fa-file-arrow-down"></i> Download Resume</a>
                 </div>
 
-                <div class="experience-grid">
-                    <div class="experience-card spotlight-card current">
-                        <span class="experience-period"><span class="live-dot" aria-hidden="true"></span> Jul 2026 - Present</span>
-                        <h3>Software Developer</h3>
-                        <p class="experience-company">GEITNA Network Sdn Bhd</p>
-                        <p>Building a marketing &amp; sales team management system (pure PHP + PostgreSQL) with role-based
-                            access and payment gateway collection, plus queue management for a clinic/panel system used by
-                            clinics across Malaysia, on Microsoft Azure and local servers.</p>
-                    </div>
-                    <div class="experience-card spotlight-card">
-                        <span class="experience-period">2024 - 2026</span>
-                        <h3>Full Stack Developer</h3>
-                        <p class="experience-company">Murtadha Dakwah Center (MADAD)</p>
-                        <p>Migrated legacy systems to Laravel with Filament v3 admin panels; built attendance (Android +
-                            web), hall and restaurant booking, pet care, and education management systems.</p>
-                    </div>
-                    <div class="experience-card spotlight-card">
-                        <span class="experience-period">2022 - 2024</span>
-                        <h3>Back End Developer</h3>
-                        <p class="experience-company">Applink Solutions</p>
-                        <p>Built Laravel/PHP backends and RESTful APIs for web and mobile apps, optimized MySQL queries,
-                            and shipped React Native + Expo apps.</p>
-                    </div>
-                    <div class="experience-card spotlight-card">
-                        <span class="experience-period">2020 - 2022</span>
-                        <h3>Assistant Executive Officer - IT</h3>
-                        <p class="experience-company">Lembaga Hasil Dalam Negeri</p>
-                        <p>Developed the Hasil Transformation System on OutSystems, maintained network infrastructure,
-                            and supported 5G research and rollout projects.</p>
-                    </div>
-                    <div class="experience-card spotlight-card">
-                        <span class="experience-period">2019</span>
-                        <h3>Mobile App Developer</h3>
-                        <p class="experience-company">Skynue Sdn Bhd</p>
-                        <p>Developed native Android (Java) and React Native apps integrated with PHP + MySQLi backends.</p>
-                    </div>
-                </div>
+                <ol class="timeline">
+                    <li class="tl-item is-current" style="--i:0">
+                        <span class="tl-dot" aria-hidden="true"><i class="fas fa-briefcase"></i></span>
+                        <div class="tl-card">
+                            <span class="tl-period"><span class="live-dot" aria-hidden="true"></span> 2026 - Now</span>
+                            <h3>Software Developer</h3>
+                            <p class="tl-company">GEITNA Network Sdn Bhd</p>
+                            <ul class="tl-tags"><li>Clinic queue system</li><li>Sales team system</li><li>Online payments</li></ul>
+                        </div>
+                    </li>
+                    <li class="tl-item" style="--i:1">
+                        <span class="tl-dot" aria-hidden="true"><i class="fas fa-mosque"></i></span>
+                        <div class="tl-card">
+                            <span class="tl-period">2024 - 2026</span>
+                            <h3>Full Stack Developer</h3>
+                            <p class="tl-company">Murtadha Dakwah Center (MADAD)</p>
+                            <ul class="tl-tags"><li>Attendance app</li><li>Hall &amp; restaurant booking</li><li>Admin panels</li></ul>
+                        </div>
+                    </li>
+                    <li class="tl-item" style="--i:2">
+                        <span class="tl-dot" aria-hidden="true"><i class="fas fa-server"></i></span>
+                        <div class="tl-card">
+                            <span class="tl-period">2022 - 2024</span>
+                            <h3>Back End Developer</h3>
+                            <p class="tl-company">Applink Solutions</p>
+                            <ul class="tl-tags"><li>APIs for web &amp; apps</li><li>Faster databases</li><li>Mobile apps</li></ul>
+                        </div>
+                    </li>
+                    <li class="tl-item" style="--i:3">
+                        <span class="tl-dot" aria-hidden="true"><i class="fas fa-landmark"></i></span>
+                        <div class="tl-card">
+                            <span class="tl-period">2020 - 2022</span>
+                            <h3>Assistant Executive Officer - IT</h3>
+                            <p class="tl-company">Lembaga Hasil Dalam Negeri</p>
+                            <ul class="tl-tags"><li>Government system</li><li>Network &amp; 5G projects</li></ul>
+                        </div>
+                    </li>
+                    <li class="tl-item" style="--i:4">
+                        <span class="tl-dot" aria-hidden="true"><i class="fas fa-mobile-screen"></i></span>
+                        <div class="tl-card">
+                            <span class="tl-period">2019</span>
+                            <h3>Mobile App Developer</h3>
+                            <p class="tl-company">Skynue Sdn Bhd</p>
+                            <ul class="tl-tags"><li>Android apps</li><li>Cross-platform apps</li></ul>
+                        </div>
+                    </li>
+                </ol>
 
                 <div class="achievement-strip">
-                    <span><strong>40%</strong> efficiency improvement from attendance system work</span>
-                    <span><strong>99.9%</strong> API uptime target in backend delivery</span>
-                    <span><strong>15+</strong> full stack projects delivered end to end</span>
+                    <span><i class="fas fa-gauge-high"></i><strong data-count="40" data-suffix="%">40%</strong> faster attendance work</span>
+                    <span><i class="fas fa-signal"></i><strong data-count="99.9" data-suffix="%">99.9%</strong> system uptime</span>
+                    <span><i class="fas fa-rocket"></i><strong data-count="15" data-suffix="+">15+</strong> projects delivered</span>
                 </div>
             </div>
         </section>

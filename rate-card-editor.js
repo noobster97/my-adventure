@@ -177,7 +177,8 @@ async function start() {
                                     ${field('Price', `${base}.price`, { type: 'number', kind: 'number' })}
                                     ${field('Before price', `${base}.prefix`, { placeholder: 'From' })}
                                     ${field('After price', `${base}.suffix`, { placeholder: '/month' })}
-                                    ${field('Tagline', `${base}.tagline`, { full: true })}
+                                    ${field('Best for (who is it for?)', `${base}.bestFor`, { full: true, placeholder: 'Shops, clinics, companies' })}
+                                    ${field('Icon (Font Awesome)', `${base}.icon`, { placeholder: 'fa-store' })}
                                     ${field('Timeline', `${base}.timeline`, { placeholder: '2 - 4 weeks' })}
                                     <label class="ed-check"><input type="checkbox" data-path="${base}.popular" data-kind="bool"${pkg.popular ? ' checked' : ''}> Most popular</label>
                                     ${field('Features (one per line)', `${base}.features`, { full: true, kind: 'lines' })}
@@ -195,6 +196,7 @@ async function start() {
                 <div class="ed-body">
                     ${data.addons.map((addon, ai) => `
                         <div class="ed-addon">
+                            ${field('Icon', `addons.${ai}.icon`, { placeholder: 'fa-bell' })}
                             ${field('Name', `addons.${ai}.name`)}
                             ${field('Price', `addons.${ai}.price`, { type: 'number', kind: 'number' })}
                             ${field('Unit', `addons.${ai}.unit`, { placeholder: '/page' })}
@@ -205,8 +207,27 @@ async function start() {
             </details>
 
             <details class="ed-group">
-                <summary>Notes &amp; terms</summary>
-                <div class="ed-body">${field('One note per line', 'meta.notes', { full: true, kind: 'lines' })}</div>
+                <summary>How it works (steps)</summary>
+                <div class="ed-body">
+                    ${(meta.process || []).map((step, i) => `
+                        <div class="ed-grid three">
+                            ${field(`Step ${i + 1} icon`, `meta.process.${i}.icon`)}
+                            ${field('Title', `meta.process.${i}.title`)}
+                            ${field('Short text', `meta.process.${i}.text`)}
+                        </div>`).join('')}
+                </div>
+            </details>
+
+            <details class="ed-group">
+                <summary>Perks &amp; terms</summary>
+                <div class="ed-body">
+                    ${(meta.perks || []).map((perk, i) => `
+                        <div class="ed-grid">
+                            ${field('Icon', `meta.perks.${i}.icon`)}
+                            ${field('Text', `meta.perks.${i}.text`)}
+                        </div>`).join('')}
+                    ${field('Fine print (one note per line)', 'meta.notes', { full: true, kind: 'lines' })}
+                </div>
             </details>`;
     }
 
@@ -277,7 +298,7 @@ async function start() {
             case 'cat-up': move(data.categories, ci, ci - 1); break;
             case 'cat-down': move(data.categories, ci, ci + 1); break;
             case 'pkg-add':
-                cat.packages.push({ id: uniqueId(`${cat.id}-package`), name: 'New package', tagline: '', price: 0, prefix: '', suffix: '', timeline: '', popular: false, features: [] });
+                cat.packages.push({ id: uniqueId(`${cat.id}-package`), name: 'New package', icon: 'fa-star', bestFor: '', price: 0, prefix: '', suffix: '', timeline: '', popular: false, features: [] });
                 openCats.add(ci);
                 break;
             case 'pkg-dup': {
@@ -302,7 +323,7 @@ async function start() {
                 delete data.meta.secondaryCurrency;
                 break;
             case 'addon-add':
-                data.addons.push({ id: uniqueId('addon'), name: 'New add-on', price: 0, unit: '' });
+                data.addons.push({ id: uniqueId('addon'), icon: 'fa-plus', name: 'New add-on', price: 0, unit: '' });
                 break;
             case 'addon-del':
                 data.addons.splice(Number(btn.dataset.ai), 1);
@@ -312,7 +333,7 @@ async function start() {
         const addonsOpen = btn.dataset.act.startsWith('addon');
         renderForm();
         openCats.forEach((i) => form.querySelector(`details[data-cat="${i}"]`)?.setAttribute('open', ''));
-        if (addonsOpen) form.querySelectorAll('details.ed-group')[form.querySelectorAll('details.ed-group').length - 2]?.setAttribute('open', '');
+        if (addonsOpen) form.querySelectorAll('details.ed-group')[form.querySelectorAll('details.ed-group').length - 3]?.setAttribute('open', '');
         setDirty(true);
         refreshPreview({ immediate: true });
     });
