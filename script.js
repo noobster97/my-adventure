@@ -146,19 +146,6 @@ if (navbar) {
     });
 }
 
-// --- Smooth Scrolling ---
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        const href = this.getAttribute('href');
-        const target = href.length > 1 ? document.querySelector(href) : null;
-        if (!target) return;
-        e.preventDefault();
-        target.scrollIntoView({
-            behavior: 'smooth'
-        });
-    });
-});
-
 // --- Reveal Animations ---
 const revealElements = document.querySelectorAll('.section-title, .bento-card, .experience-card, .achievement-strip, .work-card, .project-card-stack, .skill-pill, .hero-content > *, .cta-box');
 
@@ -179,28 +166,6 @@ revealElements.forEach((el, index) => {
     el.style.transform = 'translateY(30px)';
     el.style.transition = 'all 0.6s ease-out';
     revealObserver.observe(el);
-});
-
-// --- Mobile Bottom Nav Active State ---
-const sections = document.querySelectorAll('section');
-const navItems = document.querySelectorAll('.bottom-nav .nav-item');
-
-window.addEventListener('scroll', () => {
-    let current = '';
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        if (scrollY >= (sectionTop - sectionHeight / 3)) {
-            current = section.getAttribute('id');
-        }
-    });
-
-    navItems.forEach(item => {
-        item.classList.remove('active');
-        if (item.getAttribute('href').includes(current)) {
-            item.classList.add('active');
-        }
-    });
 });
 
 // Initialize Typing Animation

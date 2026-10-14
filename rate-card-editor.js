@@ -20,7 +20,7 @@ if (!LOCAL_HOSTS.includes(location.hostname)) {
         <div class="ed-locked">
             <h1><i class="fas fa-lock"></i> Owner only</h1>
             <p>The rate card can only be edited by the site owner. Prices are published from the GitHub repository.</p>
-            <a class="btn-primary" href="./#rates"><i class="fas fa-tags"></i> View rate card</a>
+            <a class="btn-primary" href="./#/rates"><i class="fas fa-tags"></i> View rate card</a>
             <a class="btn-secondary" href="${GITHUB_EDIT_URL}" rel="nofollow">Owner: edit on GitHub</a>
         </div>`;
 } else {

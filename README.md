@@ -40,9 +40,24 @@ http://127.0.0.1:4173
 npm run build
 ```
 
+## Pages
+
+The site is a single `index.html` that works like an app: `router.js` shows one page at a time
+using hash links, so it runs on GitHub Pages with no server config and the back button works.
+
+| Page | Link |
+| --- | --- |
+| Home | `#/` |
+| Work | `#/work` |
+| Rates | `#/rates` |
+| About | `#/about` |
+| Contact | `#/contact` |
+
+Old one-page links (`#projects`, `#experience`, `#rates`, ...) still redirect to the right page.
+
 ## Rate Card
 
-The rate card section (`#rates`) is built from one file: **`data/rate-card.json`**.
+The rate card page (`#/rates`) is built from one file: **`data/rate-card.json`**.
 There is no database. Visitors can build an estimate, send it on WhatsApp/email and
 download a PDF, but they can't change prices. Only someone with write access to this
 GitHub repo can publish changes.
