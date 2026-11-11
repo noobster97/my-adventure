@@ -116,3 +116,16 @@ python3 scripts/bump-version.py
 ```
 
 (Price changes in `data/rate-card.json` don't need it; that file is always fetched fresh.)
+
+## Paper Themes & Playful Bits
+
+`themes.css` and `playful.js` add the interactive layer; the site works the same without them.
+
+- **Paper switcher** (the "Paper" button in the top bar, or the round button on phones): Graph,
+  Kraft, Blueprint and Chalkboard. The choice is saved in the browser. To add a paper, add a
+  `html[data-paper="..."]` block in `themes.css` and an entry in `PAPERS` in `playful.js`.
+- **Kertas the paper buddy** (bottom-left): its eyes follow the cursor, it waves when you come
+  close and talks when clicked. Edit its lines in `LINES` in `playful.js`.
+- **Hero doodles** drift with the cursor and dodge it; section title highlights redraw on hover.
+
+All motion is switched off for visitors who ask for reduced motion.
