@@ -279,6 +279,78 @@ html[data-tone="dark"] .btn-secondary:hover {
     .nav-links .paper-switch { display: none; }
 }
 
+/* First-visit nudge towards the switcher */
+.paper-switch.is-hinting .paper-btn { animation: paperNudge 1.4s ease-in-out infinite; }
+
+@keyframes paperNudge {
+    0%, 55%, 100% { transform: none; }
+    65% { transform: rotate(-10deg) scale(1.12); }
+    80% { transform: rotate(8deg) scale(1.12); }
+}
+
+.paper-hint {
+    animation: hintIn .35s cubic-bezier(.3, 1.5, .5, 1) both;
+    background: var(--accent);
+    border: 2px solid #2c3e50;
+    border-radius: 12px 4px 12px 4px;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, .22);
+    color: #2c3e50;
+    font-size: 1rem;
+    line-height: 1;
+    padding: .45rem .7rem;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 12px);
+    white-space: nowrap;
+    z-index: 1150;
+}
+
+.paper-switch.is-floating .paper-hint {
+    right: calc(100% + 10px);
+    top: 8px;
+}
+
+@keyframes hintIn {
+    from { opacity: 0; transform: scale(.7) rotate(-6deg); }
+    to { opacity: 1; transform: rotate(-2deg); }
+}
+
+/* Ink burst where empty paper is tapped */
+.tap-burst {
+    height: 0;
+    pointer-events: none;
+    position: fixed;
+    width: 0;
+    z-index: 2000;
+}
+
+.tap-burst i {
+    animation: burstLine .5s ease-out both;
+    background: var(--primary);
+    border-radius: 2px;
+    height: 3px;
+    left: 0;
+    position: absolute;
+    top: -1.5px;
+    transform-origin: 0 50%;
+    width: 11px;
+}
+
+.tap-burst i:nth-child(1) { --a: 0deg; }
+.tap-burst i:nth-child(2) { --a: 51deg; background: var(--secondary); }
+.tap-burst i:nth-child(3) { --a: 103deg; }
+.tap-burst i:nth-child(4) { --a: 154deg; background: var(--accent); }
+.tap-burst i:nth-child(5) { --a: 206deg; }
+.tap-burst i:nth-child(6) { --a: 257deg; background: var(--secondary); }
+.tap-burst i:nth-child(7) { --a: 309deg; }
+
+@keyframes burstLine {
+    from { opacity: 1; transform: rotate(var(--a)) translateX(6px) scaleX(.3); }
+    60% { opacity: 1; }
+    to { opacity: 0; transform: rotate(var(--a)) translateX(26px) scaleX(1); }
+}
+
 /* Changing paper: the new sheet spreads out from the button */
 html.paper-switching::view-transition-old(root) { animation: none; }
 
@@ -482,10 +554,11 @@ html:not([data-tone="dark"]) .hero-doodle.is-yellow { color: #d4a90a; }
     .section-title:hover::after { animation: none; }
 
     .buddy, .paper-pop, .buddy-bubble { transition: none; }
+    .paper-switch.is-hinting .paper-btn, .paper-hint { animation: none; }
 
     html.paper-switching::view-transition-new(root) { animation: none; }
 }
 
 @media print {
-    .buddy-wrap, .paper-switch, .hero-doodles { display: none !important; }
+    .buddy-wrap, .paper-switch, .hero-doodles, .tap-burst { display: none !important; }
 }

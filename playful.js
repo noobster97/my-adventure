@@ -4,6 +4,10 @@
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
 
+const track = (name, data) => document.dispatchEvent(new CustomEvent('track', { detail: { name, data } }));
+const remember = (key) => { try { localStorage.setItem(key, '1'); } catch { /* private mode */ } };
+const recalls = (key) => { try { return localStorage.getItem(key) === '1'; } catch { return false; } };
+
 /* ---------- Paper themes ---------- */
 const PAPERS = [
     { id: 'graph', label: 'Graph', color: '#fdfbf7' },
@@ -12,6 +16,7 @@ const PAPERS = [
     { id: 'chalk', label: 'Chalkboard', color: '#25372f', dark: true },
 ];
 const STORE_KEY = 'paper';
+const HINT_KEY = 'paper-hint-seen';
 const root = document.documentElement;
 
 function currentPaper() {
@@ -35,6 +40,8 @@ function setPaper(id, origin) {
     const paper = PAPERS.find((p) => p.id === id);
     if (!paper || paper.id === currentPaper().id) return;
     try { localStorage.setItem(STORE_KEY, paper.id); } catch { /* private mode */ }
+    remember(HINT_KEY);
+    track('paper-change', { paper: paper.id });
 
     if (!document.startViewTransition || reducedMotion.matches) {
         applyPaper(paper);
@@ -94,6 +101,28 @@ function initPapers() {
     cta?.before(buildSwitch(false));
     document.body.append(buildSwitch(true));
     applyPaper(currentPaper());
+    if (!recalls(HINT_KEY)) setTimeout(hintPapers, 2600);
+}
+
+// First visit: point at the switcher once so people know the paper can change.
+function hintPapers() {
+    const switches = [...document.querySelectorAll('.paper-switch')];
+    if (switches.some((el) => el.classList.contains('is-open'))) return;
+    remember(HINT_KEY);
+    const stop = () => switches.forEach((el) => {
+        el.classList.remove('is-hinting');
+        el.querySelector('.paper-hint')?.remove();
+    });
+    switches.forEach((el) => {
+        const tip = document.createElement('span');
+        tip.className = 'paper-hint';
+        tip.setAttribute('aria-hidden', 'true');
+        tip.textContent = 'Change the paper!';
+        el.append(tip);
+        el.classList.add('is-hinting');
+        el.querySelector('.paper-btn').addEventListener('click', stop, { once: true });
+    });
+    setTimeout(stop, 7000);
 }
 
 /* ---------- One shared pointer position ---------- */
@@ -141,28 +170,33 @@ function initDoodles() {
     });
     hero.prepend(layer);
 
-    if (!finePointer.matches || reducedMotion.matches) return;
+    if (reducedMotion.matches) return;
 
-    let running = false;
     const REACH = 170;
+    const lean = { x: 0, y: 0 };   // where the whole layer leans (-1..1)
+    let dodging = false;           // doodles also push away from the pointer
+    let running = false;
 
-    function aim() {
+    function retarget() {
         const box = hero.getBoundingClientRect();
         if (box.bottom < 0 || box.top > innerHeight) return;
-        // Whole layer leans with the cursor; each doodle also dodges it.
-        const nx = (pointer.x - (box.left + box.width / 2)) / box.width;
-        const ny = (pointer.y - (box.top + box.height / 2)) / box.height;
         items.forEach((item) => {
-            const r = item.el.getBoundingClientRect();
-            const cx = r.left + r.width / 2 - item.dx;
-            const cy = r.top + r.height / 2 - item.dy;
-            const ox = cx - pointer.x;
-            const oy = cy - pointer.y;
-            const dist = Math.hypot(ox, oy) || 1;
-            const push = Math.max(0, 1 - dist / REACH);
-            item.tx = -nx * item.depth + (ox / dist) * push * 46;
-            item.ty = -ny * item.depth + (oy / dist) * push * 46;
-            item.trot = push * (ox > 0 ? 28 : -28);
+            let px = 0;
+            let py = 0;
+            let rot = 0;
+            if (dodging) {
+                const r = item.el.getBoundingClientRect();
+                const ox = r.left + r.width / 2 - item.dx - pointer.x;
+                const oy = r.top + r.height / 2 - item.dy - pointer.y;
+                const dist = Math.hypot(ox, oy) || 1;
+                const push = Math.max(0, 1 - dist / REACH);
+                px = (ox / dist) * push * 46;
+                py = (oy / dist) * push * 46;
+                rot = push * (ox > 0 ? 28 : -28);
+            }
+            item.tx = -lean.x * item.depth + px;
+            item.ty = -lean.y * item.depth + py;
+            item.trot = rot;
         });
         if (!running) {
             running = true;
@@ -185,7 +219,79 @@ function initDoodles() {
         else running = false;
     }
 
-    listeners.add(aim);
+    if (finePointer.matches) {
+        // Desktop: lean with the cursor and dodge it.
+        dodging = true;
+        listeners.add(() => {
+            const box = hero.getBoundingClientRect();
+            lean.x = (pointer.x - (box.left + box.width / 2)) / box.width;
+            lean.y = (pointer.y - (box.top + box.height / 2)) / box.height;
+            retarget();
+        });
+        return;
+    }
+
+    // Phones: doodles scatter from a tap, then drift back...
+    let settle = 0;
+    window.addEventListener('pointerdown', (e) => {
+        pointer.x = e.clientX;
+        pointer.y = e.clientY;
+        dodging = true;
+        retarget();
+        clearTimeout(settle);
+        settle = setTimeout(() => {
+            dodging = false;
+            retarget();
+        }, 650);
+    }, { passive: true });
+
+    // ...slide apart as the page scrolls...
+    let tilt = { x: 0, y: 0 };
+    let scrollLean = 0;
+    let scrollFrame = 0;
+    const blend = () => {
+        lean.x = tilt.x;
+        lean.y = tilt.y + scrollLean;
+        retarget();
+    };
+    window.addEventListener('scroll', () => {
+        if (scrollFrame) return;
+        scrollFrame = requestAnimationFrame(() => {
+            scrollFrame = 0;
+            scrollLean = Math.min(1.6, scrollY / 260);
+            blend();
+        });
+    }, { passive: true });
+
+    // ...and lean when the phone is tilted. Listening never shows a permission
+    // pop-up; phones that need permission (iPhone) just send no tilt data.
+    let tiltFrame = 0;
+    window.addEventListener('deviceorientation', (e) => {
+        if (e.gamma == null || e.beta == null || tiltFrame) return;
+        tiltFrame = requestAnimationFrame(() => {
+            tiltFrame = 0;
+            const clamp = (v) => Math.max(-1, Math.min(1, v));
+            tilt = { x: clamp(e.gamma / 28) * 1.4, y: clamp((e.beta - 40) / 28) * 1.4 };
+            blend();
+        });
+    }, { passive: true });
+}
+
+/* ---------- Ink burst where you tap empty paper ---------- */
+function initBursts() {
+    if (reducedMotion.matches) return;
+    const BUSY = 'a, button, input, select, textarea, label, summary, video, [role="button"], [role="radio"], .image-modal, .carousel-container';
+    window.addEventListener('pointerdown', (e) => {
+        if (e.button > 0 || e.target.closest?.(BUSY)) return;
+        const burst = document.createElement('span');
+        burst.className = 'tap-burst';
+        burst.setAttribute('aria-hidden', 'true');
+        burst.style.left = `${e.clientX}px`;
+        burst.style.top = `${e.clientY}px`;
+        burst.innerHTML = '<i></i>'.repeat(7);
+        document.body.append(burst);
+        setTimeout(() => burst.remove(), 600);
+    }, { passive: true });
 }
 
 /* ---------- Paper buddy ---------- */
@@ -241,6 +347,7 @@ function initBuddy() {
     listeners.add(look);
 
     buddy.addEventListener('click', () => {
+        track('buddy-click', { line: line % LINES.length });
         bubble.textContent = LINES[line % LINES.length];
         line += 1;
         wrap.classList.add('is-talking');
@@ -252,6 +359,24 @@ function initBuddy() {
         clearTimeout(talkTimer);
         talkTimer = setTimeout(() => wrap.classList.remove('is-talking'), 3800);
     });
+
+    // Phones: Kertas follows your scrolling with its eyes.
+    if (!finePointer.matches) {
+        let lastY = scrollY;
+        let rest = 0;
+        window.addEventListener('scroll', () => {
+            const dy = scrollY - lastY;
+            if (Math.abs(dy) < 4) return;
+            lastY = scrollY;
+            wrap.style.setProperty('--px', '1.5px');
+            wrap.style.setProperty('--py', `${dy > 0 ? 4 : -4}px`);
+            clearTimeout(rest);
+            rest = setTimeout(() => {
+                wrap.style.setProperty('--px', '0px');
+                wrap.style.setProperty('--py', '0px');
+            }, 500);
+        }, { passive: true });
+    }
 
     // Phones have no hover, so Kertas pops up for a wave now and then.
     if (!finePointer.matches && !reducedMotion.matches) {
@@ -267,6 +392,7 @@ function initBuddy() {
 
 initPapers();
 initDoodles();
+initBursts();
 initBuddy();
 window.addEventListener('pointermove', onPointer, { passive: true });
 window.addEventListener('pointerdown', onPointer, { passive: true });

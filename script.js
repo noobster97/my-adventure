@@ -194,7 +194,8 @@ function initImageCarousel() {
                 const video = slide.querySelector('video');
                 if (!video) return;
 
-                if (i === index) {
+                // Never start (or download) a video on a page that isn't showing.
+                if (i === index && !slide.closest('.view[hidden]')) {
                     video.play().catch(() => {});
                 } else {
                     video.pause();
