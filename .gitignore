@@ -2,3 +2,7 @@ node_modules/
 dist/
 .vite/
 *.log
+
+# The resume is sent on request, never published
+muhammad-syafiq-resume.pdf
+public/muhammad-syafiq-resume.pdf

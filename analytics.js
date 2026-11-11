@@ -56,9 +56,9 @@ if (websiteId && !isLocal) {
         if (link) {
             const href = link.getAttribute('href');
             const page = document.body.dataset.view;
-            if (/wa\.me|whatsapp/i.test(href)) event('whatsapp-click', { page });
+            if (link.dataset.track) event(link.dataset.track, { page });
+            else if (/wa\.me|whatsapp/i.test(href)) event('whatsapp-click', { page });
             else if (href.startsWith('mailto:')) event('email-click', { page });
-            else if (/\.pdf(\?|$)/i.test(href)) event('resume-download', { page });
             else if (/^https?:/i.test(href)) event('outbound-click', { to: new URL(href).hostname });
             return;
         }
