@@ -92,24 +92,27 @@ always matches the site. A visitor's estimate is saved separately with **Save qu
 "ESTIMATE" with a reference number that also appears in their WhatsApp message). Both images carry a
 faint website watermark and a footer with a reference and the `validUntil` date.
 
-## Resume watermark
+## Resume
 
-The resume download carries a faint name watermark (embedded as an image, so ATS resume readers
-ignore it), a footer with a link to the official copy, and proper PDF details. When you update your
-resume, run the script on the new, un-watermarked file:
+The resume is **not** published on the site. The "Request my resume" buttons open WhatsApp with a
+ready-made message, so you choose who receives it. Keep the PDF on your own computer.
+
+Before sending it, you can add a faint name watermark (embedded as an image, so ATS resume
+readers never see it):
 
 ```bash
 pip install pypdf reportlab pillow
 python3 scripts/watermark-resume.py path/to/new-resume.pdf
 ```
 
-It writes both `muhammad-syafiq-resume.pdf` and `public/muhammad-syafiq-resume.pdf`.
+The script writes `muhammad-syafiq-resume.pdf` and `public/muhammad-syafiq-resume.pdf`. Send one
+of them and do not commit either.
 
 ## Releasing changes (cache-busting)
 
 Browsers, especially on phones, keep old copies of the site's CSS/JS for a while. Every CSS, JS
-and resume link in `index.html` carries a `?v=` version so a new release is picked up straight
-away. After changing any `.css`, `.js` or the resume PDF, run this before committing:
+link in `index.html` carries a `?v=` version so a new release is picked up straight
+away. After changing any `.css` or `.js` file, run this before committing:
 
 ```bash
 python3 scripts/bump-version.py
@@ -142,7 +145,7 @@ It is **off** until you add your website ID:
 1. Create a free Umami Cloud account, add this site and copy its **Website ID**.
 2. Paste it into `index.html`: `<meta name="analytics-id" content="YOUR-ID">`.
 
-Events tracked: page views per page, `whatsapp-click`, `email-click`, `resume-download`,
+Events tracked: page views per page, `whatsapp-click`, `email-click`, `resume-request`,
 `outbound-click`, `estimate-add`, `paper-change`, `buddy-click`. Nothing is sent from localhost.
 
 ## Media
