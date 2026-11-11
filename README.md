@@ -116,3 +116,40 @@ python3 scripts/bump-version.py
 ```
 
 (Price changes in `data/rate-card.json` don't need it; that file is always fetched fresh.)
+
+## Paper Themes & Playful Bits
+
+`themes.css` and `playful.js` add the interactive layer; the site works the same without them.
+
+- **Paper switcher** (the "Paper" button in the top bar, or the round button on phones): Graph,
+  Kraft, Blueprint and Chalkboard. The choice is saved in the browser. To add a paper, add a
+  `html[data-paper="..."]` block in `themes.css` and an entry in `PAPERS` in `playful.js`.
+- **Kertas the paper buddy** (bottom-left): its eyes follow the cursor, it waves when you come
+  close and talks when clicked. Edit its lines in `LINES` in `playful.js`.
+- **Hero doodles** drift with the cursor and dodge it; section title highlights redraw on hover.
+
+All motion is switched off for visitors who ask for reduced motion.
+
+On phones the doodles scatter from a tap, slide apart as you scroll and lean when the phone is
+tilted (Android; iPhones don't share tilt without a permission pop-up, so we don't ask). Tapping
+empty paper leaves a small ink burst, and first-time visitors get a one-off "Change the paper!" nudge.
+
+## Visitor Stats
+
+`analytics.js` sends page views and a few events to [Umami](https://umami.is) (no cookies).
+It is **off** until you add your website ID:
+
+1. Create a free Umami Cloud account, add this site and copy its **Website ID**.
+2. Paste it into `index.html`: `<meta name="analytics-id" content="YOUR-ID">`.
+
+Events tracked: page views per page, `whatsapp-click`, `email-click`, `resume-download`,
+`outbound-click`, `estimate-add`, `paper-change`, `buddy-click`. Nothing is sent from localhost.
+
+## Media
+
+Screenshots are WebP (max 1600px wide) and load lazily; videos are muted H.264 with a poster image
+and only download when their slide is showing. Keep new videos under ~1 MB, e.g.:
+
+```bash
+ffmpeg -i in.mp4 -an -c:v libx264 -preset slow -crf 30 -vf "fps=24,scale=1280:-2" -pix_fmt yuv420p -movflags +faststart out.mp4
+```

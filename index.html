@@ -8,6 +8,9 @@
     <meta name="description"
         content="Portfolio and rate card of Muhammad Syafiq bin Md Asri, a Malaysian Software Developer with 6+ years building business systems, SaaS platforms, websites, and mobile apps.">
 
+    <!-- Visitor stats: paste your Umami website ID here to switch them on (see README) -->
+    <meta name="analytics-id" content="3af10241-b1de-4099-b86d-7e510ea34f25">
+
     <!-- Favicon -->
     <meta name="theme-color" content="#fdfbf7">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -40,8 +43,19 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=202610141745">
-    <link rel="stylesheet" href="rate-card.css?v=202610141745">
+    <link rel="stylesheet" href="style.css?v=202611110251">
+    <link rel="stylesheet" href="rate-card.css?v=202611110251">
+    <link rel="stylesheet" href="themes.css?v=202611110251">
+    <!-- Apply the saved paper style before first paint (no flash) -->
+    <script>
+        try {
+            var paper = localStorage.getItem('paper');
+            if (paper === 'kraft' || paper === 'blueprint' || paper === 'chalk') {
+                document.documentElement.dataset.paper = paper;
+                if (paper !== 'kraft') document.documentElement.dataset.tone = 'dark';
+            }
+        } catch (e) { }
+    </script>
 </head>
 
 <body>
@@ -88,7 +102,7 @@
                         <a href="#/rates" class="btn-primary">See Rates &amp; Get a Quote <i class="fas fa-arrow-right"></i></a>
                         <a href="#/work" class="btn-secondary">View My Work</a>
                     </div>
-                    <a href="muhammad-syafiq-resume.pdf?v=202610141745" class="hero-resume" download><i class="fas fa-file-arrow-down"></i> Download resume (PDF)</a>
+                    <a href="muhammad-syafiq-resume.pdf?v=202611110251" class="hero-resume" download><i class="fas fa-file-arrow-down"></i> Download resume (PDF)</a>
                     <div class="stats-row">
                         <div class="stat-item">
                             <span class="stat-number" data-count="6" data-suffix="+">6+</span>
@@ -227,15 +241,15 @@
                         <div class="work-media project-visual-carousel">
                             <div class="carousel-container">
                                 <div class="carousel-slide active">
-                                    <img src="assets/maigambar-discovery.png" alt="MaiGambar.my photographer discovery search page">
+                                    <img src="assets/maigambar-discovery.webp" loading="lazy" decoding="async" alt="MaiGambar.my photographer discovery search page">
                                     <span class="image-label">Discovery & Search</span>
                                 </div>
                                 <div class="carousel-slide">
-                                    <img src="assets/maigambar-profile.png" alt="MaiGambar.my photographer public profile with packages">
+                                    <img src="assets/maigambar-profile.webp" loading="lazy" decoding="async" alt="MaiGambar.my photographer public profile with packages">
                                     <span class="image-label">Photographer Profile</span>
                                 </div>
                                 <div class="carousel-slide">
-                                    <video src="assets/maigambar-preview.mp4" aria-label="MaiGambar.my product walkthrough" autoplay muted loop playsinline preload="metadata"></video>
+                                    <video src="assets/maigambar-preview.mp4" poster="assets/maigambar-preview-poster.webp" aria-label="MaiGambar.my product walkthrough" muted loop playsinline preload="none"></video>
                                     <span class="image-label">Product Walkthrough</span>
                                 </div>
                             </div>
@@ -265,7 +279,7 @@
                             <div class="tech-tags">
                                 <span>Laravel</span><span>React</span><span>TypeScript</span><span>Stripe</span><span>MySQL</span>
                             </div>
-                            <a href="https://maigambar.my" target="_blank" class="project-link">Visit Website <i class="fas fa-arrow-right"></i></a>
+                            <a href="https://maigambar.my" target="_blank" rel="noopener" class="project-link">Visit Website <i class="fas fa-arrow-right"></i></a>
                         </div>
                     </article>
 
@@ -273,11 +287,11 @@
                         <div class="work-media project-visual-carousel">
                             <div class="carousel-container">
                                 <div class="carousel-slide active">
-                                    <img src="assets/maispend-landing.png" alt="maispend AI personal finance dashboard landing">
+                                    <img src="assets/maispend-landing.webp" loading="lazy" decoding="async" alt="maispend AI personal finance dashboard landing">
                                     <span class="image-label">Landing & Wallet Card</span>
                                 </div>
                                 <div class="carousel-slide">
-                                    <video src="assets/maispend-preview.mp4" aria-label="maispend product walkthrough" autoplay muted loop playsinline preload="metadata"></video>
+                                    <video src="assets/maispend-preview.mp4" poster="assets/maispend-preview-poster.webp" aria-label="maispend product walkthrough" muted loop playsinline preload="none"></video>
                                     <span class="image-label">Product Walkthrough</span>
                                 </div>
                             </div>
@@ -306,7 +320,7 @@
                             <div class="tech-tags">
                                 <span>Laravel</span><span>Next.js</span><span>React</span><span>TypeScript</span><span>Tailwind</span><span>Stripe</span><span>Gemini AI</span>
                             </div>
-                            <a href="https://maispend.vercel.app" target="_blank" class="project-link">Visit Website <i class="fas fa-arrow-right"></i></a>
+                            <a href="https://maispend.vercel.app" target="_blank" rel="noopener" class="project-link">Visit Website <i class="fas fa-arrow-right"></i></a>
                         </div>
                     </article>
 
@@ -314,11 +328,11 @@
                         <div class="work-media project-visual-carousel">
                             <div class="carousel-container">
                                 <div class="carousel-slide active">
-                                    <video src="assets/design-web-visualizer-preview.mp4" aria-label="Design Web Visualizer palette preview" autoplay muted loop playsinline preload="metadata"></video>
+                                    <video src="assets/design-web-visualizer-preview.mp4" poster="assets/design-web-visualizer-preview-poster.webp" aria-label="Design Web Visualizer palette preview" muted loop playsinline preload="none"></video>
                                     <span class="image-label">Palette Preview</span>
                                 </div>
                                 <div class="carousel-slide">
-                                    <video src="assets/design-web-visualizer-system-preview.mp4" aria-label="Design Web Visualizer system preview" autoplay muted loop playsinline preload="metadata"></video>
+                                    <video src="assets/design-web-visualizer-system-preview.mp4" poster="assets/design-web-visualizer-system-preview-poster.webp" aria-label="Design Web Visualizer system preview" muted loop playsinline preload="none"></video>
                                     <span class="image-label">System Preview</span>
                                 </div>
                             </div>
@@ -347,13 +361,13 @@
                             <div class="tech-tags">
                                 <span>React</span><span>TypeScript</span><span>Vite</span><span>Gemini</span><span>AI APIs</span>
                             </div>
-                            <a href="https://system-visualizer-orpin.vercel.app" target="_blank" class="project-link">Visit Website <i class="fas fa-arrow-right"></i></a>
+                            <a href="https://system-visualizer-orpin.vercel.app" target="_blank" rel="noopener" class="project-link">Visit Website <i class="fas fa-arrow-right"></i></a>
                         </div>
                     </article>
 
                     <article class="work-card">
                         <div class="work-media">
-                            <img src="aimskoop.jpeg" alt="Koperasi AIMS Pulau Pinang Berhad web system">
+                            <img src="assets/aimskoop.webp" loading="lazy" decoding="async" alt="Koperasi AIMS Pulau Pinang Berhad web system">
                         </div>
                         <div class="work-content">
                             <div class="project-meta">
@@ -365,7 +379,7 @@
                             <div class="tech-tags">
                                 <span>Laravel</span><span>PHP</span><span>MySQL</span><span>Dashboard</span>
                             </div>
-                            <a href="https://www.aimskoop.com.my" target="_blank" class="project-link">Visit Website <i class="fas fa-arrow-right"></i></a>
+                            <a href="https://www.aimskoop.com.my" target="_blank" rel="noopener" class="project-link">Visit Website <i class="fas fa-arrow-right"></i></a>
                         </div>
                     </article>
 
@@ -373,11 +387,11 @@
                         <div class="work-media project-visual-carousel">
                             <div class="carousel-container">
                                 <div class="carousel-slide active">
-                                    <img src="assets/scan-attendance-list.png" alt="Scan attendance participant list dashboard">
+                                    <img src="assets/scan-attendance-list.webp" loading="lazy" decoding="async" alt="Scan attendance participant list dashboard">
                                     <span class="image-label">Attendance List</span>
                                 </div>
                                 <div class="carousel-slide">
-                                    <img src="assets/scan-attendance-dashboard.png" alt="Scan attendance statistics dashboard">
+                                    <img src="assets/scan-attendance-dashboard.webp" loading="lazy" decoding="async" alt="Scan attendance statistics dashboard">
                                     <span class="image-label">Statistics Dashboard</span>
                                 </div>
                             </div>
@@ -413,11 +427,11 @@
                         <div class="work-media project-visual-carousel">
                             <div class="carousel-container">
                                 <div class="carousel-slide active">
-                                    <img src="assets/hall-booking-rumah-kawin-madad.png" alt="Rumah Kawin MADAD hall booking website">
+                                    <img src="assets/hall-booking-rumah-kawin-madad.webp" loading="lazy" decoding="async" alt="Rumah Kawin MADAD hall booking website">
                                     <span class="image-label">Public Website</span>
                                 </div>
                                 <div class="carousel-slide">
-                                    <img src="assets/hall-booking-calendar.png" alt="Rumah Kawin MADAD booking calendar">
+                                    <img src="assets/hall-booking-calendar.webp" loading="lazy" decoding="async" alt="Rumah Kawin MADAD booking calendar">
                                     <span class="image-label">Booking Calendar</span>
                                 </div>
                             </div>
@@ -515,7 +529,7 @@
                 <div class="section-header">
                     <h2 class="section-title">Experience Snapshot</h2>
                     <p class="section-subtitle">6+ years building real systems people use every day.</p>
-                    <a href="muhammad-syafiq-resume.pdf?v=202610141745" class="btn-secondary section-action" download><i class="fas fa-file-arrow-down"></i> Download Resume</a>
+                    <a href="muhammad-syafiq-resume.pdf?v=202611110251" class="btn-secondary section-action" download><i class="fas fa-file-arrow-down"></i> Download Resume</a>
                 </div>
 
                 <ol class="timeline">
@@ -592,11 +606,11 @@
                         <a href="#/rates" class="btn-secondary large-btn">
                             <i class="fas fa-tags"></i> View Rate Card
                         </a>
-                        <a href="muhammad-syafiq-resume.pdf?v=202610141745" class="btn-secondary large-btn" download>
+                        <a href="muhammad-syafiq-resume.pdf?v=202611110251" class="btn-secondary large-btn" download>
                             <i class="fas fa-download"></i> Download Resume
                         </a>
                         <a href="https://wa.me/601114648597?text=Hi%20Syafiq,%20I'm%20interested%20in%20your%20services."
-                            target="_blank" class="btn-whatsapp large-btn">
+                            target="_blank" rel="noopener" class="btn-whatsapp large-btn">
                             <i class="fab fa-whatsapp"></i> WhatsApp Me
                         </a>
                     </div>
@@ -621,7 +635,7 @@
         </footer>
     </div>
 
-    <a href="https://wa.me/601114648597?text=Hi%20Syafiq,%20I'm%20interested%20in%20your%20services." target="_blank"
+    <a href="https://wa.me/601114648597?text=Hi%20Syafiq,%20I'm%20interested%20in%20your%20services." target="_blank" rel="noopener"
         class="floating-whatsapp">
         <i class="fab fa-whatsapp"></i>
     </a>
@@ -671,9 +685,11 @@
         </div>
     </div>
 
-    <script type="module" src="router.js?v=202610141745"></script>
-    <script type="module" src="script.js?v=202610141745"></script>
-    <script type="module" src="rate-card.js?v=202610141745"></script>
+    <script type="module" src="router.js?v=202611110251"></script>
+    <script type="module" src="script.js?v=202611110251"></script>
+    <script type="module" src="rate-card.js?v=202611110251"></script>
+    <script type="module" src="playful.js?v=202611110251"></script>
+    <script type="module" src="analytics.js?v=202611110251"></script>
 </body>
 
 </html>

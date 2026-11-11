@@ -1,0 +1,564 @@
+/* ==========================================================
+   Paper themes + playful, cursor-reactive bits
+   - html[data-paper]  graph (default) | kraft | blueprint | chalk
+   - html[data-tone]   "dark" for blueprint and chalk
+   ========================================================== */
+
+:root {
+    --grid-line: #e1e1e1;
+    --chrome-bg: rgba(253, 251, 247, 0.95);
+    --on-ink: #fff;
+}
+
+body {
+    background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+}
+
+.navbar { background: var(--chrome-bg); }
+
+/* --- Kraft paper: warm brown, soft fibres instead of a grid --- */
+html[data-paper="kraft"] {
+    --bg-dark: #d9bc93;
+    --text-dim: #5d4c38;
+    --chrome-bg: rgba(217, 188, 147, 0.96);
+}
+
+html[data-paper="kraft"] body {
+    background-image:
+        radial-gradient(rgba(92, 62, 28, .16) 1px, transparent 1.4px),
+        radial-gradient(rgba(255, 244, 222, .35) 1px, transparent 1.4px),
+        repeating-linear-gradient(0deg, rgba(92, 62, 28, .05) 0 2px, transparent 2px 7px);
+    background-size: 23px 23px, 31px 31px, auto;
+    background-position: 0 0, 11px 17px, 0 0;
+}
+
+/* --- Blueprint: white lines on engineering blue --- */
+html[data-paper="blueprint"] {
+    --bg-dark: #1c4b8a;
+    --primary: #f1f6ff;
+    --primary-dark: #cfdef5;
+    --text-light: #f1f6ff;
+    --text-dim: #bfd2ee;
+    --secondary: #ffb3a6;
+    --chrome-bg: rgba(24, 66, 124, 0.96);
+    --on-ink: #173e73;
+}
+
+html[data-paper="blueprint"] body {
+    background-image:
+        linear-gradient(rgba(255, 255, 255, .22) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .22) 1px, transparent 1px),
+        linear-gradient(rgba(255, 255, 255, .09) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .09) 1px, transparent 1px);
+    background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+}
+
+/* --- Chalkboard: chalk on dark green slate --- */
+html[data-paper="chalk"] {
+    --bg-dark: #25372f;
+    --primary: #f5f2e9;
+    --primary-dark: #d8d5cb;
+    --text-light: #f5f2e9;
+    --text-dim: #bcc7be;
+    --secondary: #ffa697;
+    --chrome-bg: rgba(31, 47, 40, 0.96);
+    --on-ink: #25372f;
+}
+
+html[data-paper="chalk"] body {
+    background-image:
+        repeating-linear-gradient(8deg, rgba(255, 255, 255, .022) 0 3px, transparent 3px 9px),
+        radial-gradient(ellipse at 20% 10%, rgba(255, 255, 255, .08), transparent 55%),
+        radial-gradient(ellipse at 85% 70%, rgba(255, 255, 255, .06), transparent 50%);
+    background-size: auto, 100vw 100vh, 100vw 100vh;
+    background-repeat: repeat, no-repeat, no-repeat;
+    background-attachment: scroll, fixed, fixed;
+}
+
+/* On the dark papers every card stays a light paper note with dark ink.
+   :where() keeps this at zero specificity so each note's own colours win. */
+:where(html[data-tone="dark"]) :where(
+    .spotlight-card, .skill-pill, .experience-card, .achievement-strip span,
+    .work-card, .tech-tags span, .project-card-stack, .cta-box, .quick-card,
+    .service-tile, .trust-row li, .tl-dot, .tl-card, .badge, .experience-period,
+    .project-industry, .interaction-hint, .stack-number, .carousel-btn,
+    .modal-close, .modal-nav, .footer-links a, .bottom-nav,
+    .rc-currency, .rc-btn, .rc-tab, .rc-card-inner, .rc-chip, .rc-perks li,
+    .rc-step-icon, .rc-receipt, .rc-addons, .rc-steps b, .rc-printer, .rc-toast,
+    .rc-sheet-bar, .rc-fly, .rc-sheet, .rc-ribbon, .rc-sheet-count,
+    .paper-pop, .buddy-bubble
+) {
+    --primary: #2c3e50;
+    --primary-dark: #1a252f;
+    --text-light: #2c3e50;
+    --text-dim: #7f8c8d;
+    --secondary: #e74c3c;
+    --bg-dark: #fdfbf7;
+    --rc-ink: #2c3e50;
+    --rc-red: #e74c3c;
+    --on-ink: #fff;
+    color: #2c3e50;
+}
+
+/* Solid ink buttons flip to chalk-white with dark lettering */
+html[data-tone="dark"] .btn-primary,
+html[data-tone="dark"] .nav-links a.nav-cta,
+html[data-tone="dark"] .next-page {
+    color: var(--on-ink);
+}
+
+html[data-tone="dark"] .next-page small {
+    color: var(--on-ink);
+    opacity: .7;
+}
+
+html[data-tone="dark"] .skills-section,
+html[data-tone="dark"] .experience-section {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 768px) {
+    html[data-paper] .rc-tabs { background: var(--chrome-bg); }
+}
+
+html[data-tone="dark"] .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* ---------- Paper switcher ---------- */
+.paper-switch {
+    position: relative;
+    font-family: var(--font-heading);
+}
+
+.paper-btn {
+    align-items: center;
+    background: none;
+    border: 2px dashed var(--primary);
+    border-radius: 999px;
+    color: var(--text-light);
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    font-size: 1.05rem;
+    gap: .45rem;
+    line-height: 1;
+    padding: .4rem .8rem;
+    transition: transform .2s ease, background .2s ease;
+}
+
+.paper-btn * { cursor: pointer; }
+
+.paper-btn:hover { transform: rotate(-3deg) scale(1.05); }
+
+.paper-btn:focus-visible,
+.paper-opt:focus-visible,
+.buddy:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+}
+
+.paper-chip {
+    border: 2px solid var(--primary);
+    border-radius: 4px;
+    display: inline-block;
+    height: 18px;
+    transform: rotate(-8deg);
+    width: 18px;
+}
+
+.paper-pop {
+    background: #fff;
+    border: 2px solid var(--primary);
+    border-radius: 14px 4px 14px 4px;
+    box-shadow: 5px 5px 0 rgba(0, 0, 0, .25);
+    display: grid;
+    gap: .5rem;
+    grid-template-columns: repeat(2, 1fr);
+    opacity: 0;
+    padding: .7rem;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 12px);
+    transform: translateY(-8px) rotate(2deg) scale(.95);
+    transform-origin: top right;
+    transition: opacity .18s ease, transform .22s cubic-bezier(.3, 1.5, .5, 1);
+    visibility: hidden;
+    width: 236px;
+    z-index: 1200;
+}
+
+.paper-switch.is-open .paper-pop {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+    visibility: visible;
+}
+
+.paper-opt {
+    background: none;
+    border: 0;
+    color: #2c3e50;
+    cursor: pointer;
+    display: grid;
+    font: inherit;
+    font-size: 1rem;
+    gap: .3rem;
+    justify-items: center;
+    padding: .25rem;
+}
+
+.paper-opt * { cursor: pointer; }
+
+.paper-swatch {
+    border: 2px solid #2c3e50;
+    border-radius: 6px;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, .18);
+    display: block;
+    height: 58px;
+    transition: transform .2s cubic-bezier(.3, 1.5, .5, 1);
+    width: 100%;
+}
+
+.paper-opt:hover .paper-swatch { transform: translateY(-4px) rotate(-3deg); }
+
+.paper-opt[aria-checked="true"] .paper-swatch {
+    box-shadow: 0 0 0 3px #f1c40f, 3px 3px 0 3px rgba(0, 0, 0, .18);
+}
+
+.paper-swatch[data-swatch="graph"] {
+    background:
+        linear-gradient(#d6d6d6 1px, transparent 1px) 0 0 / 10px 10px,
+        linear-gradient(90deg, #d6d6d6 1px, transparent 1px) 0 0 / 10px 10px,
+        #fdfbf7;
+}
+
+.paper-swatch[data-swatch="kraft"] {
+    background:
+        radial-gradient(rgba(92, 62, 28, .3) 1px, transparent 1.4px) 0 0 / 9px 9px,
+        #d9bc93;
+}
+
+.paper-swatch[data-swatch="blueprint"] {
+    background:
+        linear-gradient(rgba(255, 255, 255, .3) 1px, transparent 1px) 0 0 / 10px 10px,
+        linear-gradient(90deg, rgba(255, 255, 255, .3) 1px, transparent 1px) 0 0 / 10px 10px,
+        #1c4b8a;
+}
+
+.paper-swatch[data-swatch="chalk"] {
+    background:
+        repeating-linear-gradient(8deg, rgba(255, 255, 255, .08) 0 2px, transparent 2px 7px),
+        #25372f;
+}
+
+/* Phone: the top bar is hidden, so the switcher floats in the corner */
+.paper-switch.is-floating {
+    display: none;
+    position: fixed;
+    right: 12px;
+    top: calc(10px + env(safe-area-inset-top, 0px));
+    z-index: 1100;
+}
+
+.paper-switch.is-floating .paper-btn {
+    background: var(--chrome-bg);
+    height: 44px;
+    justify-content: center;
+    padding: 0;
+    width: 44px;
+}
+
+.paper-switch.is-floating .paper-btn-label { display: none; }
+
+@media (max-width: 768px) {
+    .paper-switch.is-floating { display: block; }
+    .nav-links .paper-switch { display: none; }
+}
+
+/* First-visit nudge towards the switcher */
+.paper-switch.is-hinting .paper-btn { animation: paperNudge 1.4s ease-in-out infinite; }
+
+@keyframes paperNudge {
+    0%, 55%, 100% { transform: none; }
+    65% { transform: rotate(-10deg) scale(1.12); }
+    80% { transform: rotate(8deg) scale(1.12); }
+}
+
+.paper-hint {
+    animation: hintIn .35s cubic-bezier(.3, 1.5, .5, 1) both;
+    background: var(--accent);
+    border: 2px solid #2c3e50;
+    border-radius: 12px 4px 12px 4px;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, .22);
+    color: #2c3e50;
+    font-size: 1rem;
+    line-height: 1;
+    padding: .45rem .7rem;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 12px);
+    white-space: nowrap;
+    z-index: 1150;
+}
+
+.paper-switch.is-floating .paper-hint {
+    right: calc(100% + 10px);
+    top: 8px;
+}
+
+@keyframes hintIn {
+    from { opacity: 0; transform: scale(.7) rotate(-6deg); }
+    to { opacity: 1; transform: rotate(-2deg); }
+}
+
+/* Ink burst where empty paper is tapped */
+.tap-burst {
+    height: 0;
+    pointer-events: none;
+    position: fixed;
+    width: 0;
+    z-index: 2000;
+}
+
+.tap-burst i {
+    animation: burstLine .5s ease-out both;
+    background: var(--primary);
+    border-radius: 2px;
+    height: 3px;
+    left: 0;
+    position: absolute;
+    top: -1.5px;
+    transform-origin: 0 50%;
+    width: 11px;
+}
+
+.tap-burst i:nth-child(1) { --a: 0deg; }
+.tap-burst i:nth-child(2) { --a: 51deg; background: var(--secondary); }
+.tap-burst i:nth-child(3) { --a: 103deg; }
+.tap-burst i:nth-child(4) { --a: 154deg; background: var(--accent); }
+.tap-burst i:nth-child(5) { --a: 206deg; }
+.tap-burst i:nth-child(6) { --a: 257deg; background: var(--secondary); }
+.tap-burst i:nth-child(7) { --a: 309deg; }
+
+@keyframes burstLine {
+    from { opacity: 1; transform: rotate(var(--a)) translateX(6px) scaleX(.3); }
+    60% { opacity: 1; }
+    to { opacity: 0; transform: rotate(var(--a)) translateX(26px) scaleX(1); }
+}
+
+/* Changing paper: the new sheet spreads out from the button */
+html.paper-switching::view-transition-old(root) { animation: none; }
+
+html.paper-switching::view-transition-new(root) {
+    animation: paperReveal .65s cubic-bezier(.4, 0, .2, 1) both;
+}
+
+html.paper-switching::view-transition-group(*) { animation-duration: .3s; }
+
+@keyframes paperReveal {
+    from { clip-path: circle(0 at var(--paper-x, 50%) var(--paper-y, 0%)); }
+    to { clip-path: circle(150vmax at var(--paper-x, 50%) var(--paper-y, 0%)); }
+}
+
+/* ---------- Hero doodles that drift away from the cursor ---------- */
+.hero-doodles {
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
+}
+
+.hero .container { position: relative; z-index: 1; }
+
+.hero-doodle {
+    color: var(--primary);
+    height: var(--size, 48px);
+    left: var(--x);
+    opacity: .75;
+    position: absolute;
+    top: var(--y);
+    transform: translate(var(--dx, 0px), var(--dy, 0px)) rotate(var(--rot, 0deg));
+    width: var(--size, 48px);
+    will-change: transform;
+}
+
+.hero-doodle svg {
+    animation: doodleBob 6s ease-in-out infinite;
+    animation-delay: calc(var(--n) * -1.1s);
+    display: block;
+    fill: none;
+    height: 100%;
+    overflow: visible;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2.4;
+    width: 100%;
+}
+
+.hero-doodle.is-red { color: var(--secondary); }
+.hero-doodle.is-yellow { color: var(--accent); }
+html:not([data-tone="dark"]) .hero-doodle.is-yellow { color: #d4a90a; }
+
+@keyframes doodleBob {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-7px) rotate(4deg); }
+}
+
+@media (max-width: 768px) {
+    .hero-doodle { opacity: .5; --size: 30px !important; }
+    .hero-doodle.is-desk { display: none; }
+}
+
+/* Title highlighter redraws itself when you point at it */
+.section-title::after { transform-origin: left center; }
+
+.section-title:hover::after {
+    animation: redraw .55s cubic-bezier(.3, .9, .4, 1);
+}
+
+@keyframes redraw {
+    from { transform: skewX(-10deg) scaleX(0); }
+    to { transform: skewX(-10deg) scaleX(1); }
+}
+
+/* ---------- Paper buddy: a sticky note that watches the cursor ---------- */
+.buddy-wrap {
+    bottom: 0;
+    left: 28px;
+    pointer-events: none;
+    position: fixed;
+    z-index: 90;
+}
+
+.buddy {
+    background: none;
+    border: 0;
+    cursor: pointer;
+    display: block;
+    height: 84px;
+    padding: 0;
+    pointer-events: auto;
+    transform: translateY(42%);
+    transition: transform .45s cubic-bezier(.3, 1.5, .5, 1);
+    width: 84px;
+}
+
+.buddy * { cursor: pointer; }
+
+.buddy svg { display: block; height: 100%; overflow: visible; width: 100%; }
+
+.buddy-wrap[data-mood="curious"] .buddy,
+.buddy-wrap[data-mood="shy"] .buddy,
+.buddy-wrap.is-talking .buddy { transform: translateY(6%); }
+
+.buddy-wrap.is-hopping .buddy { animation: buddyHop .5s cubic-bezier(.3, 1.4, .5, 1); }
+
+@keyframes buddyHop {
+    0% { transform: translateY(6%); }
+    40% { transform: translateY(-22%) rotate(-6deg); }
+    100% { transform: translateY(6%); }
+}
+
+.buddy-note { fill: #fef08a; stroke: #2c3e50; stroke-width: 2.5; stroke-linejoin: round; }
+.buddy-fold { fill: #eab308; stroke: #2c3e50; stroke-width: 2.5; stroke-linejoin: round; }
+.buddy-eye { fill: #fff; stroke: #2c3e50; stroke-width: 2.2; }
+.buddy-pupil { fill: #2c3e50; transform: translate(var(--px, 0px), var(--py, 0px)); transition: transform .08s linear; }
+.buddy-line { fill: none; stroke: #2c3e50; stroke-linecap: round; stroke-width: 2.5; }
+
+.buddy-lids {
+    animation: buddyBlink 5.5s infinite;
+    fill: #fef08a;
+    transform: scaleY(0);
+    transform-box: fill-box;
+    transform-origin: top;
+}
+
+@keyframes buddyBlink {
+    0%, 94%, 100% { transform: scaleY(0); }
+    96%, 98% { transform: scaleY(1); }
+}
+
+.buddy-cheek { fill: #fb7185; opacity: 0; transition: opacity .25s ease; }
+.buddy-wrap[data-mood="shy"] .buddy-cheek { opacity: .75; }
+
+.buddy-mouth-o { opacity: 0; }
+.buddy-wrap[data-mood="shy"] .buddy-mouth-o { opacity: 1; }
+.buddy-wrap[data-mood="shy"] .buddy-mouth { opacity: 0; }
+
+.buddy-arm {
+    transform: rotate(40deg);
+    transform-box: fill-box;
+    transform-origin: 0% 100%;
+    transition: transform .3s ease;
+}
+
+.buddy-wrap[data-mood="curious"] .buddy-arm,
+.buddy-wrap.is-waving .buddy-arm { animation: buddyWave .5s ease-in-out infinite alternate; }
+
+@keyframes buddyWave {
+    from { transform: rotate(-12deg); }
+    to { transform: rotate(18deg); }
+}
+
+.buddy-bubble {
+    background: #fff;
+    border: 2px solid #2c3e50;
+    border-radius: 16px 16px 16px 4px;
+    bottom: 92px;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, .22);
+    color: #2c3e50;
+    font-family: var(--font-heading);
+    font-size: 1.05rem;
+    left: 36px;
+    line-height: 1.25;
+    opacity: 0;
+    padding: .55rem .8rem;
+    position: absolute;
+    transform: translateY(8px) scale(.9);
+    transform-origin: bottom left;
+    transition: opacity .2s ease, transform .25s cubic-bezier(.3, 1.5, .5, 1);
+    width: max-content;
+    max-width: min(230px, calc(100vw - 80px));
+}
+
+.buddy-wrap.is-talking .buddy-bubble {
+    opacity: 1;
+    transform: none;
+}
+
+@media (max-width: 768px) {
+    .buddy-wrap {
+        bottom: calc(4.1rem + env(safe-area-inset-bottom, 0px));
+        left: 10px;
+    }
+
+    .buddy { height: 60px; transform: translateY(30%); width: 60px; }
+    .buddy-bubble { bottom: 66px; left: 24px; }
+
+    /* Keep clear of the estimate bar and contact form on phones */
+    body[data-view="rates"] .buddy-wrap,
+    body[data-view="contact"] .buddy-wrap { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-doodle svg,
+    .buddy-lids,
+    .buddy-wrap[data-mood="curious"] .buddy-arm,
+    .buddy-wrap.is-waving .buddy-arm,
+    .buddy-wrap.is-hopping .buddy,
+    .section-title:hover::after { animation: none; }
+
+    .buddy, .paper-pop, .buddy-bubble { transition: none; }
+    .paper-switch.is-hinting .paper-btn, .paper-hint { animation: none; }
+
+    html.paper-switching::view-transition-new(root) { animation: none; }
+}
+
+@media print {
+    .buddy-wrap, .paper-switch, .hero-doodles, .tap-burst { display: none !important; }
+}
