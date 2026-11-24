@@ -294,6 +294,27 @@ function initBursts() {
     }, { passive: true });
 }
 
+/* ---------- Kertas remembers you ----------
+   Counts visits (one per browser session) and how long you've been away.
+   Stored only in this browser; desk.js reads it from <html data-visits data-days-away>. */
+function rememberVisit() {
+    try {
+        let visits = Number(localStorage.getItem('kertas-visits')) || 0;
+        const last = Number(localStorage.getItem('kertas-last')) || 0;
+        if (!sessionStorage.getItem('kertas-session')) {
+            visits += 1;
+            localStorage.setItem('kertas-visits', String(visits));
+            sessionStorage.setItem('kertas-session', '1');
+            root.dataset.daysAway = last ? String(Math.floor((Date.now() - last) / 86400000)) : '0';
+            sessionStorage.setItem('kertas-away', root.dataset.daysAway);
+        } else {
+            root.dataset.daysAway = sessionStorage.getItem('kertas-away') || '0';
+        }
+        localStorage.setItem('kertas-last', String(Date.now()));
+        root.dataset.visits = String(Math.max(1, visits));
+    } catch { /* private mode: every visit is a first visit */ }
+}
+
 /* ---------- Paper buddy ---------- */
 const LINES = [
     'Hi! I\'m Kertas. 👋',
@@ -346,10 +367,8 @@ function initBuddy() {
     }
     listeners.add(look);
 
-    buddy.addEventListener('click', () => {
-        track('buddy-click', { line: line % LINES.length });
-        bubble.textContent = LINES[line % LINES.length];
-        line += 1;
+    function say(text) {
+        bubble.textContent = text;
         wrap.classList.add('is-talking');
         if (!reducedMotion.matches) {
             wrap.classList.remove('is-hopping');
@@ -358,7 +377,38 @@ function initBuddy() {
         }
         clearTimeout(talkTimer);
         talkTimer = setTimeout(() => wrap.classList.remove('is-talking'), 3800);
+    }
+
+    // Returning visitors get a welcome back as Kertas' first line.
+    const visits = Number(root.dataset.visits) || 1;
+    if (visits > 1) LINES[0] = `Welcome back! Visit number ${visits}.`;
+
+    buddy.addEventListener('click', () => {
+        track('buddy-click', { line: line % LINES.length });
+        say(LINES[line % LINES.length]);
+        line += 1;
     });
+
+    // Kertas waves goodbye when you reach the bottom of a page (once per page you open).
+    const footer = document.querySelector('.site-footer');
+    let waved = '';
+    if (footer && 'IntersectionObserver' in window) {
+        let footerSeen = false;
+        new IntersectionObserver(([entry]) => {
+            footerSeen = entry.isIntersecting;
+            if (!footerSeen) return;
+            // wait a beat so the desk tour has finished leaving the screen
+            setTimeout(() => {
+                const page = location.hash || '#/';
+                if (!footerSeen || waved === page || document.body.classList.contains('desk-in-view')) return;
+                if (document.documentElement.scrollHeight <= window.innerHeight * 1.3) return;   // short page, no goodbye
+                waved = page;
+                wrap.dataset.mood = 'curious';
+                say('Bye for now! Come back soon.');
+                setTimeout(() => { wrap.dataset.mood = 'idle'; }, 2600);
+            }, 400);
+        }, { threshold: 0.3 }).observe(footer);
+    }
 
     // Phones: Kertas follows your scrolling with its eyes.
     if (!finePointer.matches) {
@@ -390,6 +440,7 @@ function initBuddy() {
     }
 }
 
+rememberVisit();
 initPapers();
 initDoodles();
 initBursts();
