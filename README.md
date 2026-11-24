@@ -137,6 +137,24 @@ On phones the doodles scatter from a tap, slide apart as you scroll and lean whe
 tilted (Android; iPhones don't share tilt without a permission pop-up, so we don't ask). Tapping
 empty paper leaves a small ink burst, and first-time visitors get a one-off "Change the paper!" nudge.
 
+## 3D Desk Tour (home page)
+
+`desk.js` and `desk.css` turn the top of the home page into a 3D paper desk built with
+[Three.js](https://threejs.org) (loaded from jsDelivr only on the home page, no build step).
+
+- The desk stays pinned while you scroll. Each scroll stop shows one object and one card:
+  **The desk → Work (photo stack) → Rates (price tag) → About (ID card) → Contact (paper plane)**.
+  Each card links to the full page. The dots on the right (desktop) jump between stops.
+- Clicking an object on the desk scrolls the tour to it. The other objects slide aside so it stands alone.
+- **Kertas** walks along as the tour guide. Its eyes follow the cursor, it blinks and waves,
+  it hops and talks when poked (three quick pokes = backflip), and it comments when you change the paper.
+  The flat Kertas in the corner hides while the desk is on screen.
+- Edit the cards in `index.html` (`.tour-step` sections). Edit Kertas' lines in `STOP_LINES`,
+  `POKE_LINES` and `PAPER_LINES` at the top of `desk.js`. The photos use the `*-preview-poster.webp`
+  files in `assets/`.
+- If WebGL is missing, Data Saver is on, or Three.js can't load, the extra stops stay hidden and the
+  home page looks the same as before. With reduced motion, the camera follows the scroll without idle animation.
+
 ## Visitor Stats
 
 `analytics.js` sends page views and a few events to [Umami](https://umami.is) (no cookies).
@@ -146,7 +164,7 @@ It is **off** until you add your website ID:
 2. Paste it into `index.html`: `<meta name="analytics-id" content="YOUR-ID">`.
 
 Events tracked: page views per page, `whatsapp-click`, `email-click`, `resume-request`,
-`outbound-click`, `estimate-add`, `paper-change`, `buddy-click`. Nothing is sent from localhost.
+`outbound-click`, `estimate-add`, `paper-change`, `buddy-click`, `desk-pick`. Nothing is sent from localhost.
 
 ## Media
 

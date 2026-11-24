@@ -1,0 +1,369 @@
+/* ==========================================================
+   3D desk tour on the home page (desk.js)
+   Active only when <html> has .has-desk (set in <head> when WebGL works).
+   The desk is pinned full-screen behind the hero and five tour stops.
+   Each stop shows one card on its own side of the screen while the camera
+   frames the object on the other side, so text never sits on an object.
+   ========================================================== */
+
+.desk-sticky,
+.tour-step,
+.tour-hint { display: none; }
+
+/* --- the pinned desk --- */
+html.has-desk .desk-tour { position: relative; }
+
+html.has-desk .desk-sticky {
+    display: block;
+    position: sticky;
+    top: 0;
+    z-index: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100svh;
+    margin-left: calc(50% - 50vw);
+    margin-bottom: -100vh;
+    margin-bottom: -100svh;
+    pointer-events: none;
+}
+
+.desk-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    pointer-events: auto;
+    touch-action: pan-y;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.desk-sticky.is-hovering .desk-canvas { cursor: pointer; }
+
+/* Hero + stops scroll over the desk; only their cards catch clicks. */
+html.has-desk .desk-tour > .hero,
+html.has-desk .desk-tour > .tour-step {
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+}
+
+html.has-desk .desk-tour .hero-content,
+html.has-desk .tour-card { pointer-events: auto; }
+
+html.has-desk .hero-doodles { display: none; }
+html.has-desk .desk-tour > .hero { min-height: 100vh; min-height: 100svh; }
+
+/* --- hover hint + Kertas' speech bubble (placed by desk.js) --- */
+.desk-tip,
+.kertas-bubble {
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    color: #2c3e50;
+    background: #fff;
+    border: 2px solid #2c3e50;
+    font-family: var(--font-heading);
+    opacity: 0;
+    transition: opacity .2s ease;
+    will-change: transform;
+}
+
+.desk-tip {
+    white-space: nowrap;
+    font-size: 1.05rem;
+    padding: .2rem .7rem;
+    border-radius: var(--border-radius-sketch);
+    box-shadow: 3px 3px 0 #2c3e50;
+}
+
+.desk-tip small {
+    font-family: var(--font-main);
+    font-size: .72rem;
+    font-weight: 600;
+    color: #5f6b6c;
+    margin-left: .35rem;
+}
+
+.desk-tip.show { opacity: 1; }
+
+.kertas-bubble {
+    max-width: 230px;
+    font-size: 1.1rem;
+    line-height: 1.25;
+    padding: .5rem .8rem;
+    border-radius: 14px;
+    box-shadow: 3px 3px 0 #2c3e50;
+}
+
+.kertas-bubble::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -9px;
+    width: 14px;
+    height: 14px;
+    background: #fff;
+    border-right: 2px solid #2c3e50;
+    border-bottom: 2px solid #2c3e50;
+    transform: translateX(-50%) rotate(45deg);
+}
+
+.kertas-bubble.show { opacity: 1; }
+
+/* The 3D Kertas takes over while the desk is on screen. */
+body.desk-in-view .buddy-wrap {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .3s ease, visibility 0s linear .3s;
+}
+
+/* --- side rail: where you are in the tour --- */
+.tour-rail {
+    position: absolute;
+    right: max(18px, env(safe-area-inset-right, 0px));
+    top: 50%;
+    transform: translateY(-50%);
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 8px;
+    background: var(--chrome-bg);
+    border: 2px solid var(--primary);
+    border-radius: 999px;
+    pointer-events: auto;
+    transition: opacity .3s ease;
+}
+
+.tour-rail button {
+    position: relative;
+    width: 14px;
+    height: 14px;
+    padding: 0;
+    border-radius: 50%;
+    border: 2px solid var(--primary);
+    background: transparent;
+    cursor: pointer;
+    transition: transform .2s ease, background-color .2s ease;
+}
+
+.tour-rail button.is-on { background: var(--accent); transform: scale(1.25); }
+.tour-rail button:hover { transform: scale(1.25); }
+.tour-rail button:focus-visible { outline: 3px dashed var(--secondary); outline-offset: 3px; }
+
+.tour-rail span {
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    padding: 0 .5rem;
+    border-radius: 6px;
+    background: var(--chrome-bg);
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    color: var(--primary);
+    opacity: 0;
+    transition: opacity .2s ease;
+    pointer-events: none;
+}
+
+.tour-rail button:hover span,
+.tour-rail button:focus-visible span,
+.tour-rail button.is-on span { opacity: 1; }
+
+.desk-sticky.is-past .tour-rail { opacity: 0; pointer-events: none; }
+
+/* --- scroll hint under the hero stats --- */
+html.has-desk .tour-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    margin-top: 2rem;
+    padding: .3rem 0;
+    border: 0;
+    background: none;
+    color: var(--secondary);
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+html.has-desk .tour-hint i { animation: hintBob 1.6s ease-in-out infinite; }
+
+@keyframes hintBob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(5px); }
+}
+
+/* --- tour stops: one paper card each --- */
+html.has-desk .tour-step {
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding: 6rem 0 3rem;
+}
+
+html.has-desk .tour-step > .container { width: 100%; }
+
+.tour-card {
+    max-width: 400px;
+    color: #2c3e50;
+    background: #fff;
+    border: 2px solid #2c3e50;
+    border-radius: 6px 14px 8px 16px;
+    box-shadow: 6px 6px 0 #2c3e50;
+    padding: 1.6rem 1.7rem 1.7rem;
+}
+
+.tour-kicker {
+    display: block;
+    font-family: var(--font-main);
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #e74c3c;
+}
+
+.tour-card h2 {
+    margin: .35rem 0 .6rem;
+    font-family: var(--font-heading);
+    font-size: 2.3rem;
+    font-weight: 400;
+    line-height: 1.05;
+    color: #2c3e50;
+    text-wrap: balance;
+}
+
+.tour-card p {
+    margin: 0;
+    color: #5f6b6c;
+    line-height: 1.55;
+}
+
+.tour-prices {
+    list-style: none;
+    margin: .2rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: .15rem;
+}
+
+.tour-prices li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .45rem 0;
+    border-bottom: 1.5px dashed #c9cfd0;
+}
+
+.tour-prices span { color: #5f6b6c; }
+
+.tour-prices b {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: #e74c3c;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.tour-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .8rem;
+    margin-top: 1.3rem;
+}
+
+/* Cards are always light paper, so their buttons keep the light-paper look on every theme. */
+.tour-card .btn-primary { background: #2c3e50; color: #fff; border-color: #2c3e50; }
+.tour-card .btn-secondary { background: #fff; color: #2c3e50; border-color: #2c3e50; }
+
+/* Kertas' line at each object stop: a tiny paper face + a handwritten quote */
+.kertas-says {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin: 1.1rem 0 0 !important;
+    padding-top: .9rem;
+    border-top: 1.5px dashed #c9cfd0;
+    font-family: var(--font-heading);
+    font-size: 1.05rem;
+    line-height: 1.25;
+    color: #2c3e50 !important;
+}
+
+.kertas-says::before {
+    content: "";
+    flex: none;
+    width: 26px;
+    height: 28px;
+    border: 2px solid #2c3e50;
+    border-radius: 3px;
+    background:
+        radial-gradient(circle at 34% 40%, #2c3e50 0 2.2px, transparent 2.6px),
+        radial-gradient(circle at 66% 40%, #2c3e50 0 2.2px, transparent 2.6px),
+        radial-gradient(circle at 20% 66%, #ff9aa2 0 2.6px, transparent 3px),
+        radial-gradient(circle at 80% 66%, #ff9aa2 0 2.6px, transparent 3px),
+        #fff;
+}
+
+/* --- desktop: hero text on the left, desk on the right --- */
+@media (min-width: 980px) {
+    html.has-desk .desk-tour .hero-content.centered {
+        text-align: left;
+        align-items: flex-start;
+        margin: 0;
+        max-width: 540px;
+    }
+
+    html.has-desk .desk-tour .display-text {
+        font-size: clamp(3.2rem, 5vw, 4.5rem);
+        min-height: 2em;
+    }
+
+    html.has-desk .desk-tour .lead-text { padding: 0; }
+    html.has-desk .desk-tour .stats-row { gap: 2.4rem; }
+    html.has-desk .desk-tour .stat-item { align-items: flex-start; }
+
+    html.has-desk .tour-rail { display: flex; }
+}
+
+/* --- phones and tablets: object up top, card at the bottom --- */
+@media (max-width: 979px) {
+    html.has-desk .desk-tour .display-text { min-height: 2em; }
+
+    html.has-desk .tour-step {
+        align-items: flex-end;
+        padding: 6rem 0 calc(5.5rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    .tour-card {
+        max-width: 520px;
+        margin: 0 auto;
+        padding: 1.2rem 1.3rem 1.3rem;
+        box-shadow: 4px 4px 0 #2c3e50;
+    }
+
+    .tour-card h2 { font-size: 1.9rem; }
+    .tour-card p { font-size: .95rem; }
+    .tour-actions { margin-top: 1rem; }
+    .tour-actions a { flex: 1 1 auto; justify-content: center; }
+    .kertas-bubble { max-width: 190px; font-size: 1rem; }
+    .kertas-says { font-size: .98rem; margin-top: .8rem !important; padding-top: .7rem; }
+
+    /* the floating WhatsApp button would cover the card buttons; the Contact stop has its own */
+    body.desk-in-view .floating-whatsapp { opacity: 0; visibility: hidden; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .desk-tip,
+    .kertas-bubble,
+    .tour-rail,
+    .tour-rail button,
+    .tour-rail span { transition: none; }
+    html.has-desk .tour-hint i { animation: none; }
+}
