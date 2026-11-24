@@ -103,6 +103,60 @@ function buildDesk(THREE) {
     sun.shadow.radius = 4;
     scene.add(sun);
 
+    // The desk itself: the site's current paper (graph, kraft, blueprint or chalk) as a real 3D surface.
+    // Seen from straight above it looks just like the flat page; tilted, it recedes into the distance.
+    const CELL = 0.4;                       // one 20px grid square, in desk units
+    const deskCanvas = document.createElement('canvas');
+    deskCanvas.width = deskCanvas.height = 512;   // 5 x 5 grid squares
+    const deskTex = new THREE.CanvasTexture(deskCanvas);
+    deskTex.colorSpace = THREE.SRGBColorSpace;
+    deskTex.wrapS = deskTex.wrapT = THREE.RepeatWrapping;
+    deskTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    const DESK_SIZE = 120;
+    deskTex.repeat.set(DESK_SIZE / (CELL * 5), DESK_SIZE / (CELL * 5));
+    const deskMat = new THREE.MeshBasicMaterial({ map: deskTex });
+    const desk = new THREE.Mesh(new THREE.PlaneGeometry(DESK_SIZE, DESK_SIZE), deskMat);
+    desk.rotation.x = -Math.PI / 2;
+    desk.position.y = -0.002;
+    scene.add(desk);
+    scene.fog = new THREE.Fog(0xffffff, 20, 50);
+
+    function paintDesk() {
+        const paper = root.dataset.paper || 'graph';
+        const bg = getComputedStyle(root).getPropertyValue('--bg-dark').trim() || '#fdfbf7';
+        const g = deskCanvas.getContext('2d');
+        const n = deskCanvas.width, step = n / 5;
+        g.fillStyle = bg;
+        g.fillRect(0, 0, n, n);
+        const lines = (color, every, width) => {
+            g.strokeStyle = color; g.lineWidth = width;
+            for (let i = 0; i <= n; i += every) {
+                g.beginPath(); g.moveTo(i, 0); g.lineTo(i, n); g.stroke();
+                g.beginPath(); g.moveTo(0, i); g.lineTo(n, i); g.stroke();
+            }
+        };
+        if (paper === 'blueprint') {
+            lines('rgba(255,255,255,.12)', step, 3);
+            lines('rgba(255,255,255,.28)', n, 5);
+        } else if (paper === 'kraft') {
+            for (let i = 0; i < 900; i++) {
+                g.fillStyle = i % 3 ? 'rgba(92,62,28,.16)' : 'rgba(255,244,222,.35)';
+                g.beginPath(); g.arc(Math.random() * n, Math.random() * n, 2.5, 0, Math.PI * 2); g.fill();
+            }
+        } else if (paper === 'chalk') {
+            for (let i = 0; i < 60; i++) {
+                g.strokeStyle = 'rgba(255,255,255,.035)'; g.lineWidth = 6;
+                const y = Math.random() * n;
+                g.beginPath(); g.moveTo(0, y); g.lineTo(n, y + 40); g.stroke();
+            }
+        } else {
+            lines('#e1e1e1', step, 4);
+        }
+        deskTex.needsUpdate = true;
+        scene.fog.color.set(bg);
+        setTimeout(wake);   // the render loop is set up further down
+    }
+
     const floorMat = new THREE.ShadowMaterial({ opacity: 0.16 });
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), floorMat);
     floor.rotation.x = -Math.PI / 2;
@@ -410,6 +464,7 @@ function buildDesk(THREE) {
 
     // ---------- camera poses for each stop ----------
     let width = 1, height = 1, wide = true;
+    const TOP_DIR = new THREE.Vector3(0, 1, 0.02).normalize();
     const OVERVIEW_DIR = new THREE.Vector3(0, 0.86, 0.62).normalize();
     const FOCUS_DIR = new THREE.Vector3(0, 0.6, 1).normalize();
     const overview = { center: new THREE.Vector3(), corners: [] };
@@ -466,13 +521,14 @@ function buildDesk(THREE) {
         const focusNdc = wide ? [0.34, 0.02] : [0, 0.42];
         const focusFracW = wide ? 0.5 : 0.9;
         poses = [];
-        // 0: hero. Desktop: whole desk on the right. Phones: desk waits just below the screen.
+        // 0: hero. Looking straight down, so the desk reads as a flat 2D page; scrolling tilts it into 3D.
+        // Desktop: the flat-lay sits on the right. Phones: it waits just below the screen.
         if (wide) {
-            const d = fitDistance(overview.center, OVERVIEW_DIR, overview.corners, 0.3, 0.6);
-            poses.push(framed(overview.center, OVERVIEW_DIR, d, 0.66, -0.02));
+            const d = fitDistance(overview.center, TOP_DIR, overview.corners, 0.32, 0.72);
+            poses.push(framed(overview.center, TOP_DIR, d, 0.64, -0.04));
         } else {
-            const d = fitDistance(overview.center, OVERVIEW_DIR, overview.corners, 0.94, 0.5);
-            poses.push(framed(overview.center, OVERVIEW_DIR, d, 0, -1.7));
+            const d = fitDistance(overview.center, TOP_DIR, overview.corners, 0.94, 0.5);
+            poses.push(framed(overview.center, TOP_DIR, d, 0, -1.6));
         }
         // 1: the whole desk
         if (wide) {
@@ -584,7 +640,7 @@ function buildDesk(THREE) {
         say(POKE_LINES[Math.floor(Math.random() * POKE_LINES.length)]);
     }
 
-    const applyTone = () => { floorMat.opacity = root.dataset.tone === 'dark' ? 0.32 : 0.16; };
+    const applyTone = () => { floorMat.opacity = root.dataset.tone === 'dark' ? 0.32 : 0.16; paintDesk(); };
     new MutationObserver(() => {
         applyTone();
         const line = PAPER_LINES[root.dataset.paper || 'graph'];
@@ -594,7 +650,7 @@ function buildDesk(THREE) {
             say(line);
         }
         wake();
-    }).observe(root, { attributes: true, attributeFilter: ['data-paper'] });
+    }).observe(root, { attributes: true, attributeFilter: ['data-paper', 'data-tone'] });
     applyTone();
 
     // ---------- loop: only runs while the desk is on screen ----------
@@ -630,6 +686,10 @@ function buildDesk(THREE) {
         firstFrame = false;
         camera.position.copy(camPos);
         camera.lookAt(camTarget);
+        // the far desk fades into the paper colour, like the mockup
+        const camDist = camPos.distanceTo(camTarget);
+        scene.fog.near = camDist * 1.25;
+        scene.fog.far = camDist * 3.2;
 
         // objects: the one at the current stop gets picked up
         for (const id in items) {
@@ -645,17 +705,18 @@ function buildDesk(THREE) {
         for (const id in items) if (!star || items[id].f > star.f) star = items[id];
         const clear = star ? ease(star.f) : 0;
         const push = (obj, base, amount) => {
-            v.set(base.x - star.base.x, 0, base.z - star.base.z);
-            if (v.lengthSq() < 1e-4) v.set(1, 0, 0);
+            // slide sideways and back, never toward the camera
+            v.set(base.x - star.base.x, 0, Math.min(0, base.z - star.base.z) * 0.5);
+            if (Math.abs(v.x) < 0.5) v.x = Math.sign(v.x || 1) * 0.5;
             v.normalize().multiplyScalar(amount * clear);
             obj.position.set(base.x + v.x, base.y, base.z + v.z);
         };
         for (const id in items) {
             const it = items[id];
             if (it === star) it.group.position.copy(it.base);
-            else push(it.group, it.base, 3.2);
+            else push(it.group, it.base, 4.4);
         }
-        push(pencil, PENCIL_HOME, 3.2);
+        push(pencil, PENCIL_HOME, 4.4);
 
         // doodles drift and dodge the pointer
         doodles.forEach((d) => {

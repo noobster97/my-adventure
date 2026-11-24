@@ -137,10 +137,10 @@ const navbar = document.querySelector('.navbar');
 if (navbar) {
     window.addEventListener('scroll', () => {
         if (window.scrollY > 50) {
-            navbar.style.background = 'rgba(253, 251, 247, 0.98)';
+            navbar.style.background = 'var(--chrome-bg)';
             navbar.style.boxShadow = '0 4px 0px rgba(0,0,0,0.1)';
         } else {
-            navbar.style.background = 'rgba(253, 251, 247, 0.95)';
+            navbar.style.background = '';
             navbar.style.boxShadow = 'none';
         }
     });

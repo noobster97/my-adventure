@@ -52,6 +52,9 @@ html.has-desk .desk-tour .hero-content,
 html.has-desk .tour-card { pointer-events: auto; }
 
 html.has-desk .hero-doodles { display: none; }
+
+/* The tour already leads to Work, Rates and About, so the shortcut cards below it would repeat it. */
+html.has-desk .quick-section { display: none; }
 html.has-desk .desk-tour > .hero { min-height: 100vh; min-height: 100svh; }
 
 /* --- hover hint + Kertas' speech bubble (placed by desk.js) --- */
@@ -244,33 +247,6 @@ html.has-desk .tour-step > .container { width: 100%; }
     line-height: 1.55;
 }
 
-.tour-prices {
-    list-style: none;
-    margin: .2rem 0 0;
-    padding: 0;
-    display: grid;
-    gap: .15rem;
-}
-
-.tour-prices li {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: .45rem 0;
-    border-bottom: 1.5px dashed #c9cfd0;
-}
-
-.tour-prices span { color: #5f6b6c; }
-
-.tour-prices b {
-    font-family: var(--font-heading);
-    font-size: 1.25rem;
-    font-weight: 400;
-    color: #e74c3c;
-    white-space: nowrap;
-    font-variant-numeric: tabular-nums;
-}
-
 .tour-actions {
     display: flex;
     flex-wrap: wrap;
@@ -279,8 +255,8 @@ html.has-desk .tour-step > .container { width: 100%; }
 }
 
 /* Cards are always light paper, so their buttons keep the light-paper look on every theme. */
-.tour-card .btn-primary { background: #2c3e50; color: #fff; border-color: #2c3e50; }
-.tour-card .btn-secondary { background: #fff; color: #2c3e50; border-color: #2c3e50; }
+:root .tour-card .btn-primary { background: #2c3e50; color: #fff; border-color: #2c3e50; }
+:root .tour-card .btn-secondary { background: #fff; color: #2c3e50; border-color: #2c3e50; }
 
 /* Kertas' line at each object stop: a tiny paper face + a handwritten quote */
 .kertas-says {
