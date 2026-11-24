@@ -132,19 +132,6 @@ if (stackCards.length > 0) {
     reorderStack();
 }
 
-// --- Navbar Scroll Effect ---
-const navbar = document.querySelector('.navbar');
-if (navbar) {
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            navbar.style.background = 'var(--chrome-bg)';
-            navbar.style.boxShadow = '0 4px 0px rgba(0,0,0,0.1)';
-        } else {
-            navbar.style.background = '';
-            navbar.style.boxShadow = 'none';
-        }
-    });
-}
 
 // --- Reveal Animations ---
 const revealElements = document.querySelectorAll('.section-title, .bento-card, .experience-card, .achievement-strip, .work-card, .project-card-stack, .hero-content > *, .cta-box');

@@ -29,8 +29,29 @@ if (tour && root.classList.contains('has-desk')) {
 }
 
 // What Kertas says when it arrives at each stop, when poked, and when the paper changes.
+const TIME_OF_DAY = (() => {
+    // ?desk-time=morning|day|evening|night previews another time of day
+    let forced = null;
+    try { forced = new URLSearchParams(location.search).get('desk-time'); } catch { /* old browser */ }
+    if (['morning', 'day', 'evening', 'night'].includes(forced)) return forced;
+    const h = new Date().getHours();
+    return h >= 20 || h < 6 ? 'night' : h >= 17 ? 'evening' : h < 11 ? 'morning' : 'day';
+})();
+
+function greeting() {
+    const visits = +root.dataset.visits || 1;
+    const away = +root.dataset.daysAway || 0;
+    if (visits > 1 && away >= 1) return `Welcome back! It\u2019s been ${away} day${away > 1 ? 's' : ''}. I missed you!`;
+    if (visits > 1) return `Welcome back! Visit number ${visits}. Scroll, I\u2019ll show you again!`;
+    return {
+        morning: "Selamat pagi! I'm Kertas. Scroll down, I'll show you around!",
+        evening: "Selamat petang! I'm Kertas. Scroll down, I'll show you around!",
+        night: "Working late? Me too. I'm Kertas, scroll and I'll show you around!",
+    }[TIME_OF_DAY] || "Hi! I'm Kertas. Scroll down, I'll show you around!";
+}
+
 const STOP_LINES = [
-    "Hi! I'm Kertas. Scroll down, I'll show you around!",
+    null, // filled in by greeting()
     'This is Syafiq’s desk. Everything here is real work.',
     'These apps are live. Real people use them every day!',
     'Websites start at RM 800. No hidden fees, promise.',
@@ -50,7 +71,6 @@ function buildDesk(THREE) {
     const STOPS = steps.length;
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setClearColor(0x000000, 0);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -93,9 +113,15 @@ function buildDesk(THREE) {
     const BODY = (px, wt = 600) => `${wt} ${px}px Outfit, system-ui, sans-serif`;
 
     // ---------- lights + a floor that only shows shadows (the page's paper shows through) ----------
-    scene.add(new THREE.HemisphereLight(0xffffff, 0xcfc6b4, 2.1));
-    const sun = new THREE.DirectionalLight(0xffffff, 1.6);
-    sun.position.set(-6, 14, 8);
+    const LIGHTING = {
+        morning: { sky: 0xfff6e8, ground: 0xd8cbb4, hemi: 2.0, sun: 0xffe2b8, sunI: 1.6, sunPos: [-10, 10, 6], lamp: 0, dim: 0 },
+        day: { sky: 0xffffff, ground: 0xcfc6b4, hemi: 2.1, sun: 0xffffff, sunI: 1.6, sunPos: [-6, 14, 8], lamp: 0, dim: 0 },
+        evening: { sky: 0xfff0e0, ground: 0xc9b49e, hemi: 1.9, sun: 0xffc48a, sunI: 1.4, sunPos: [-13, 6, 3], lamp: 1.4, dim: 0.05 },
+        night: { sky: 0xe6eaff, ground: 0x8c8aa0, hemi: 1.55, sun: 0xc8d2ff, sunI: 0.45, sunPos: [-6, 14, 8], lamp: 2.2, dim: 0.1 },
+    }[TIME_OF_DAY];
+    scene.add(new THREE.HemisphereLight(LIGHTING.sky, LIGHTING.ground, LIGHTING.hemi));
+    const sun = new THREE.DirectionalLight(LIGHTING.sun, LIGHTING.sunI);
+    sun.position.set(...LIGHTING.sunPos);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
     Object.assign(sun.shadow.camera, { left: -9, right: 9, top: 9, bottom: -9, near: 1, far: 40 });
@@ -153,8 +179,19 @@ function buildDesk(THREE) {
             lines('#e1e1e1', step, 4);
         }
         deskTex.needsUpdate = true;
-        scene.fog.color.set(bg);
+        // at night the desk dims a little; fog and sky follow so the horizon stays seamless
+        scene.fog.color.set(bg).multiplyScalar(1 - LIGHTING.dim);
+        renderer.setClearColor(scene.fog.color, 1);
         setTimeout(wake);   // the render loop is set up further down
+    }
+
+    // evening/night: the whole desk dims a touch, and the lamp throws a warm pool of light
+    if (LIGHTING.dim) {
+        const dimmer = new THREE.Mesh(new THREE.PlaneGeometry(DESK_SIZE, DESK_SIZE),
+            new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: LIGHTING.dim, depthWrite: false }));
+        dimmer.rotation.x = -Math.PI / 2;
+        dimmer.position.y = -0.001;
+        scene.add(dimmer);
     }
 
     const floorMat = new THREE.ShadowMaterial({ opacity: 0.16 });
@@ -183,22 +220,21 @@ function buildDesk(THREE) {
     // ---------- Work (stop 2): a stack of photos that stand up in a row ----------
     const loader = new THREE.TextureLoader();
     const SHOTS = [
-        { src: 'assets/design-web-visualizer-preview-poster.webp', name: 'Design Visualizer', rest: [0.32, 0.02, 0.26, 0.32] },
-        { src: 'assets/maispend-preview-poster.webp', name: 'maispend', rest: [-0.28, 0.07, -0.08, -0.22] },
-        { src: 'assets/maigambar-preview-poster.webp', name: 'MaiGambar.my', rest: [0.04, 0.12, 0.04, 0.05] },
+        { src: 'assets/design-web-visualizer-preview-poster.webp', video: 'assets/design-web-visualizer-preview.mp4', name: 'Design Visualizer', rest: [0.32, 0.02, 0.26, 0.32] },
+        { src: 'assets/maispend-preview-poster.webp', video: 'assets/maispend-preview.mp4', name: 'maispend', rest: [-0.28, 0.07, -0.08, -0.22] },
+        { src: 'assets/maigambar-preview-poster.webp', video: 'assets/maigambar-preview.mp4', name: 'MaiGambar.my', rest: [0.04, 0.12, 0.04, 0.05] },
     ];
+    // centre-crop a wide screenshot or video into the 4:3 photo window
+    function cropTo(t, aspect) {
+        const box = 1.76 / 1.32;
+        if (aspect > box) { t.repeat.set(box / aspect, 1); t.offset.set((1 - box / aspect) / 2, 0); }
+        else { t.repeat.set(1, aspect / box); t.offset.set(0, (1 - aspect / box) / 2); }
+    }
     const workG = new THREE.Group();
     const photos = SHOTS.map((s) => {
         const g = new THREE.Group();
         g.add(inked(new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.04, 2.45), M.paper)));
-        const tex = loader.load(s.src, (t) => {
-            // centre-crop the wide screenshot into the 4:3 photo window
-            const imgAspect = t.image.width / t.image.height;
-            const box = 1.76 / 1.32;
-            if (imgAspect > box) { t.repeat.set(box / imgAspect, 1); t.offset.set((1 - box / imgAspect) / 2, 0); }
-            else { t.repeat.set(1, imgAspect / box); t.offset.set(0, (1 - imgAspect / box) / 2); }
-            wake();
-        });
+        const tex = loader.load(s.src, (t) => { cropTo(t, t.image.width / t.image.height); wake(); });
         tex.colorSpace = THREE.SRGBColorSpace;
         tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
         const photo = new THREE.Mesh(new THREE.PlaneGeometry(1.76, 1.32), new THREE.MeshBasicMaterial({ map: tex, color: 0xf2f2f2 }));
@@ -216,12 +252,14 @@ function buildDesk(THREE) {
         cap.position.set(0, 0.022, 0.86);
         g.add(cap);
         g.userData.rest = s.rest;
+        g.userData.photo = photo;
+        g.userData.video = s.video;
         workG.add(g);
         return g;
     });
-    addItem('work', workG, [-2.9, 0, -1.3], {
+    addItem('work', workG, [2.8, 0, 2.7], {
         stop: 2, name: 'My work', sub: '3 live apps',
-        focus: [0.3, 1.3, 1.0], dist: 8.2, span: 9.4, guide: [3.85, 0, 1.5],
+        focus: [0.3, 1.3, 1.0], dist: 8.2, span: 9.4, guide: [3.6, 0, 1.0],
         update(t, still) {
             photos.forEach((p, i) => {
                 const [x, y, z, ry] = p.userData.rest;
@@ -233,6 +271,34 @@ function buildDesk(THREE) {
             });
         },
     });
+
+    // At the Work stop the photos come alive: each plays its app's preview video.
+    // Videos only download when you get there, and never with reduced motion or Data Saver.
+    const videosAllowed = !reducedMotion.matches && !(navigator.connection && navigator.connection.saveData);
+    let videosReady = false;
+    function playVideos(on) {
+        if (on && !videosReady && videosAllowed) {
+            videosReady = true;
+            photos.forEach((g) => {
+                const el = document.createElement('video');
+                el.muted = true; el.loop = true; el.playsInline = true; el.preload = 'auto';
+                el.setAttribute('muted', ''); el.setAttribute('playsinline', '');
+                el.src = g.userData.video;
+                const vt = new THREE.VideoTexture(el);
+                vt.colorSpace = THREE.SRGBColorSpace;
+                el.addEventListener('loadedmetadata', () => cropTo(vt, el.videoWidth / el.videoHeight));
+                // keep the screenshot until the first real frame, so there's never a black photo
+                el.addEventListener('playing', () => { g.userData.photo.material.map = vt; g.userData.photo.material.needsUpdate = true; }, { once: true });
+                g.userData.videoEl = el;
+            });
+        }
+        photos.forEach((g) => {
+            const el = g.userData.videoEl;
+            if (!el) return;
+            if (on && el.paused) el.play().catch(() => {});
+            else if (!on && !el.paused) el.pause();
+        });
+    }
 
     // ---------- Rates (stop 3): a kraft price tag on a red string ----------
     const tagShape = new THREE.Shape();
@@ -256,6 +322,40 @@ function buildDesk(THREE) {
     }));
     tagText.position.set(0.22, 0, 0.032);
     tag.add(tagText);
+    // The back of the tag: the most-picked package in each category, read from data/rate-card.json.
+    let backRows = [];
+    const drawBack = (ctx, w) => {
+        ctx.clearRect(0, 0, w, 400);
+        ctx.fillStyle = INK; ctx.textAlign = 'center';
+        ctx.font = HAND(54); ctx.fillText('Most picked', w / 2, 66);
+        ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(190, 84); ctx.bezierCurveTo(260, 78, 350, 90, 420, 82); ctx.stroke();
+        if (!backRows.length) { ctx.font = BODY(28, 500); ctx.fillText('See the rate card below', w / 2, 220); return; }
+        backRows.slice(0, 4).forEach((row, i) => {
+            const y = 146 + i * 64;
+            ctx.textAlign = 'left'; ctx.fillStyle = INK; ctx.font = BODY(28, 600); ctx.fillText(row.name, 40, y);
+            ctx.textAlign = 'right'; ctx.fillStyle = '#c0392b'; ctx.font = HAND(42); ctx.fillText(row.price, w - 36, y);
+        });
+    };
+    const backTex = textTexture(608, 400, drawBack);
+    const tagBack = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 1.25), new THREE.MeshBasicMaterial({ transparent: true, map: backTex }));
+    tagBack.rotation.y = Math.PI;
+    tagBack.position.set(0.22, 0, -0.032);
+    tag.add(tagBack);
+    fetch('data/rate-card.json', { cache: 'no-cache' })
+        .then((r) => r.json())
+        .then((data) => {
+            const cur = data.meta?.currency || 'RM';
+            backRows = data.categories.map((c) => {
+                const p = c.packages.find((x) => x.popular) || c.packages[0];
+                const suffix = (p.suffix || '').replace('/month', '/mo');
+                return { name: p.name, price: `${p.prefix ? 'from ' : ''}${cur} ${Number(p.price).toLocaleString('en-MY')}${suffix}` };
+            });
+            drawBack(backTex.image.getContext('2d'), 608);
+            backTex.needsUpdate = true;
+            wake();
+        })
+        .catch(() => {});
     const string = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([
         new THREE.Vector3(-0.85, 0.1, 0), new THREE.Vector3(-0.95, 0.5, 0.05), new THREE.Vector3(-1.5, 0.75, 0.02),
         new THREE.Vector3(-1.85, 0.45, 0), new THREE.Vector3(-2.0, -0.05, 0),
@@ -265,14 +365,17 @@ function buildDesk(THREE) {
     const ratesG = new THREE.Group();
     ratesG.add(tag);
     ratesG.rotation.y = 0.06;
-    addItem('rates', ratesG, [-0.9, 0, 2.4], {
-        stop: 3, name: 'Rates', sub: 'from RM 800',
-        focus: [0.4, 1.0, 0.3], dist: 6.2, span: 6.0, guide: [2.4, 0, 0.7],
+    addItem('rates', ratesG, [7.0, 0, 2.8], {
+        stop: 3, name: 'Rates', sub: 'from RM 800', action: 'tap to flip',
+        focus: [-0.4, 1.0, 0.3], dist: 6.2, span: 6.4, guide: [-2.7, 0, 0.4],
+        flip: 0, flipTo: 0,
         update(t, still) {
             const k = ease(this.f);
+            if (this.f < 0.3) this.flipTo = 0;
+            this.flip = still ? this.flipTo : lerp(this.flip, this.flipTo, 0.12);
             const sway = still ? 0 : Math.sin(t * 1.7);
             tag.position.set(0, lerp(0.08 + this.h * 0.3, 1.45, k), lerp(0, 0.1, k));
-            tag.rotation.set(lerp(-Math.PI / 2 + 0.1 + this.h * 0.35, -0.15, k), lerp(0, sway * 0.18, k), lerp(-0.14, sway * 0.05, k));
+            tag.rotation.set(lerp(-Math.PI / 2 + 0.1 + this.h * 0.35, -0.15, k), lerp(0, sway * 0.18, k) + ease(this.flip) * Math.PI, lerp(-0.14, sway * 0.05, k));
         },
     });
 
@@ -314,7 +417,7 @@ function buildDesk(THREE) {
     const aboutG = new THREE.Group();
     aboutG.add(card);
     aboutG.rotation.y = -0.15;
-    addItem('about', aboutG, [3.0, 0, 1.4], {
+    addItem('about', aboutG, [6.6, 0, -0.6], {
         stop: 4, name: 'About me', sub: '6+ years',
         focus: [-0.4, 1.3, 0.3], dist: 6.4, span: 5.4, guide: [-1.95, 0, 0.9],
         update(t, still) {
@@ -335,11 +438,24 @@ function buildDesk(THREE) {
     plane.add(inked(new THREE.Mesh(planeGeo, M.paperBoth), 1));
     const contactG = new THREE.Group();
     contactG.add(plane);
-    addItem('contact', contactG, [2.0, 1.5, -2.1], {
-        stop: 5, name: 'Say hi', sub: 'WhatsApp',
+    contactG.scale.setScalar(0.8);
+    addItem('contact', contactG, [3.6, 1.6, -2.9], {
+        stop: 5, name: 'Say hi', sub: 'WhatsApp', action: 'tap to send',
         focus: [-0.5, -0.3, 0.4], dist: 6.6, span: 7.2, guide: [-2.0, -1.5, 0.9], dir: [0, 1.1, 1],
+        flyStart: null,
         update(t, still) {
             const k = ease(this.f);
+            // send-off: the plane shoots away, then a fresh one unfolds back in its place
+            const ft = this.flyStart === null ? -1 : t - this.flyStart;
+            if (ft >= 3.4) this.flyStart = null;
+            plane.visible = !(ft >= 1.3 && ft < 2.6);
+            plane.scale.setScalar(ft >= 2.6 && ft < 3.4 ? ease((ft - 2.6) / 0.8) : 1);
+            if (ft >= 0 && ft < 1.3) {
+                const e = ft / 1.3;
+                plane.position.set(1.7 + e * e * 10, 0.3 + e * e * 5, -e * e * 4);
+                plane.rotation.set(-0.2, 0.35, 0.35 + e * 0.6);
+                return;
+            }
             if (still) {
                 plane.position.set(0, this.h * 0.3, 0);
                 plane.rotation.set(0.08, -0.55, 0.1);
@@ -352,6 +468,15 @@ function buildDesk(THREE) {
         },
     });
 
+    function sendPlane() {
+        if (reducedMotion.matches || items.contact.flyStart !== null) return;
+        items.contact.flyStart = clock.elapsedTime;
+        if (!reducedMotion.matches) kState.hop = 1;
+        lastPoke = performance.now();
+        say('Message on its way!', 3000);
+    }
+    tour.querySelectorAll('.tour-step[data-stop="5"] a[href*="wa.me"]').forEach((a) => a.addEventListener('click', sendPlane));
+
     // ---------- decor: pencil + doodles that dodge the pointer ----------
     const pencil = new THREE.Group();
     const shaft = inked(new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 2.3, 6), M.yellow));
@@ -359,9 +484,49 @@ function buildDesk(THREE) {
     const lead = new THREE.Mesh(new THREE.ConeGeometry(0.035, 0.11, 6), M.ink); lead.position.y = 1.45;
     const eraser = inked(new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.25, 6), M.red)); eraser.position.y = -1.275;
     pencil.add(shaft, tip3d, lead, eraser);
-    pencil.rotation.set(0, 0.5, Math.PI / 2);
-    pencil.position.set(-0.2, 0.11, -0.2);
+    pencil.rotation.set(0, 0.35, Math.PI / 2);
+    pencil.position.set(-0.2, 0.11, 3.5);
     const PENCIL_HOME = pencil.position.clone();
+
+    // A desk lamp. It switches on in the evening and at night (visitor's own clock).
+    const lamp = new THREE.Group();
+    const lampMat = toon('#e74c3c');
+    const lampBase = inked(new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.55, 0.14, 20), lampMat));
+    lampBase.position.y = 0.07;
+    const lower = inked(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.7, 8), M.ink));
+    lower.position.set(0.25, 0.9, 0); lower.rotation.z = -0.3;
+    const upper = inked(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.4, 8), M.ink));
+    upper.position.set(0.95, 1.95, 0); upper.rotation.z = -1.25;
+    const shade = inked(new THREE.Mesh(new THREE.ConeGeometry(0.48, 0.7, 20, 1, true), lampMat.clone()));
+    shade.material.side = THREE.DoubleSide;
+    shade.position.set(1.7, 2.05, 0); shade.rotation.z = 0.75;
+    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.17, 16, 12), new THREE.MeshBasicMaterial({ color: LIGHTING.lamp ? 0xfff1b8 : 0xdadada }));
+    bulb.position.set(1.83, 1.8, 0);
+    lamp.add(lampBase, lower, upper, shade, bulb);
+    lamp.rotation.y = -2.55;
+    lamp.position.set(8.6, 0, -3.4);
+    scene.add(lamp);
+    const LAMP_HOME = lamp.position.clone();
+    if (LIGHTING.lamp) {
+        const spot = new THREE.SpotLight(0xffc77a, LIGHTING.lamp, 0, 0.85, 0.8, 0);
+        bulb.add(spot);
+        spot.target.position.set(5.0, 0, 0.2);
+        scene.add(spot.target);
+        const glowCanvas = document.createElement('canvas');
+        glowCanvas.width = glowCanvas.height = 256;
+        const gg = glowCanvas.getContext('2d');
+        const rg = gg.createRadialGradient(128, 128, 0, 128, 128, 128);
+        rg.addColorStop(0, 'rgba(255, 200, 120, 0.55)');
+        rg.addColorStop(1, 'rgba(255, 200, 120, 0)');
+        gg.fillStyle = rg; gg.fillRect(0, 0, 256, 256);
+        const glowTex = new THREE.CanvasTexture(glowCanvas);
+        const glow = new THREE.Mesh(new THREE.PlaneGeometry(11, 11), new THREE.MeshBasicMaterial({
+            map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: TIME_OF_DAY === 'night' ? 1 : 0.6,
+        }));
+        glow.rotation.x = -Math.PI / 2;
+        glow.position.set(5.6, 0.003, -0.4);
+        scene.add(glow);
+    }
     scene.add(pencil);
 
     const star = new THREE.Shape();
@@ -370,11 +535,9 @@ function buildDesk(THREE) {
         if (i) star.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); else star.moveTo(Math.cos(a) * rr, Math.sin(a) * rr);
     }
     const doodles = [
-        [inked(new THREE.Mesh(new THREE.ExtrudeGeometry(star, { depth: 0.08, bevelEnabled: false }), M.yellow)), [-4.9, 1.4, 0.6]],
-        [inked(new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.07, 8, 24), M.blue), 40), [4.3, 1.9, -1.4]],
+        [inked(new THREE.Mesh(new THREE.ExtrudeGeometry(star, { depth: 0.08, bevelEnabled: false }), M.yellow)), [1.6, 1.4, -3.9]],
         [new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([-3, -2, -1, 0, 1, 2, 3]
-            .map((x, i) => new THREE.Vector3(x * 0.14, i % 2 ? 0.11 : -0.11, 0))), 40, 0.045, 6), M.red), [-3.6, 1.2, 2.6]],
-        [inked(new THREE.Mesh(new THREE.OctahedronGeometry(0.24), M.paper), 1), [-0.4, 1.7, -2.9]],
+            .map((x, i) => new THREE.Vector3(x * 0.14, i % 2 ? 0.11 : -0.11, 0))), 40, 0.045, 6), M.red), [9.0, 1.2, 0.6]],
     ].map(([mesh, home], i) => {
         mesh.userData = { home: new THREE.Vector3(...home), off: new THREE.Vector3(), seed: i * 1.9 };
         scene.add(mesh);
@@ -424,7 +587,7 @@ function buildDesk(THREE) {
         kBody.add(arm);
         return arm;
     });
-    const K_HOME = new THREE.Vector3(0.9, 0, 0.3);
+    const K_HOME = new THREE.Vector3(3.1, 0, -0.1);
     kertas.position.copy(K_HOME);
     kertas.traverse((o) => { if (o.isMesh) { o.userData.kertas = true; pickables.push(o); } });
     scene.add(kertas);
@@ -476,8 +639,10 @@ function buildDesk(THREE) {
         const b = new THREE.Box3();
         Object.values(items).forEach((it) => b.expandByObject(it.group));
         b.expandByObject(pencil);
+        b.expandByObject(lamp);
         b.expandByPoint(K_HOME.clone().setY(1.1));
         b.min.y = 0;
+        b.max.y = Math.min(b.max.y, 0.8);   // frame the desk's footprint; tall things (lamp, plane) may overlap the edge
         overview.center.copy(b.getCenter(new THREE.Vector3())).setY(0.4);
         overview.corners = [];
         for (const x of [b.min.x, b.max.x]) for (const y of [b.min.y, b.max.y]) for (const z of [b.min.z, b.max.z]) {
@@ -524,16 +689,17 @@ function buildDesk(THREE) {
         // 0: hero. Looking straight down, so the desk reads as a flat 2D page; scrolling tilts it into 3D.
         // Desktop: the flat-lay sits on the right. Phones: it waits just below the screen.
         if (wide) {
-            const d = fitDistance(overview.center, TOP_DIR, overview.corners, 0.32, 0.72);
-            poses.push(framed(overview.center, TOP_DIR, d, 0.64, -0.04));
+            const tanV = Math.tan(vfov / 2);
+            const d = Math.max(10 / (2 * tanV), 16.6 / (2 * tanV * camera.aspect));
+            poses.push(framed(new THREE.Vector3(1.5, 0, 0.1), TOP_DIR, d, 0, 0));
         } else {
             const d = fitDistance(overview.center, TOP_DIR, overview.corners, 0.94, 0.5);
             poses.push(framed(overview.center, TOP_DIR, d, 0, -1.6));
         }
         // 1: the whole desk
         if (wide) {
-            const d = fitDistance(overview.center, OVERVIEW_DIR, overview.corners, 0.56, 0.8);
-            poses.push(framed(overview.center, OVERVIEW_DIR, d, 0.36, 0));
+            const d = fitDistance(overview.center, OVERVIEW_DIR, overview.corners, 0.94, 0.74);
+            poses.push(framed(overview.center, OVERVIEW_DIR, d, 0.02, -0.1));
         } else {
             const d = fitDistance(overview.center, OVERVIEW_DIR, overview.corners, 0.94, 0.42);
             poses.push(framed(overview.center, OVERVIEW_DIR, d, 0, 0.42));
@@ -588,7 +754,7 @@ function buildDesk(THREE) {
         hovered = target;
         sticky.classList.toggle('is-hovering', !!target);
         if (target === 'kertas') tip.innerHTML = 'Kertas<small>poke me</small>';
-        else if (target) tip.innerHTML = `${target.name}<small>${target.sub}</small>`;
+        else if (target) tip.innerHTML = `${target.name}<small>${target.action && Math.round(scrollProgress()) === target.stop ? target.action : target.sub}</small>`;
         tip.classList.toggle('show', !!target);
         wake();
     }
@@ -607,8 +773,17 @@ function buildDesk(THREE) {
         downAt = null;
         pointer.copy(toNdc(e));
         const target = pick(e);
+        const here = Math.round(scrollProgress());
         if (target === 'kertas') poke();
-        else if (target) {
+        else if (target && target.id === 'rates' && here === target.stop) {
+            target.flipTo = target.flipTo ? 0 : 1;
+            setHover(null);   // keep the hint off the side you just flipped to
+            track('desk-pick', { item: 'rates-flip' });
+        } else if (target && target.id === 'contact' && here === target.stop) {
+            sendPlane();
+            setHover(null);
+            track('desk-pick', { item: 'contact-plane' });
+        } else if (target) {
             track('desk-pick', { item: target.id });
             goToStop(target.stop);
         }
@@ -700,6 +875,8 @@ function buildDesk(THREE) {
             it.update(t, still);
         }
 
+        playVideos(visible && items.work.f > 0.35);
+
         // the desk clears space: other objects slide away from the one in focus
         let star = null;
         for (const id in items) if (!star || items[id].f > star.f) star = items[id];
@@ -708,7 +885,8 @@ function buildDesk(THREE) {
             // slide sideways and back, never toward the camera
             v.set(base.x - star.base.x, 0, Math.min(0, base.z - star.base.z) * 0.5);
             if (Math.abs(v.x) < 0.5) v.x = Math.sign(v.x || 1) * 0.5;
-            v.normalize().multiplyScalar(amount * clear);
+            // objects in front of the star go further aside, so they never loom over it
+            v.normalize().multiplyScalar((amount + (base.z > star.base.z + 0.5 ? 3 : 0)) * clear);
             obj.position.set(base.x + v.x, base.y, base.z + v.z);
         };
         for (const id in items) {
@@ -717,6 +895,7 @@ function buildDesk(THREE) {
             else push(it.group, it.base, 4.4);
         }
         push(pencil, PENCIL_HOME, 4.4);
+        push(lamp, LAMP_HOME, 4.4);
 
         // doodles drift and dodge the pointer
         doodles.forEach((d) => {
@@ -765,8 +944,8 @@ function buildDesk(THREE) {
         if (Math.abs(p - near) < 0.12 && near !== lastSaid) {
             lastSaid = near;
             kState.wave = 1.4;
-            if (near <= 1 && performance.now() - lastPoke > 3000) say(STOP_LINES[near]);
-            else if (near > 1 && performance.now() - lastPoke > 3000) bubble.classList.remove('show');
+            if (near <= 1 && (!lastPoke || performance.now() - lastPoke > 3000)) say(near === 0 ? greeting() : STOP_LINES[near]);
+            else if (near > 1 && (!lastPoke || performance.now() - lastPoke > 3000)) bubble.classList.remove('show');
         }
 
         scene.updateMatrixWorld();
@@ -791,6 +970,7 @@ function buildDesk(THREE) {
     window.addEventListener('scroll', wake, { passive: true });
     new IntersectionObserver(([entry]) => {
         visible = entry.isIntersecting;
+        if (!visible) playVideos(false);
         document.body.classList.toggle('desk-in-view', visible);
         if (visible) { measureStops(); wake(); }
     }).observe(tour);

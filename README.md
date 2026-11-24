@@ -142,18 +142,32 @@ empty paper leaves a small ink burst, and first-time visitors get a one-off "Cha
 `desk.js` and `desk.css` turn the top of the home page into a 3D paper desk built with
 [Three.js](https://threejs.org) (loaded from jsDelivr only on the home page, no build step).
 
-- The desk stays pinned while you scroll. Each scroll stop shows one object and one card:
+- The page opens looking straight down at the desk (a flat 2D flat-lay beside the hero text). Scrolling
+  tilts it into 3D and visits one object per stop, each with one card:
   **The desk → Work (photo stack) → Rates (price tag) → About (ID card) → Contact (paper plane)**.
-  Each card links to the full page. The dots on the right (desktop) jump between stops.
-- Clicking an object on the desk scrolls the tour to it. The other objects slide aside so it stands alone.
-- **Kertas** walks along as the tour guide. Its eyes follow the cursor, it blinks and waves,
-  it hops and talks when poked (three quick pokes = backflip), and it comments when you change the paper.
-  The flat Kertas in the corner hides while the desk is on screen.
+- The desk is the current paper (Graph, Kraft, Blueprint, Chalkboard) drawn in 3D, fading into the distance.
+- The object in focus gets the desk to itself: the others slide aside. Clicking an object scrolls to it.
+- **Work:** the photos play each app's preview video (`assets/*-preview.mp4`). Videos only download
+  at that stop, and never with reduced motion or Data Saver.
+- **Rates:** tap the tag to flip it. The back shows the most popular package in each category, read
+  from `data/rate-card.json`, so it always matches your prices.
+- **Contact:** tap the plane or "WhatsApp me" and the plane flies off with your message.
+- **Time of day:** the visitor's own clock sets the light. Evenings and nights switch on the desk lamp.
+  Preview another time with `?desk-time=morning`, `day`, `evening` or `night` in the address.
+- **Kertas** walks along as the tour guide: eyes follow the cursor, it blinks and waves, hops and talks
+  when poked (three quick pokes = backflip), comments when you change the paper, welcomes returning
+  visitors ("Welcome back! It's been 2 days"), and waves goodbye at the bottom of a page. Visits are
+  counted only in the visitor's own browser.
 - Edit the cards in `index.html` (`.tour-step` sections). Edit Kertas' lines in `STOP_LINES`,
-  `POKE_LINES` and `PAPER_LINES` at the top of `desk.js`. The photos use the `*-preview-poster.webp`
-  files in `assets/`.
+  `POKE_LINES`, `PAPER_LINES` and `greeting()` in `desk.js`, and `LINES` in `playful.js`.
 - If WebGL is missing, Data Saver is on, or Three.js can't load, the extra stops stay hidden and the
-  home page looks the same as before. With reduced motion, the camera follows the scroll without idle animation.
+  home page works as a normal page.
+
+## Site Shell
+
+`shell.css` (loaded last) gives every page the same frame: the logo in the top-left corner, the paper
+switch and **WhatsApp me** in the top-right (they scroll away with the page), and one bottom dock with
+the pages (Home, Work, Rates, About, Contact) on every screen size.
 
 ## Visitor Stats
 

@@ -122,62 +122,6 @@ body.desk-in-view .buddy-wrap {
     transition: opacity .3s ease, visibility 0s linear .3s;
 }
 
-/* --- side rail: where you are in the tour --- */
-.tour-rail {
-    position: absolute;
-    right: max(18px, env(safe-area-inset-right, 0px));
-    top: 50%;
-    transform: translateY(-50%);
-    display: none;
-    flex-direction: column;
-    gap: 12px;
-    padding: 12px 8px;
-    background: var(--chrome-bg);
-    border: 2px solid var(--primary);
-    border-radius: 999px;
-    pointer-events: auto;
-    transition: opacity .3s ease;
-}
-
-.tour-rail button {
-    position: relative;
-    width: 14px;
-    height: 14px;
-    padding: 0;
-    border-radius: 50%;
-    border: 2px solid var(--primary);
-    background: transparent;
-    cursor: pointer;
-    transition: transform .2s ease, background-color .2s ease;
-}
-
-.tour-rail button.is-on { background: var(--accent); transform: scale(1.25); }
-.tour-rail button:hover { transform: scale(1.25); }
-.tour-rail button:focus-visible { outline: 3px dashed var(--secondary); outline-offset: 3px; }
-
-.tour-rail span {
-    position: absolute;
-    right: 30px;
-    top: 50%;
-    transform: translateY(-50%);
-    white-space: nowrap;
-    padding: 0 .5rem;
-    border-radius: 6px;
-    background: var(--chrome-bg);
-    font-family: var(--font-heading);
-    font-size: 1rem;
-    color: var(--primary);
-    opacity: 0;
-    transition: opacity .2s ease;
-    pointer-events: none;
-}
-
-.tour-rail button:hover span,
-.tour-rail button:focus-visible span,
-.tour-rail button.is-on span { opacity: 1; }
-
-.desk-sticky.is-past .tour-rail { opacity: 0; pointer-events: none; }
-
 /* --- scroll hint under the hero stats --- */
 html.has-desk .tour-hint {
     display: inline-flex;
@@ -206,10 +150,16 @@ html.has-desk .tour-step {
     align-items: center;
     min-height: 100vh;
     min-height: 100svh;
-    padding: 6rem 0 3rem;
+    padding: 6rem 0 7rem;   /* clear of the bottom dock */
 }
 
 html.has-desk .tour-step > .container { width: 100%; }
+
+/* The desk stop shows the whole desk, so its short card sits in the empty back-left corner. */
+html.has-desk .tour-step--top { align-items: flex-start; padding-top: 7rem; }
+
+/* The ID card on the desk already shows the years and projects. */
+html.has-desk .desk-tour .stats-row { display: none; }
 
 .tour-card {
     max-width: 400px;
@@ -289,6 +239,9 @@ html.has-desk .tour-step > .container { width: 100%; }
 
 /* --- desktop: hero text on the left, desk on the right --- */
 @media (min-width: 980px) {
+    /* hero text lines up with the logo in the top-left, like the mockup */
+    html.has-desk .desk-tour > .hero > .container { width: 100%; }
+
     html.has-desk .desk-tour .hero-content.centered {
         text-align: left;
         align-items: flex-start;
@@ -305,16 +258,16 @@ html.has-desk .tour-step > .container { width: 100%; }
     html.has-desk .desk-tour .stats-row { gap: 2.4rem; }
     html.has-desk .desk-tour .stat-item { align-items: flex-start; }
 
-    html.has-desk .tour-rail { display: flex; }
 }
 
 /* --- phones and tablets: object up top, card at the bottom --- */
 @media (max-width: 979px) {
     html.has-desk .desk-tour .display-text { min-height: 2em; }
 
-    html.has-desk .tour-step {
+    html.has-desk .tour-step,
+    html.has-desk .tour-step--top {
         align-items: flex-end;
-        padding: 6rem 0 calc(5.5rem + env(safe-area-inset-bottom, 0px));
+        padding: 6rem 0 calc(6.2rem + env(safe-area-inset-bottom, 0px));
     }
 
     .tour-card {
@@ -331,15 +284,11 @@ html.has-desk .tour-step > .container { width: 100%; }
     .kertas-bubble { max-width: 190px; font-size: 1rem; }
     .kertas-says { font-size: .98rem; margin-top: .8rem !important; padding-top: .7rem; }
 
-    /* the floating WhatsApp button would cover the card buttons; the Contact stop has its own */
-    body.desk-in-view .floating-whatsapp { opacity: 0; visibility: hidden; }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .desk-tip,
     .kertas-bubble,
-    .tour-rail,
-    .tour-rail button,
-    .tour-rail span { transition: none; }
+    .kertas-says { transition: none; }
     html.has-desk .tour-hint i { animation: none; }
 }

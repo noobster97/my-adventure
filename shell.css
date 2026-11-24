@@ -1,0 +1,120 @@
+/* ==========================================================
+   Site shell, mockup style
+   - No top bar: the logo sits in the top-left corner, the paper switch
+     and WhatsApp in the top-right. They scroll away with the page.
+   - Pages live in one bottom dock, on every screen size.
+   Loaded last so it overrides the older bar styles in style.css/themes.css.
+   ========================================================== */
+
+/* --- top corners --- */
+.navbar,
+html[data-paper] .navbar {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: transparent !important;
+    border: 0;
+    box-shadow: none !important;
+    padding: calc(1rem + env(safe-area-inset-top, 0px)) 0 0;
+    z-index: 1000;
+}
+
+.navbar .nav-links {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+}
+
+html .navbar .nav-links a.nav-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    background: var(--accent);
+    color: #2c3e50;
+    border: 2px solid #2c3e50;
+    box-shadow: 3px 3px 0 #2c3e50;
+}
+
+html .navbar .nav-links a.nav-cta:hover {
+    background: var(--accent);
+    color: #2c3e50;
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 #2c3e50;
+}
+
+.navbar .nav-links a.nav-cta::after { display: none; }
+
+/* One paper switch: the one in the top-right corner. */
+.paper-switch.is-floating,
+html .paper-switch.is-floating { display: none; }
+.nav-links .paper-switch { display: block; }
+
+/* --- bottom dock --- */
+.bottom-nav,
+html .bottom-nav {
+    display: flex;
+    position: fixed;
+    left: 50%;
+    right: auto;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    width: auto;
+    transform: translateX(-50%);
+    gap: 2px;
+    padding: 6px;
+    background: #fff;
+    border: 2px solid #2c3e50;
+    border-radius: 18px;
+    box-shadow: 4px 4px 0 #2c3e50;
+    z-index: 1000;
+}
+
+.bottom-nav .nav-item {
+    flex: 0 0 auto;
+    flex-direction: row;
+    gap: .45rem;
+    min-height: 40px;
+    padding: 0 1rem;
+    font-size: 1rem;
+    color: #5f6b6c;
+}
+
+.bottom-nav .nav-item.active { color: #2c3e50; }
+.bottom-nav .nav-item i { font-size: .95rem; }
+.bottom-nav .nav-item:focus-visible { outline: 3px dashed var(--secondary); outline-offset: 2px; border-radius: 12px; }
+
+.nav-indicator { border-radius: 12px; }
+
+body { padding-bottom: 96px; }
+
+@media (max-width: 768px) {
+    .navbar { padding-top: calc(.75rem + env(safe-area-inset-top, 0px)); }
+    .navbar .logo { font-size: 1.6rem; }
+    html .navbar .nav-links a.nav-cta { padding: .55rem .7rem; }
+    .navbar .nav-links a.nav-cta span { display: none; }
+
+    .bottom-nav,
+    html .bottom-nav {
+        left: max(10px, env(safe-area-inset-left, 0px));
+        right: max(10px, env(safe-area-inset-right, 0px));
+        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+        transform: none;
+        justify-content: space-between;
+    }
+
+    .bottom-nav .nav-item {
+        flex: 1 1 0;
+        flex-direction: column;
+        gap: .15rem;
+        padding: .3rem 0;
+        font-size: .78rem;
+    }
+
+    /* the top corners sit over the page now, so pages start a little lower */
+    .hero { padding-top: 5.5rem; }
+    .view:not([data-view="home"]) > section:first-child { padding-top: 5.5rem; }
+
+    .buddy-wrap { bottom: calc(5.2rem + env(safe-area-inset-bottom, 0px)); }
+}
