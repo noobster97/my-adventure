@@ -439,9 +439,9 @@ function buildDesk(THREE) {
     const contactG = new THREE.Group();
     contactG.add(plane);
     contactG.scale.setScalar(0.8);
-    addItem('contact', contactG, [3.6, 1.6, -2.9], {
+    addItem('contact', contactG, [3.6, 0, -2.9], {
         stop: 5, name: 'Say hi', sub: 'WhatsApp', action: 'tap to send',
-        focus: [-0.5, -0.3, 0.4], dist: 6.6, span: 7.2, guide: [-2.0, -1.5, 0.9], dir: [0, 1.1, 1],
+        focus: [-0.5, 1.3, 0.4], dist: 6.6, span: 7.2, guide: [-2.0, 0, 0.9], dir: [0, 1.1, 1],
         flyStart: null,
         update(t, still) {
             const k = ease(this.f);
@@ -452,19 +452,21 @@ function buildDesk(THREE) {
             plane.scale.setScalar(ft >= 2.6 && ft < 3.4 ? ease((ft - 2.6) / 0.8) : 1);
             if (ft >= 0 && ft < 1.3) {
                 const e = ft / 1.3;
-                plane.position.set(1.7 + e * e * 10, 0.3 + e * e * 5, -e * e * 4);
+                plane.position.set(1.7 + e * e * 10, 1.9 + e * e * 5, -e * e * 4);
                 plane.rotation.set(-0.2, 0.35, 0.35 + e * 0.6);
                 return;
             }
+            // At rest the plane sits on the desk on its keel. It only takes off at its own stop,
+            // flies loops there, and glides back down to the desk when you scroll away.
+            const REST_Y = 0.38;
             if (still) {
-                plane.position.set(0, this.h * 0.3, 0);
-                plane.rotation.set(0.08, -0.55, 0.1);
+                plane.position.set(0, REST_Y + this.h * 0.25 + k * 1.3, 0);
+                plane.rotation.set(0, -0.55, 0);
                 return;
             }
             const a = t * 0.9;
-            const idleY = Math.sin(t * 1.6) * 0.14 + this.h * 0.3;
-            plane.position.set(lerp(0, Math.cos(a) * 1.7, k), lerp(idleY, 0.3 + Math.sin(a * 2) * 0.25, k), lerp(0, Math.sin(a) * 0.9, k));
-            plane.rotation.set(lerp(Math.sin(t * 1.3) * 0.1, -0.4, k), lerp(-0.55 - this.h * 0.25, -a - Math.PI / 2, k), lerp(0.1 + this.h * 0.15, Math.cos(a * 2) * 0.1, k));
+            plane.position.set(lerp(0, Math.cos(a) * 1.7, k), lerp(REST_Y + this.h * 0.25, 1.6 + Math.sin(a * 2) * 0.25, k), lerp(0, Math.sin(a) * 0.9, k));
+            plane.rotation.set(lerp(0, -0.4, k), lerp(-0.55 - this.h * 0.2, -a - Math.PI / 2, k), lerp(this.h * 0.1, Math.cos(a * 2) * 0.1, k));
         },
     });
 
@@ -535,11 +537,15 @@ function buildDesk(THREE) {
         if (i) star.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); else star.moveTo(Math.cos(a) * rr, Math.sin(a) * rr);
     }
     const doodles = [
-        [inked(new THREE.Mesh(new THREE.ExtrudeGeometry(star, { depth: 0.08, bevelEnabled: false }), M.yellow)), [1.6, 1.4, -3.9]],
-        [new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([-3, -2, -1, 0, 1, 2, 3]
-            .map((x, i) => new THREE.Vector3(x * 0.14, i % 2 ? 0.11 : -0.11, 0))), 40, 0.045, 6), M.red), [9.0, 1.2, 0.6]],
-    ].map(([mesh, home], i) => {
-        mesh.userData = { home: new THREE.Vector3(...home), off: new THREE.Vector3(), seed: i * 1.9 };
+        // a paper star, lying flat
+        [inked(new THREE.Mesh(new THREE.ExtrudeGeometry(star, { depth: 0.06, bevelEnabled: false }), M.yellow)), [1.6, 0, -3.9], 0.0],
+        // a red rubber band, lying flat
+        [new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.035, 8, 32), M.red), [9.0, 0, 0.6], 0.035],
+    ].map(([mesh, home, lift], i) => {
+        mesh.castShadow = true;
+        mesh.rotation.x = -Math.PI / 2;
+        mesh.scale.z = i === 1 ? 0.6 : 1;   // the band is a squashed loop, not a perfect ring
+        mesh.userData = { home: new THREE.Vector3(...home), off: new THREE.Vector3(), vel: new THREE.Vector3(), spin: 0, lift, seed: i * 1.9 };
         scene.add(mesh);
         return mesh;
     });
@@ -893,19 +899,25 @@ function buildDesk(THREE) {
             const it = items[id];
             if (it === star) it.group.position.copy(it.base);
             else push(it.group, it.base, 4.4);
+            if (it.f > 0.5) it.wasUp = true;
+            else if (it.wasUp && it.f < 0.08) { it.wasUp = false; it.landAt = t; }
+            const since = it.landAt === undefined ? 9 : t - it.landAt;
+            if (!still && since < 0.9) it.group.position.y += Math.abs(Math.sin(since * 11)) * 0.14 * Math.exp(-since * 6);
         }
         push(pencil, PENCIL_HOME, 4.4);
         push(lamp, LAMP_HOME, 4.4);
 
-        // doodles drift and dodge the pointer
+        // the star and the rubber band lie on the desk; the pointer nudges them and friction stops them
         doodles.forEach((d) => {
             const u = d.userData;
             v.copy(d.position).project(camera);
             const dx = v.x - pointer.x, dy = v.y - pointer.y, dist = Math.hypot(dx, dy) || 1;
-            if (!still && dist < 0.22) { u.off.x += (dx / dist) * dt * 3; u.off.z -= (dy / dist) * dt * 3; }
-            u.off.multiplyScalar(1 - dt * 0.9).clampLength(0, 1.5);
-            d.position.set(u.home.x + u.off.x, u.home.y + (still ? 0 : Math.sin(t * 1.1 + u.seed) * 0.18), u.home.z + u.off.z);
-            if (!still) { d.rotation.x = t * 0.3 + u.seed; d.rotation.y = t * 0.45 + u.seed; }
+            if (!still && dist < 0.12) { u.vel.x += (dx / dist) * dt * 18; u.vel.z -= (dy / dist) * dt * 18; u.spin += (dx > 0 ? 1 : -1) * dt * 10; }
+            u.vel.multiplyScalar(Math.exp(-dt * 4));      // friction
+            u.spin *= Math.exp(-dt * 4);
+            u.off.addScaledVector(u.vel, dt).clampLength(0, 1.6);
+            d.position.set(u.home.x + u.off.x, 0.01 + u.lift, u.home.z + u.off.z);
+            d.rotation.z += u.spin * dt;
         });
 
         // Kertas walks to the object at each stop

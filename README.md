@@ -146,6 +146,10 @@ empty paper leaves a small ink burst, and first-time visitors get a one-off "Cha
   tilts it into 3D and visits one object per stop, each with one card:
   **The desk → Work (photo stack) → Rates (price tag) → About (ID card) → Contact (paper plane)**.
 - The desk is the current paper (Graph, Kraft, Blueprint, Chalkboard) drawn in 3D, fading into the distance.
+- Everything obeys gravity: objects rest on the desk and only rise when you hover them (picked up a
+  little) or when the tour holds one up to show you. They drop back with a small bounce. The paper plane
+  sits on the desk until the Contact stop, then takes off. The paper star and rubber band slide when
+  your cursor nudges them, and friction stops them where they land.
 - The object in focus gets the desk to itself: the others slide aside. Clicking an object scrolls to it.
 - **Work:** the photos play each app's preview video (`assets/*-preview.mp4`). Videos only download
   at that stop, and never with reduced motion or Data Saver.
@@ -167,7 +171,8 @@ empty paper leaves a small ink burst, and first-time visitors get a one-off "Cha
 
 `shell.css` (loaded last) gives every page the same frame: the logo in the top-left corner, the paper
 switch and **WhatsApp me** in the top-right (they scroll away with the page), and one bottom dock with
-the pages (Home, Work, Rates, About, Contact) on every screen size.
+the pages (Home, Work, Rates, About, Contact) on every screen size. Changing page turns it like a
+sketchbook page (forward turns from the left edge, back from the right).
 
 ## Visitor Stats
 

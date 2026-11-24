@@ -118,3 +118,40 @@ body { padding-bottom: 96px; }
 
     .buddy-wrap { bottom: calc(5.2rem + env(safe-area-inset-bottom, 0px)); }
 }
+
+/* --- page changes turn like a sketchbook page --- */
+::view-transition-old(root) {
+    animation: pageTurnOut .5s cubic-bezier(.4, 0, .6, 1) both;
+    transform-origin: left center;
+}
+
+::view-transition-new(root) {
+    animation: pageSettle .5s ease-out both;
+}
+
+html[data-nav-dir="back"]::view-transition-old(root) {
+    animation-name: pageTurnOutBack;
+    transform-origin: right center;
+}
+
+html[data-nav-dir="back"]::view-transition-new(root) { animation-name: pageSettle; }
+
+@keyframes pageTurnOut {
+    to { transform: perspective(1800px) rotateY(-88deg); opacity: .4; }
+}
+
+@keyframes pageTurnOutBack {
+    to { transform: perspective(1800px) rotateY(88deg); opacity: .4; }
+}
+
+@keyframes pageSettle {
+    from { opacity: 0; filter: brightness(.94); }
+}
+
+::view-transition-group(root) { z-index: 1; }
+::view-transition-old(root) { z-index: 2; }
+
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) { animation: none; }
+}
