@@ -179,11 +179,13 @@ function buildDesk(THREE) {
     const BODY = (px, wt = 600) => `${wt} ${px}px Outfit, system-ui, sans-serif`;
 
     // ---------- lights + a floor that only shows shadows (the page's paper shows through) ----------
+    // The desk is always the paper colour (like the mockup). Time of day only changes the light on
+    // the objects a little, and switches the desk lamp on in the evening and at night.
     const LIGHTING = {
-        morning: { sky: 0xfff6e8, ground: 0xd8cbb4, hemi: 2.0, sun: 0xffe2b8, sunI: 1.6, sunPos: [-10, 10, 6], lamp: 0, dim: 0 },
-        day: { sky: 0xffffff, ground: 0xcfc6b4, hemi: 2.1, sun: 0xffffff, sunI: 1.6, sunPos: [-6, 14, 8], lamp: 0, dim: 0 },
-        evening: { sky: 0xfff0e0, ground: 0xc9b49e, hemi: 1.9, sun: 0xffc48a, sunI: 1.4, sunPos: [-13, 6, 3], lamp: 1.4, dim: 0.05 },
-        night: { sky: 0xe6eaff, ground: 0x8c8aa0, hemi: 1.55, sun: 0xc8d2ff, sunI: 0.45, sunPos: [-6, 14, 8], lamp: 2.2, dim: 0.1 },
+        morning: { sky: 0xfff8ee, ground: 0xd8cbb4, hemi: 2.0, sun: 0xffeccc, sunI: 1.6, sunPos: [-10, 10, 6], lamp: 0 },
+        day: { sky: 0xffffff, ground: 0xcfc6b4, hemi: 2.1, sun: 0xffffff, sunI: 1.6, sunPos: [-6, 14, 8], lamp: 0 },
+        evening: { sky: 0xffffff, ground: 0xcfc6b4, hemi: 2.0, sun: 0xffe6c8, sunI: 1.4, sunPos: [-12, 8, 4], lamp: 0.7 },
+        night: { sky: 0xffffff, ground: 0xcfc6b4, hemi: 1.9, sun: 0xfff2e0, sunI: 1.1, sunPos: [-6, 14, 8], lamp: 1.1 },
     }[TIME_OF_DAY];
     scene.add(new THREE.HemisphereLight(LIGHTING.sky, LIGHTING.ground, LIGHTING.hemi));
     const sun = new THREE.DirectionalLight(LIGHTING.sun, LIGHTING.sunI);
@@ -245,19 +247,9 @@ function buildDesk(THREE) {
             lines('#e1e1e1', step, 4);
         }
         deskTex.needsUpdate = true;
-        // at night the desk dims a little; fog and sky follow so the horizon stays seamless
-        scene.fog.color.set(bg).multiplyScalar(1 - LIGHTING.dim);
+        scene.fog.color.set(bg);
         renderer.setClearColor(scene.fog.color, 1);
         setTimeout(wake);   // the render loop is set up further down
-    }
-
-    // evening/night: the whole desk dims a touch, and the lamp throws a warm pool of light
-    if (LIGHTING.dim) {
-        const dimmer = new THREE.Mesh(new THREE.PlaneGeometry(DESK_SIZE, DESK_SIZE),
-            new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: LIGHTING.dim, depthWrite: false }));
-        dimmer.rotation.x = -Math.PI / 2;
-        dimmer.position.y = -0.001;
-        scene.add(dimmer);
     }
 
     const floorMat = new THREE.ShadowMaterial({ opacity: 0.16 });
@@ -583,20 +575,6 @@ function buildDesk(THREE) {
         bulb.add(spot);
         spot.target.position.set(5.0, 0, 0.2);
         scene.add(spot.target);
-        const glowCanvas = document.createElement('canvas');
-        glowCanvas.width = glowCanvas.height = 256;
-        const gg = glowCanvas.getContext('2d');
-        const rg = gg.createRadialGradient(128, 128, 0, 128, 128, 128);
-        rg.addColorStop(0, 'rgba(255, 200, 120, 0.55)');
-        rg.addColorStop(1, 'rgba(255, 200, 120, 0)');
-        gg.fillStyle = rg; gg.fillRect(0, 0, 256, 256);
-        const glowTex = new THREE.CanvasTexture(glowCanvas);
-        const glow = new THREE.Mesh(new THREE.PlaneGeometry(11, 11), new THREE.MeshBasicMaterial({
-            map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: TIME_OF_DAY === 'night' ? 1 : 0.6,
-        }));
-        glow.rotation.x = -Math.PI / 2;
-        glow.position.set(5.6, 0.003, -0.4);
-        scene.add(glow);
     }
     scene.add(pencil);
 

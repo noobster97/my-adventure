@@ -159,7 +159,8 @@ empty paper leaves a small ink burst, and first-time visitors get a one-off "Cha
 - Everything obeys gravity: objects rest on the desk, lift a little on hover, stand up while their page
   is open, and drop back with a small bounce. The paper star and rubber band slide when your cursor
   nudges them.
-- The visitor's clock sets the light; evenings and nights switch on the desk lamp. Preview with
+- The desk is always the paper colour. The visitor's clock only warms the light on the objects a
+  little, and evenings and nights switch on the desk lamp. Preview with
   `?desk-time=morning`, `day`, `evening` or `night`.
 - **Kertas** lives on the desk: it walks to whatever page you open and says one line, its eyes follow
   the cursor, it hops and talks when poked (three quick pokes = backflip), reacts to paper changes,
