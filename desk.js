@@ -1,17 +1,20 @@
-// 3D desk tour on the home page.
-// A paper desk stays pinned behind the hero while you scroll. The camera visits one
-// object per stop: photos = Work, price tag = Rates, ID card = About, paper plane = Contact.
-// Kertas, the paper buddy, walks along as a tour guide and reacts when you poke it.
-// Everything here is decoration: if Three.js can't load, the extra stops stay hidden
-// and the home page works as before.
+// The 3D paper desk: the site's main view (desk mode).
+// The desk sits behind every page. Each page is an object on it:
+// photos = Work, price tag = Rates, ID card = About, paper plane = Contact.
+// Opening a page (from the dock, a link, or by tapping the object) flies the camera to that
+// object while the page opens in #app (side panel on desktop, bottom sheet on phones).
+// Kertas, the paper buddy, walks to whatever you open and reacts when you poke it.
+// If Three.js can't load, <html> loses .has-desk and the site is a normal multi-page site.
 
 const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 const root = document.documentElement;
-const tour = document.getElementById('deskTour');
+const stage = document.querySelector('.desk-stage');
+const app = document.getElementById('app');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const track = (name, data) => document.dispatchEvent(new CustomEvent('track', { detail: { name, data } }));
 
-if (tour && root.classList.contains('has-desk')) {
+if (stage && app && root.classList.contains('has-desk')) {
+    initSheet();
     import(THREE_URL)
         .then((THREE) => {
             const fonts = document.fonts
@@ -24,11 +27,80 @@ if (tour && root.classList.contains('has-desk')) {
         })
         .catch((err) => {
             console.warn('3D desk is off:', err);
-            root.classList.remove('has-desk');
+            root.classList.remove('has-desk', 'sheet-full');
         });
 }
 
-// What Kertas says when it arrives at each stop, when poked, and when the paper changes.
+const route = () => document.body.dataset.view || 'home';
+
+// Esc closes the open page and goes back to the desk.
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && root.classList.contains('has-desk') && route() !== 'home' && !e.defaultPrevented) location.hash = '#/';
+});
+const phone = () => window.innerWidth <= 760;
+
+/* ---------- Phone bottom sheet ----------
+   Two resting heights: "peek" (desk on top, page below) and "full" (page fills the screen).
+   Drag the grip, tap it, or scroll the page to switch. Every new page starts at peek. */
+function initSheet() {
+    const grip = app.querySelector('.sheet-grip');
+    const setFull = (full) => {
+        root.classList.toggle('sheet-full', full);
+        grip?.setAttribute('aria-label', full ? 'Show the desk' : 'Show more');
+        document.dispatchEvent(new Event('sheetchange'));
+    };
+    grip?.addEventListener('click', () => { if (!dragged) setFull(!root.classList.contains('sheet-full')); });
+
+    // scrolling the page while it peeks opens it fully
+    app.addEventListener('scroll', () => {
+        if (phone() && !root.classList.contains('sheet-full') && app.scrollTop > 12) setFull(true);
+    }, { passive: true });
+
+    // drag the grip (or the top strip of the sheet) up and down
+    let startY = 0, startOffset = 0, dragging = false, dragged = false, lastY = 0, lastT = 0, speed = 0;
+    const peekOffset = () => window.innerHeight * 0.46;
+    const bar = app.querySelector('.panel-bar');
+    const onDown = (e) => {
+        if (!phone()) return;
+        dragging = true; dragged = false;
+        startY = lastY = e.clientY; lastT = performance.now(); speed = 0;
+        startOffset = root.classList.contains('sheet-full') ? 0 : peekOffset();
+        root.classList.add('sheet-dragging');
+        grip.setPointerCapture?.(e.pointerId);
+    };
+    const onMove = (e) => {
+        if (!dragging) return;
+        const dy = e.clientY - startY;
+        if (Math.abs(dy) > 6) dragged = true;
+        const now = performance.now();
+        speed = (e.clientY - lastY) / Math.max(1, now - lastT);
+        lastY = e.clientY; lastT = now;
+        const y = Math.max(0, Math.min(window.innerHeight * 0.7, startOffset + dy));
+        app.style.setProperty('--sheet-y', `${y}px`);
+        if (y === 0) root.classList.add('sheet-full');
+        else root.classList.remove('sheet-full');
+    };
+    const onUp = () => {
+        if (!dragging) return;
+        dragging = false;
+        root.classList.remove('sheet-dragging');
+        const y = parseFloat(app.style.getPropertyValue('--sheet-y')) || startOffset;
+        app.style.removeProperty('--sheet-y');
+        const full = speed < -0.4 ? true : speed > 0.4 ? false : y < peekOffset() / 2;
+        setFull(full);
+        setTimeout(() => { dragged = false; }, 0);
+    };
+    grip?.addEventListener('pointerdown', onDown);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+    bar?.addEventListener('touchmove', (e) => { if (dragging) e.preventDefault(); }, { passive: false });
+
+    // every page opens at peek, so you see its object first
+    new MutationObserver(() => setFull(false)).observe(document.body, { attributes: true, attributeFilter: ['data-view'] });
+}
+
+// What Kertas says: a greeting, one line per page, pokes, and paper changes.
 const TIME_OF_DAY = (() => {
     // ?desk-time=morning|day|evening|night previews another time of day
     let forced = null;
@@ -41,34 +113,28 @@ const TIME_OF_DAY = (() => {
 function greeting() {
     const visits = +root.dataset.visits || 1;
     const away = +root.dataset.daysAway || 0;
-    if (visits > 1 && away >= 1) return `Welcome back! It\u2019s been ${away} day${away > 1 ? 's' : ''}. I missed you!`;
-    if (visits > 1) return `Welcome back! Visit number ${visits}. Scroll, I\u2019ll show you again!`;
+    if (visits > 1 && away >= 1) return `Welcome back! It’s been ${away} day${away > 1 ? 's' : ''}. I missed you!`;
+    if (visits > 1) return `Welcome back! Visit number ${visits}.`;
     return {
-        morning: "Selamat pagi! I'm Kertas. Scroll down, I'll show you around!",
-        evening: "Selamat petang! I'm Kertas. Scroll down, I'll show you around!",
-        night: "Working late? Me too. I'm Kertas, scroll and I'll show you around!",
-    }[TIME_OF_DAY] || "Hi! I'm Kertas. Scroll down, I'll show you around!";
+        morning: "Selamat pagi! I'm Kertas. Tap anything on the desk!",
+        evening: "Selamat petang! I'm Kertas. Tap anything on the desk!",
+        night: "Working late? Me too. Tap anything on the desk!",
+    }[TIME_OF_DAY] || "Hi! I'm Kertas. Tap anything on the desk!";
 }
 
-const STOP_LINES = [
-    null, // filled in by greeting()
-    'This is Syafiq’s desk. Everything here is real work.',
-    'These apps are live. Real people use them every day!',
-    'Websites start at RM 800. No hidden fees, promise.',
-    '6+ years of building systems. Not bad, eh?',
-    'Send a message! He replies fast on WhatsApp.',
-];
+const PAGE_LINES = {
+    work: 'These apps are live. Real people use them!',
+    rates: 'Tap the tag. There’s more on the back!',
+    about: 'Six years of building systems. Not bad, eh?',
+    contact: 'Tap the plane and watch it fly!',
+};
 const POKE_LINES = ['Hehe, that tickles!', 'Selamat datang!', 'I’m made of 100% paper.', 'Try the Paper button up top!', 'Careful, I crease easily.', 'Psst… tap the price tag.'];
 const PAPER_LINES = { graph: 'Back to graph paper. Classic!', kraft: 'Ooh, kraft paper. So cosy.', blueprint: 'Blueprint mode. Very engineer.', chalk: 'Chalkboard! Class is in session.' };
 
 function buildDesk(THREE) {
-    const sticky = tour.querySelector('.desk-sticky');
-    const canvas = tour.querySelector('.desk-canvas');
-    const tip = tour.querySelector('.desk-tip');
-    const bubble = tour.querySelector('.kertas-bubble');
-    const railButtons = [...tour.querySelectorAll('.tour-rail [data-tour-go]')];
-    const steps = [...tour.querySelectorAll('[data-stop]')].sort((a, b) => a.dataset.stop - b.dataset.stop);
-    const STOPS = steps.length;
+    const canvas = stage.querySelector('.desk-canvas');
+    const tip = stage.querySelector('.desk-tip');
+    const bubble = stage.querySelector('.kertas-bubble');
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.shadowMap.enabled = true;
@@ -113,11 +179,13 @@ function buildDesk(THREE) {
     const BODY = (px, wt = 600) => `${wt} ${px}px Outfit, system-ui, sans-serif`;
 
     // ---------- lights + a floor that only shows shadows (the page's paper shows through) ----------
+    // The desk is always the paper colour (like the mockup). Time of day only changes the light on
+    // the objects a little, and switches the desk lamp on in the evening and at night.
     const LIGHTING = {
-        morning: { sky: 0xfff6e8, ground: 0xd8cbb4, hemi: 2.0, sun: 0xffe2b8, sunI: 1.6, sunPos: [-10, 10, 6], lamp: 0, dim: 0 },
-        day: { sky: 0xffffff, ground: 0xcfc6b4, hemi: 2.1, sun: 0xffffff, sunI: 1.6, sunPos: [-6, 14, 8], lamp: 0, dim: 0 },
-        evening: { sky: 0xfff0e0, ground: 0xc9b49e, hemi: 1.9, sun: 0xffc48a, sunI: 1.4, sunPos: [-13, 6, 3], lamp: 1.4, dim: 0.05 },
-        night: { sky: 0xe6eaff, ground: 0x8c8aa0, hemi: 1.55, sun: 0xc8d2ff, sunI: 0.45, sunPos: [-6, 14, 8], lamp: 2.2, dim: 0.1 },
+        morning: { sky: 0xfff8ee, ground: 0xd8cbb4, hemi: 2.0, sun: 0xffeccc, sunI: 1.6, sunPos: [-10, 10, 6], lamp: 0 },
+        day: { sky: 0xffffff, ground: 0xcfc6b4, hemi: 2.1, sun: 0xffffff, sunI: 1.6, sunPos: [-6, 14, 8], lamp: 0 },
+        evening: { sky: 0xffffff, ground: 0xcfc6b4, hemi: 2.0, sun: 0xffe6c8, sunI: 1.4, sunPos: [-12, 8, 4], lamp: 0.7 },
+        night: { sky: 0xffffff, ground: 0xcfc6b4, hemi: 1.9, sun: 0xfff2e0, sunI: 1.1, sunPos: [-6, 14, 8], lamp: 1.1 },
     }[TIME_OF_DAY];
     scene.add(new THREE.HemisphereLight(LIGHTING.sky, LIGHTING.ground, LIGHTING.hemi));
     const sun = new THREE.DirectionalLight(LIGHTING.sun, LIGHTING.sunI);
@@ -179,19 +247,9 @@ function buildDesk(THREE) {
             lines('#e1e1e1', step, 4);
         }
         deskTex.needsUpdate = true;
-        // at night the desk dims a little; fog and sky follow so the horizon stays seamless
-        scene.fog.color.set(bg).multiplyScalar(1 - LIGHTING.dim);
+        scene.fog.color.set(bg);
         renderer.setClearColor(scene.fog.color, 1);
         setTimeout(wake);   // the render loop is set up further down
-    }
-
-    // evening/night: the whole desk dims a touch, and the lamp throws a warm pool of light
-    if (LIGHTING.dim) {
-        const dimmer = new THREE.Mesh(new THREE.PlaneGeometry(DESK_SIZE, DESK_SIZE),
-            new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: LIGHTING.dim, depthWrite: false }));
-        dimmer.rotation.x = -Math.PI / 2;
-        dimmer.position.y = -0.001;
-        scene.add(dimmer);
     }
 
     const floorMat = new THREE.ShadowMaterial({ opacity: 0.16 });
@@ -217,7 +275,7 @@ function buildDesk(THREE) {
         return item;
     }
 
-    // ---------- Work (stop 2): a stack of photos that stand up in a row ----------
+    // ---------- Work: a stack of photos that stand up in a row ----------
     const loader = new THREE.TextureLoader();
     const SHOTS = [
         { src: 'assets/design-web-visualizer-preview-poster.webp', video: 'assets/design-web-visualizer-preview.mp4', name: 'Design Visualizer', rest: [0.32, 0.02, 0.26, 0.32] },
@@ -258,7 +316,7 @@ function buildDesk(THREE) {
         return g;
     });
     addItem('work', workG, [2.8, 0, 2.7], {
-        stop: 2, name: 'My work', sub: '3 live apps',
+        name: 'My work', sub: '3 live apps', tall: 3.2,
         focus: [0.3, 1.3, 1.0], dist: 8.2, span: 9.4, guide: [3.6, 0, 1.0],
         update(t, still) {
             photos.forEach((p, i) => {
@@ -300,7 +358,7 @@ function buildDesk(THREE) {
         });
     }
 
-    // ---------- Rates (stop 3): a kraft price tag on a red string ----------
+    // ---------- Rates: a kraft price tag on a red string ----------
     const tagShape = new THREE.Shape();
     tagShape.moveTo(-0.75, 0.68); tagShape.lineTo(1.25, 0.68); tagShape.lineTo(1.25, -0.68);
     tagShape.lineTo(-0.75, -0.68); tagShape.lineTo(-1.3, 0); tagShape.closePath();
@@ -366,7 +424,7 @@ function buildDesk(THREE) {
     ratesG.add(tag);
     ratesG.rotation.y = 0.06;
     addItem('rates', ratesG, [7.0, 0, 2.8], {
-        stop: 3, name: 'Rates', sub: 'from RM 800', action: 'tap to flip',
+        name: 'Rates', sub: 'from RM 800', action: 'tap to flip', tall: 2.0,
         focus: [-0.4, 1.0, 0.3], dist: 6.2, span: 6.4, guide: [-2.7, 0, 0.4],
         flip: 0, flipTo: 0,
         update(t, still) {
@@ -379,7 +437,7 @@ function buildDesk(THREE) {
         },
     });
 
-    // ---------- About (stop 4): an ID card on a lanyard ----------
+    // ---------- About: an ID card on a lanyard ----------
     const cw = 0.8, ch = 1.15, r = 0.12;
     const cardShape = new THREE.Shape();
     cardShape.moveTo(-cw + r, -ch); cardShape.lineTo(cw - r, -ch); cardShape.quadraticCurveTo(cw, -ch, cw, -ch + r);
@@ -418,7 +476,7 @@ function buildDesk(THREE) {
     aboutG.add(card);
     aboutG.rotation.y = -0.15;
     addItem('about', aboutG, [6.6, 0, -0.6], {
-        stop: 4, name: 'About me', sub: '6+ years',
+        name: 'About me', sub: '6+ years', tall: 3.8,
         focus: [-0.4, 1.3, 0.3], dist: 6.4, span: 5.4, guide: [-1.95, 0, 0.9],
         update(t, still) {
             const k = ease(this.f);
@@ -427,7 +485,7 @@ function buildDesk(THREE) {
         },
     });
 
-    // ---------- Contact (stop 5): a paper plane that loops when you visit it ----------
+    // ---------- Contact: a paper plane that takes off when you open the page ----------
     const N = [1.35, 0, 0], WL = [-0.95, 0.08, -0.95], WR = [-0.95, 0.08, 0.95];
     const TL = [-0.95, 0, -0.05], TR = [-0.95, 0, 0.05], K = [-0.95, -0.38, 0];
     const planeGeo = new THREE.BufferGeometry();
@@ -440,7 +498,7 @@ function buildDesk(THREE) {
     contactG.add(plane);
     contactG.scale.setScalar(0.8);
     addItem('contact', contactG, [3.6, 0, -2.9], {
-        stop: 5, name: 'Say hi', sub: 'WhatsApp', action: 'tap to send',
+        name: 'Say hi', sub: 'WhatsApp', action: 'tap to send', tall: 2.6,
         focus: [-0.5, 1.3, 0.4], dist: 6.6, span: 7.2, guide: [-2.0, 0, 0.9], dir: [0, 1.1, 1],
         flyStart: null,
         update(t, still) {
@@ -477,7 +535,10 @@ function buildDesk(THREE) {
         lastPoke = performance.now();
         say('Message on its way!', 3000);
     }
-    tour.querySelectorAll('.tour-step[data-stop="5"] a[href*="wa.me"]').forEach((a) => a.addEventListener('click', sendPlane));
+    // any WhatsApp button on the Contact page (or the one top-right while it's open) sends the plane
+    document.querySelectorAll('.view[data-view="contact"] a[href*="wa.me"], .nav-cta[href*="wa.me"]').forEach((a) => a.addEventListener('click', () => {
+        if (route() === 'contact') sendPlane();
+    }));
 
     // ---------- decor: pencil + doodles that dodge the pointer ----------
     const pencil = new THREE.Group();
@@ -514,20 +575,6 @@ function buildDesk(THREE) {
         bulb.add(spot);
         spot.target.position.set(5.0, 0, 0.2);
         scene.add(spot.target);
-        const glowCanvas = document.createElement('canvas');
-        glowCanvas.width = glowCanvas.height = 256;
-        const gg = glowCanvas.getContext('2d');
-        const rg = gg.createRadialGradient(128, 128, 0, 128, 128, 128);
-        rg.addColorStop(0, 'rgba(255, 200, 120, 0.55)');
-        rg.addColorStop(1, 'rgba(255, 200, 120, 0)');
-        gg.fillStyle = rg; gg.fillRect(0, 0, 256, 256);
-        const glowTex = new THREE.CanvasTexture(glowCanvas);
-        const glow = new THREE.Mesh(new THREE.PlaneGeometry(11, 11), new THREE.MeshBasicMaterial({
-            map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: TIME_OF_DAY === 'night' ? 1 : 0.6,
-        }));
-        glow.rotation.x = -Math.PI / 2;
-        glow.position.set(5.6, 0.003, -0.4);
-        scene.add(glow);
     }
     scene.add(pencil);
 
@@ -550,7 +597,7 @@ function buildDesk(THREE) {
         return mesh;
     });
 
-    // ---------- Kertas, the paper buddy and tour guide ----------
+    // ---------- Kertas, the paper buddy ----------
     const kertas = new THREE.Group();
     const kBody = new THREE.Group();
     kertas.add(kBody);
@@ -599,40 +646,16 @@ function buildDesk(THREE) {
     scene.add(kertas);
     const kState = { hop: 0, flip: 0, wave: 1.5, blink: 2.5, pokes: [], pos: K_HOME.clone() };
 
-    function guideSpot(stop) {
-        const it = Object.values(items).find((x) => x.stop === stop);
+    function guideSpot(name) {
+        const it = items[name];
         if (!it) return K_HOME;
         const spot = it.base.clone().add(new THREE.Vector3(...it.guide));
         spot.y = 0;
         return spot;
     }
 
-    // ---------- scroll → tour progress ----------
-    let stopAt = [];        // scroll position where each stop is centred
-    function measureStops() {
-        stopAt = steps.map((el, i) => {
-            if (i === 0) return 0;
-            const rect = el.getBoundingClientRect();
-            return rect.top + window.scrollY + rect.height / 2 - window.innerHeight / 2;
-        });
-    }
-    function scrollProgress() {
-        const y = window.scrollY;
-        if (!stopAt.length || y <= stopAt[0]) return 0;
-        for (let i = 0; i < STOPS - 1; i++) {
-            if (y < stopAt[i + 1]) return i + (y - stopAt[i]) / Math.max(1, stopAt[i + 1] - stopAt[i]);
-        }
-        return STOPS - 1;
-    }
-    function goToStop(i) {
-        measureStops();
-        window.scrollTo({ top: Math.max(0, stopAt[i] || 0), behavior: reducedMotion.matches ? 'auto' : 'smooth' });
-    }
-    railButtons.forEach((b) => b.addEventListener('click', () => goToStop(+b.dataset.tourGo)));
-    tour.querySelectorAll('.tour-hint[data-tour-go]').forEach((b) => b.addEventListener('click', () => goToStop(+b.dataset.tourGo)));
-
-    // ---------- camera poses for each stop ----------
-    let width = 1, height = 1, wide = true;
+    // ---------- camera poses ----------
+    let width = 1, height = 1;
     const TOP_DIR = new THREE.Vector3(0, 1, 0.02).normalize();
     const OVERVIEW_DIR = new THREE.Vector3(0, 0.86, 0.62).normalize();
     const FOCUS_DIR = new THREE.Vector3(0, 0.6, 1).normalize();
@@ -648,7 +671,7 @@ function buildDesk(THREE) {
         b.expandByObject(lamp);
         b.expandByPoint(K_HOME.clone().setY(1.1));
         b.min.y = 0;
-        b.max.y = Math.min(b.max.y, 0.8);   // frame the desk's footprint; tall things (lamp, plane) may overlap the edge
+        b.max.y = Math.min(b.max.y, 0.8);   // frame the desk's footprint; tall things may overlap the edge
         overview.center.copy(b.getCenter(new THREE.Vector3())).setY(0.4);
         overview.corners = [];
         for (const x of [b.min.x, b.max.x]) for (const y of [b.min.y, b.max.y]) for (const z of [b.min.z, b.max.z]) {
@@ -683,52 +706,52 @@ function buildDesk(THREE) {
         return { pos: pos.add(shift), target: target.add(shift) };
     }
 
-    let poses = [];
-    function computePoses() {
-        wide = width >= 980;
-        const vfov = THREE.MathUtils.degToRad(camera.fov);
-        const halfTan = Math.tan(vfov / 2) * camera.aspect;
-        // where the object sits on screen: right half on desktop (card on the left), top on phones (card at the bottom)
-        const focusNdc = wide ? [0.34, 0.02] : [0, 0.42];
-        const focusFracW = wide ? 0.5 : 0.9;
-        poses = [];
-        // 0: hero. Looking straight down, so the desk reads as a flat 2D page; scrolling tilts it into 3D.
-        // Desktop: the flat-lay sits on the right. Phones: it waits just below the screen.
-        if (wide) {
-            const tanV = Math.tan(vfov / 2);
-            const d = Math.max(10 / (2 * tanV), 16.6 / (2 * tanV * camera.aspect));
-            poses.push(framed(new THREE.Vector3(1.5, 0, 0.1), TOP_DIR, d, 0, 0));
-        } else {
-            const d = fitDistance(overview.center, TOP_DIR, overview.corners, 0.94, 0.5);
-            poses.push(framed(overview.center, TOP_DIR, d, 0, -1.6));
+    // The part of the screen the desk owns, in NDC: everything except the panel (desktop)
+    // or the sheet (phone). Returns its centre and half-size.
+    function freeArea() {
+        if (phone()) {
+            if (root.classList.contains('sheet-full')) return { cx: 0, cy: 0.6, hw: 0.9, hh: 0.3 };
+            const sheetTop = (app.getBoundingClientRect().top || height * 0.55) / height;   // 0..1 from the top
+            const top = 64 / height;                                                         // the top corners
+            const mid = (top + sheetTop) / 2;
+            return { cx: 0, cy: 1 - 2 * mid, hw: 0.92, hh: Math.max(0.2, (sheetTop - top) * 0.92) };
         }
-        // 1: the whole desk
-        if (wide) {
-            const d = fitDistance(overview.center, OVERVIEW_DIR, overview.corners, 0.94, 0.74);
-            poses.push(framed(overview.center, OVERVIEW_DIR, d, 0.02, -0.1));
-        } else {
-            const d = fitDistance(overview.center, OVERVIEW_DIR, overview.corners, 0.94, 0.42);
-            poses.push(framed(overview.center, OVERVIEW_DIR, d, 0, 0.42));
+        if (route() === 'home') {
+            // the hero text owns the left; the desk gets the rest of the screen
+            const heroRight = 560 / width;
+            const left = Math.min(0.5, heroRight);
+            return { cx: left, cy: -0.04, hw: (1 - left) * 0.96, hh: 0.8 };
         }
-        // 2-5: one object each
-        Object.values(items).sort((a, b) => a.stop - b.stop).forEach((it) => {
-            const center = it.base.clone().add(new THREE.Vector3(...it.focus));
-            const needed = (it.span / 2) / (halfTan * focusFracW);
-            const dist = Math.max(it.dist, needed);
-            const dir = it.dir ? new THREE.Vector3(...it.dir).normalize() : FOCUS_DIR;
-            poses.push(framed(center, dir, dist, focusNdc[0], focusNdc[1]));
-        });
+        const panelLeft = app.getBoundingClientRect().left / width;  // 0..1
+        const f = Math.max(0.3, panelLeft - 0.02);
+        return { cx: -1 + f, cy: -0.06, hw: f * 0.9, hh: 0.72 };
+    }
+
+    // Where the camera should be for the current page.
+    function goalPose(intro) {
+        const area = freeArea();
+        const name = route();
+        const it = items[name];
+        if (!it) {
+            const dir = intro ? TOP_DIR : OVERVIEW_DIR;
+            const d = fitDistance(overview.center, dir, overview.corners, area.hw, area.hh);
+            return framed(overview.center, dir, d, area.cx, area.cy);
+        }
+        const tanV = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
+        const center = it.base.clone().add(new THREE.Vector3(...it.focus));
+        const needW = (it.span / 2) / (tanV * camera.aspect * area.hw);
+        const needH = (it.tall / 2) / (tanV * area.hh);
+        const dist = Math.max(it.dist, needW, needH);
+        const dir = it.dir ? new THREE.Vector3(...it.dir).normalize() : FOCUS_DIR;
+        return framed(center, dir, dist, area.cx, area.cy);
     }
 
     function resize() {
-        const rect = sticky.getBoundingClientRect();
-        width = Math.max(1, rect.width); height = Math.max(1, rect.height);
+        width = Math.max(1, window.innerWidth); height = Math.max(1, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, width < 700 ? 1.75 : 2));
         renderer.setSize(width, height, false);
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
-        computePoses();
-        measureStops();
         wake();
     }
 
@@ -744,9 +767,8 @@ function buildDesk(THREE) {
     let hovered = null;
 
     function toNdc(e) {
-        const rect = canvas.getBoundingClientRect();
-        pointerPx.x = e.clientX - rect.left; pointerPx.y = e.clientY - rect.top;
-        ndc.set((pointerPx.x / rect.width) * 2 - 1, -(pointerPx.y / rect.height) * 2 + 1);
+        pointerPx.x = e.clientX; pointerPx.y = e.clientY;
+        ndc.set((e.clientX / width) * 2 - 1, -(e.clientY / height) * 2 + 1);
         return ndc;
     }
     function pick(e) {
@@ -758,9 +780,9 @@ function buildDesk(THREE) {
     function setHover(target) {
         if (target === hovered) return;
         hovered = target;
-        sticky.classList.toggle('is-hovering', !!target);
+        stage.classList.toggle('is-hovering', !!target);
         if (target === 'kertas') tip.innerHTML = 'Kertas<small>poke me</small>';
-        else if (target) tip.innerHTML = `${target.name}<small>${target.action && Math.round(scrollProgress()) === target.stop ? target.action : target.sub}</small>`;
+        else if (target) tip.innerHTML = `${target.name}<small>${route() === target.id ? target.action || target.sub : 'open'}</small>`;
         tip.classList.toggle('show', !!target);
         wake();
     }
@@ -772,6 +794,9 @@ function buildDesk(THREE) {
     });
     canvas.addEventListener('pointerleave', () => { pointer.set(9, 9); setHover(null); });
 
+    // Tapping an object does exactly what the dock does: it opens that page.
+    // Tapping the object of the page that's already open uses it (flip the tag, send the plane).
+    // Tapping empty desk while a page is open goes back to the desk.
     let downAt = null;
     canvas.addEventListener('pointerdown', (e) => { downAt = [e.clientX, e.clientY]; });
     canvas.addEventListener('pointerup', (e) => {
@@ -779,26 +804,29 @@ function buildDesk(THREE) {
         downAt = null;
         pointer.copy(toNdc(e));
         const target = pick(e);
-        const here = Math.round(scrollProgress());
+        const here = route();
         if (target === 'kertas') poke();
-        else if (target && target.id === 'rates' && here === target.stop) {
+        else if (target && target.id === here && target.id === 'rates') {
             target.flipTo = target.flipTo ? 0 : 1;
             setHover(null);   // keep the hint off the side you just flipped to
             track('desk-pick', { item: 'rates-flip' });
-        } else if (target && target.id === 'contact' && here === target.stop) {
+        } else if (target && target.id === here && target.id === 'contact') {
             sendPlane();
             setHover(null);
             track('desk-pick', { item: 'contact-plane' });
-        } else if (target) {
+        } else if (target && target.id !== here) {
             track('desk-pick', { item: target.id });
-            goToStop(target.stop);
+            setHover(null);
+            location.hash = `#/${target.id}`;
+        } else if (!target && here !== 'home') {
+            location.hash = '#/';
         }
         wake();
     });
 
     // ---------- Kertas talks ----------
-    let talkTimer = 0, lastSaid = -1, lastPoke = 0;
-    function say(text, ms = 4200) {
+    let talkTimer = 0, lastPoke = 0, lastRoute = null;
+    function say(text, ms = 3800) {
         bubble.textContent = text;
         bubble.classList.add('show');
         clearTimeout(talkTimer);
@@ -821,11 +849,22 @@ function buildDesk(THREE) {
         say(POKE_LINES[Math.floor(Math.random() * POKE_LINES.length)]);
     }
 
+    // Kertas waves goodbye when you reach the end of a page (once per page you open).
+    let wavedOn = '';
+    app.addEventListener('scroll', () => {
+        const here = route();
+        if (here === 'home' || wavedOn === here) return;
+        if (app.scrollTop + app.clientHeight < app.scrollHeight - 8 || app.scrollHeight < app.clientHeight * 1.4) return;
+        wavedOn = here;
+        kState.wave = 2;
+        say('Bye for now! Come back soon.', 3000);
+    }, { passive: true });
+
     const applyTone = () => { floorMat.opacity = root.dataset.tone === 'dark' ? 0.32 : 0.16; paintDesk(); };
     new MutationObserver(() => {
         applyTone();
         const line = PAPER_LINES[root.dataset.paper || 'graph'];
-        if (visible && line) {
+        if (line && !document.hidden) {
             if (!reducedMotion.matches) kState.hop = 1;
             lastPoke = performance.now();
             say(line);
@@ -834,15 +873,53 @@ function buildDesk(THREE) {
     }).observe(root, { attributes: true, attributeFilter: ['data-paper', 'data-tone'] });
     applyTone();
 
-    // ---------- loop: only runs while the desk is on screen ----------
+    // Kertas' speech bubble: try above Kertas, then below, then beside it. Take the first spot that
+    // stays inside the desk's free area and doesn't overlap the object that's open.
+    const box3 = new THREE.Box3();
+    function screenRect(obj) {
+        box3.setFromObject(obj);
+        let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+        for (const x of [box3.min.x, box3.max.x]) for (const y of [box3.min.y, box3.max.y]) for (const z of [box3.min.z, box3.max.z]) {
+            v.set(x, y, z).project(camera);
+            const sx = (v.x * 0.5 + 0.5) * width, sy = (-v.y * 0.5 + 0.5) * height;
+            x0 = Math.min(x0, sx); x1 = Math.max(x1, sx); y0 = Math.min(y0, sy); y1 = Math.max(y1, sy);
+        }
+        return { x0, y0, x1, y1 };
+    }
+    function placeBubble(open) {
+        const area = freeArea();
+        const left = ((area.cx - area.hw) * 0.5 + 0.5) * width + 8;
+        const right = ((area.cx + area.hw) * 0.5 + 0.5) * width - 8;
+        const top = Math.max(phone() ? 64 : 76, ((1 - (area.cy + area.hh)) * 0.5) * height);
+        const bottom = phone() ? app.getBoundingClientRect().top - 8 : height - 96;
+        const k = screenRect(kBody);
+        const avoid = open ? screenRect(open.group) : null;
+        const bw = bubble.offsetWidth || 180, bh = bubble.offsetHeight || 50;
+        const kx = (k.x0 + k.x1) / 2, gap = 14;
+        const spots = [
+            { x: kx - bw / 2, y: k.y0 - gap - bh, tail: 'down' },
+            { x: kx - bw / 2, y: k.y1 + gap, tail: 'up' },
+            { x: k.x1 + gap, y: (k.y0 + k.y1) / 2 - bh / 2, tail: 'left' },
+            { x: k.x0 - gap - bw, y: (k.y0 + k.y1) / 2 - bh / 2, tail: 'right' },
+        ];
+        const fits = (r) => r.x >= left && r.x + bw <= right && r.y >= top && r.y + bh <= bottom;
+        const clear = (r) => !avoid || r.x + bw < avoid.x0 || r.x > avoid.x1 || r.y + bh < avoid.y0 || r.y > avoid.y1;
+        let spot = spots.find((r) => fits(r) && clear(r)) || spots.find(fits);
+        if (!spot) { bubble.style.visibility = 'hidden'; return; }
+        bubble.style.visibility = 'visible';
+        bubble.dataset.tail = spot.tail;
+        bubble.style.transform = `translate(${Math.round(spot.x)}px, ${Math.round(spot.y)}px)`;
+    }
+
+    // ---------- loop ----------
     const clock = new THREE.Clock();
-    let visible = false, rafId = 0, quietFrames = 0, firstFrame = true;
+    let rafId = 0, quietFrames = 0, firstFrame = true;
+    const startedAt = performance.now();
     const camPos = new THREE.Vector3(), camTarget = new THREE.Vector3();
-    const goalPos = new THREE.Vector3(), goalTarget = new THREE.Vector3();
 
     function wake() {
         quietFrames = 0;
-        if (!rafId && visible && !document.hidden && poses.length) { clock.getDelta(); rafId = requestAnimationFrame(frame); }
+        if (!rafId && !document.hidden) { clock.getDelta(); rafId = requestAnimationFrame(frame); }
     }
 
     function frame() {
@@ -850,38 +927,40 @@ function buildDesk(THREE) {
         const dt = Math.min(clock.getDelta(), 0.05);
         const t = clock.elapsedTime;
         const still = reducedMotion.matches;
-        const p = scrollProgress();
-        const near = Math.round(p);
+        const here = route();
 
-        // camera: rest at each stop, glide between them
-        const i = Math.min(STOPS - 2, Math.floor(p));
-        const f = smooth((p - i - 0.12) / 0.76);
-        goalPos.copy(poses[i].pos).lerp(poses[i + 1].pos, f);
-        goalTarget.copy(poses[i].target).lerp(poses[i + 1].target, f);
-        lean.lerp(pointer.lengthSq() > 4 || still ? centre : pointer, 1 - Math.exp(-dt * 3));
-        goalPos.x += lean.x * 0.35;
-        goalPos.y += lean.y * 0.2;
-        const k = firstFrame || still ? 1 : 1 - Math.exp(-dt * 7);
-        camPos.lerp(goalPos, k);
-        camTarget.lerp(goalTarget, k);
+        // camera: the first moment looks straight down (a flat 2D desk), then it tilts into 3D
+        const intro = here === 'home' && !still && performance.now() - startedAt < 700;
+        const goal = goalPose(intro);
+        lean.lerp(pointer.lengthSq() > 4 || still || phone() ? centre : pointer, 1 - Math.exp(-dt * 3));
+        goal.pos.x += lean.x * 0.35;
+        goal.pos.y += lean.y * 0.2;
+        if (firstFrame) {
+            // a deep link (#/work) still starts flat, so the tilt reads the same everywhere
+            const flat = framed(overview.center, TOP_DIR, fitDistance(overview.center, TOP_DIR, overview.corners, 0.94, 0.8), 0, 0);
+            camPos.copy(still ? goal.pos : flat.pos); camTarget.copy(still ? goal.target : flat.target);
+        }
+        const k = still ? 1 : 1 - Math.exp(-dt * (firstFrame ? 0 : 3.2));
+        camPos.lerp(goal.pos, k);
+        camTarget.lerp(goal.target, k);
         firstFrame = false;
         camera.position.copy(camPos);
         camera.lookAt(camTarget);
-        // the far desk fades into the paper colour, like the mockup
+        // the far desk fades into the paper colour
         const camDist = camPos.distanceTo(camTarget);
         scene.fog.near = camDist * 1.25;
         scene.fog.far = camDist * 3.2;
 
-        // objects: the one at the current stop gets picked up
+        // objects: the one whose page is open gets picked up
         for (const id in items) {
             const it = items[id];
             it.h = lerp(it.h, hovered === it ? 1 : 0, 1 - Math.exp(-dt * (still ? 40 : 8)));
-            const goalF = clamp01(1 - Math.abs(p - it.stop) * 1.6);
-            it.f = still ? goalF : lerp(it.f, goalF, 1 - Math.exp(-dt * 6));
+            const goalF = id === here ? 1 : 0;
+            it.f = still ? goalF : lerp(it.f, goalF, 1 - Math.exp(-dt * 4));
             it.update(t, still);
         }
 
-        playVideos(visible && items.work.f > 0.35);
+        playVideos(here === 'work' && !document.hidden);
 
         // the desk clears space: other objects slide away from the one in focus
         let star = null;
@@ -920,10 +999,10 @@ function buildDesk(THREE) {
             d.rotation.z += u.spin * dt;
         });
 
-        // Kertas walks to the object at each stop
-        const spot = guideSpot(i).clone().lerp(guideSpot(i + 1), smooth((p - i - 0.15) / 0.7));
+        // Kertas walks over to whatever page is open
+        const spot = guideSpot(here);
         const beforeX = kState.pos.x, beforeZ = kState.pos.z;
-        kState.pos.lerp(spot, still ? 1 : 1 - Math.exp(-dt * 3.5));
+        kState.pos.lerp(spot, still ? 1 : 1 - Math.exp(-dt * 2.6));
         const speed = Math.hypot(kState.pos.x - beforeX, kState.pos.z - beforeZ) / Math.max(dt, 1e-3);
         const walking = !still && speed > 0.4;
         kState.hop = Math.max(0, kState.hop - dt * 2.4);
@@ -952,43 +1031,33 @@ function buildDesk(THREE) {
         if (kState.blink < -0.12) kState.blink = 2.5 + Math.random() * 3;
         eyes.forEach((e) => { e.scale.y = kState.blink < 0 && !still ? 0.12 : 1; });
 
-        // Kertas comments when you arrive at a stop
-        if (Math.abs(p - near) < 0.12 && near !== lastSaid) {
-            lastSaid = near;
+        // Kertas speaks once when it arrives: a greeting on the desk, one line per page
+        if (here !== lastRoute && (still || speed < 0.3) && (!lastPoke || performance.now() - lastPoke > 2500)) {
+            const first = lastRoute === null;
+            lastRoute = here;
             kState.wave = 1.4;
-            if (near <= 1 && (!lastPoke || performance.now() - lastPoke > 3000)) say(near === 0 ? greeting() : STOP_LINES[near]);
-            else if (near > 1 && (!lastPoke || performance.now() - lastPoke > 3000)) bubble.classList.remove('show');
+            if (here === 'home') { if (first) say(greeting(), 4500); else bubble.classList.remove('show'); }
+            else say(PAGE_LINES[here] || '');
         }
 
         scene.updateMatrixWorld();
         renderer.render(scene, camera);
 
-        // speech bubble over Kertas, hover hint by the pointer
-        v.set(0, 1.4, 0).applyMatrix4(kertas.matrixWorld).project(camera);
-        const bx = (v.x * 0.5 + 0.5) * width, by = (-v.y * 0.5 + 0.5) * height;
-        const bw = bubble.offsetWidth || 180;
-        const clampedX = Math.max(bw / 2 + 12, Math.min(width - bw / 2 - 12, bx));
-        bubble.style.transform = `translate(${Math.round(clampedX)}px, ${Math.round(by)}px) translate(-50%, -100%)`;
-        bubble.style.visibility = v.z > 1 || by < 120 || by > height - 40 ? 'hidden' : 'visible';
+        // speech bubble next to Kertas, placed where it doesn't cover the open object
+        if (bubble.classList.contains('show')) placeBubble(star && star.f > 0.3 ? star : null);
         if (hovered) tip.style.transform = `translate(${Math.round(pointerPx.x + 16)}px, ${Math.round(pointerPx.y + 18)}px)`;
 
-        railButtons.forEach((b) => b.classList.toggle('is-on', +b.dataset.tourGo === near));
-        sticky.classList.toggle('is-past', window.scrollY > (stopAt[STOPS - 1] || 0) + height * 0.35);
-
-        if (still && ++quietFrames > 20) return;
-        if (visible && !document.hidden) rafId = requestAnimationFrame(frame);
+        // the desk is hidden behind a full sheet: let it settle, then stop drawing
+        const hiddenBehindSheet = phone() && root.classList.contains('sheet-full');
+        if ((still || hiddenBehindSheet) && ++quietFrames > 40) return;
+        if (!document.hidden) rafId = requestAnimationFrame(frame);
     }
 
-    window.addEventListener('scroll', wake, { passive: true });
-    new IntersectionObserver(([entry]) => {
-        visible = entry.isIntersecting;
-        if (!visible) playVideos(false);
-        document.body.classList.toggle('desk-in-view', visible);
-        if (visible) { measureStops(); wake(); }
-    }).observe(tour);
-    document.addEventListener('visibilitychange', wake);
-    new ResizeObserver(resize).observe(sticky);
-    new ResizeObserver(measureStops).observe(tour);
+    // route changes, sheet moves and resizes all reframe the camera
+    new MutationObserver(() => { setHover(null); wake(); }).observe(document.body, { attributes: true, attributeFilter: ['data-view'] });
+    document.addEventListener('sheetchange', wake);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) playVideos(false); wake(); });
+    window.addEventListener('resize', resize);
 
     measureOverview();
     resize();

@@ -137,35 +137,39 @@ On phones the doodles scatter from a tap, slide apart as you scroll and lean whe
 tilted (Android; iPhones don't share tilt without a permission pop-up, so we don't ask). Tapping
 empty paper leaves a small ink burst, and first-time visitors get a one-off "Change the paper!" nudge.
 
-## 3D Desk Tour (home page)
+## 3D Desk (the main view)
 
-`desk.js` and `desk.css` turn the top of the home page into a 3D paper desk built with
-[Three.js](https://threejs.org) (loaded from jsDelivr only on the home page, no build step).
+`desk.js` and `desk.css` make the site an app on a 3D paper desk, built with
+[Three.js](https://threejs.org) (loaded from jsDelivr, pinned, no build step).
 
-- The page opens looking straight down at the desk (a flat 2D flat-lay beside the hero text). Scrolling
-  tilts it into 3D and visits one object per stop, each with one card:
-  **The desk → Work (photo stack) → Rates (price tag) → About (ID card) → Contact (paper plane)**.
-- The desk is the current paper (Graph, Kraft, Blueprint, Chalkboard) drawn in 3D, fading into the distance.
-- Everything obeys gravity: objects rest on the desk and only rise when you hover them (picked up a
-  little) or when the tour holds one up to show you. They drop back with a small bounce. The paper plane
-  sits on the desk until the Contact stop, then takes off. The paper star and rubber band slide when
-  your cursor nudges them, and friction stops them where they land.
-- The object in focus gets the desk to itself: the others slide aside. Clicking an object scrolls to it.
-- **Work:** the photos play each app's preview video (`assets/*-preview.mp4`). Videos only download
-  at that stop, and never with reduced motion or Data Saver.
-- **Rates:** tap the tag to flip it. The back shows the most popular package in each category, read
-  from `data/rate-card.json`, so it always matches your prices.
-- **Contact:** tap the plane or "WhatsApp me" and the plane flies off with your message.
-- **Time of day:** the visitor's own clock sets the light. Evenings and nights switch on the desk lamp.
-  Preview another time with `?desk-time=morning`, `day`, `evening` or `night` in the address.
-- **Kertas** walks along as the tour guide: eyes follow the cursor, it blinks and waves, hops and talks
-  when poked (three quick pokes = backflip), comments when you change the paper, welcomes returning
-  visitors ("Welcome back! It's been 2 days"), and waves goodbye at the bottom of a page. Visits are
-  counted only in the visitor's own browser.
-- Edit the cards in `index.html` (`.tour-step` sections). Edit Kertas' lines in `STOP_LINES`,
-  `POKE_LINES`, `PAPER_LINES` and `greeting()` in `desk.js`, and `LINES` in `playful.js`.
-- If WebGL is missing, Data Saver is on, or Three.js can't load, the extra stops stay hidden and the
-  home page works as a normal page.
+- The desk sits behind every page. Each page is an object on it: **photos = Work, price tag = Rates,
+  ID card = About, paper plane = Contact**.
+- **One rule:** tapping an object and tapping a page in the bottom dock do the same thing. The camera
+  flies to that object, it lifts off the desk, and the page opens beside it. Tap empty desk, the ✕ or
+  press Esc to go back. Links like `#/rates` still work and can be shared.
+- **Desktop:** the page opens in a side panel on the right; the object sits on the left.
+- **Phones:** the desk stays on the top half and the page opens in a bottom sheet. Drag the grip, tap
+  it, or just scroll the page to open the sheet fully. Every page opens at half height first.
+- **Home:** the hero text sits over the desk (left on desktop, in the sheet on phones). The desk opens
+  flat, seen from above, then tilts into 3D.
+- On the open object: tap the price tag to flip it to the most popular package per category (from
+  `data/rate-card.json`); tap the plane (or any WhatsApp button on Contact) to send it flying; the Work
+  photos play the app preview videos (`assets/*-preview.mp4`, only while Work is open, never with
+  reduced motion or Data Saver).
+- Everything obeys gravity: objects rest on the desk, lift a little on hover, stand up while their page
+  is open, and drop back with a small bounce. The paper star and rubber band slide when your cursor
+  nudges them.
+- The desk is always the paper colour. The visitor's clock only warms the light on the objects a
+  little, and evenings and nights switch on the desk lamp. Preview with
+  `?desk-time=morning`, `day`, `evening` or `night`.
+- **Kertas** lives on the desk: it walks to whatever page you open and says one line, its eyes follow
+  the cursor, it hops and talks when poked (three quick pokes = backflip), reacts to paper changes,
+  welcomes returning visitors and waves goodbye when you reach the end of a page. Its speech bubble
+  always sits beside Kertas where it doesn't cover the open object. Edit the lines in `PAGE_LINES`,
+  `POKE_LINES`, `PAPER_LINES` and `greeting()` in `desk.js`.
+- Visits are counted only in the visitor's own browser (`playful.js`).
+- If WebGL is missing, Data Saver is on, or Three.js can't load, the site is a normal multi-page site
+  (pages, dock, page-turn transitions and the flat Kertas in the corner).
 
 ## Site Shell
 
