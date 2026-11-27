@@ -1,30 +1,34 @@
 /* ==========================================================
-   3D desk tour on the home page (desk.js)
+   Desk mode (desk.js): the 3D desk is the app.
    Active only when <html> has .has-desk (set in <head> when WebGL works).
-   The desk is pinned full-screen behind the hero and five tour stops.
-   Each stop shows one card on its own side of the screen while the camera
-   frames the object on the other side, so text never sits on an object.
+
+   - The desk is fixed behind everything.
+   - Home: the hero text sits over the desk (left on desktop, in the sheet on phones).
+   - Work / Rates / About / Contact: the camera flies to that object and the page
+     opens in #app, which is a side panel on desktop and a bottom sheet on phones.
+   - Tapping an object and tapping the dock do the same thing: they change the route.
+
+   Without .has-desk none of this applies and the site is a normal multi-page site.
    ========================================================== */
 
-.desk-sticky,
-.tour-step,
-.tour-hint { display: none; }
+.desk-stage,
+.panel-bar,
+.desk-hint { display: none; }
 
-/* --- the pinned desk --- */
-html.has-desk .desk-tour { position: relative; }
+/* --- the desk, fixed behind everything --- */
+html.has-desk,
+html.has-desk body {
+    height: 100%;
+    overflow: hidden;
+}
 
-html.has-desk .desk-sticky {
+html.has-desk body { padding-bottom: 0; }
+
+html.has-desk .desk-stage {
     display: block;
-    position: sticky;
-    top: 0;
+    position: fixed;
+    inset: 0;
     z-index: 0;
-    width: 100vw;
-    height: 100vh;
-    height: 100svh;
-    margin-left: calc(50% - 50vw);
-    margin-bottom: -100vh;
-    margin-bottom: -100svh;
-    pointer-events: none;
 }
 
 .desk-canvas {
@@ -33,29 +37,22 @@ html.has-desk .desk-sticky {
     width: 100%;
     height: 100%;
     display: block;
-    pointer-events: auto;
-    touch-action: pan-y;
+    touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
 }
 
-.desk-sticky.is-hovering .desk-canvas { cursor: pointer; }
+.desk-stage.is-hovering .desk-canvas { cursor: pointer; }
 
-/* Hero + stops scroll over the desk; only their cards catch clicks. */
-html.has-desk .desk-tour > .hero,
-html.has-desk .desk-tour > .tour-step {
-    position: relative;
-    z-index: 1;
-    pointer-events: none;
-}
-
-html.has-desk .desk-tour .hero-content,
-html.has-desk .tour-card { pointer-events: auto; }
-
+/* One Kertas: the 3D one on the desk. */
+html.has-desk .buddy-wrap { display: none; }
 html.has-desk .hero-doodles { display: none; }
 
-/* The tour already leads to Work, Rates and About, so the shortcut cards below it would repeat it. */
-html.has-desk .quick-section { display: none; }
-html.has-desk .desk-tour > .hero { min-height: 100vh; min-height: 100svh; }
+/* The desk replaces these on Home: the objects are the shortcuts,
+   and the Rates page already lists what I build with prices. */
+html.has-desk .quick-section,
+html.has-desk #services,
+html.has-desk .desk-tour .stats-row,
+html.has-desk .hero .stats-row { display: none; }
 
 /* --- hover hint + Kertas' speech bubble (placed by desk.js) --- */
 .desk-tip,
@@ -71,6 +68,7 @@ html.has-desk .desk-tour > .hero { min-height: 100vh; min-height: 100svh; }
     opacity: 0;
     transition: opacity .2s ease;
     will-change: transform;
+    z-index: 2;
 }
 
 .desk-tip {
@@ -89,17 +87,19 @@ html.has-desk .desk-tour > .hero { min-height: 100vh; min-height: 100svh; }
     margin-left: .35rem;
 }
 
-.desk-tip.show { opacity: 1; }
+.desk-tip.show,
+.kertas-bubble.show { opacity: 1; }
 
 .kertas-bubble {
-    max-width: 230px;
-    font-size: 1.1rem;
+    max-width: 220px;
+    font-size: 1.08rem;
     line-height: 1.25;
-    padding: .5rem .8rem;
+    padding: .45rem .75rem;
     border-radius: 14px;
     box-shadow: 3px 3px 0 #2c3e50;
 }
 
+/* the tail points at Kertas: down (bubble above), up (below), left or right (beside) */
 .kertas-bubble::after {
     content: "";
     position: absolute;
@@ -113,182 +113,217 @@ html.has-desk .desk-tour > .hero { min-height: 100vh; min-height: 100svh; }
     transform: translateX(-50%) rotate(45deg);
 }
 
-.kertas-bubble.show { opacity: 1; }
+.kertas-bubble[data-tail="up"]::after { bottom: auto; top: -9px; transform: translateX(-50%) rotate(225deg); }
+.kertas-bubble[data-tail="left"]::after { left: -9px; bottom: auto; top: 50%; transform: translateY(-50%) rotate(135deg); }
+.kertas-bubble[data-tail="right"]::after { left: auto; right: -9px; bottom: auto; top: 50%; transform: translateY(-50%) rotate(-45deg); }
 
-/* The 3D Kertas takes over while the desk is on screen. */
-body.desk-in-view .buddy-wrap {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity .3s ease, visibility 0s linear .3s;
+/* --- #app: panel / sheet --- */
+html.has-desk #app {
+    position: fixed;
+    z-index: 10;
+    min-height: 0;
+    padding-top: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
 }
 
-/* --- scroll hint under the hero stats --- */
-html.has-desk .tour-hint {
-    display: inline-flex;
-    align-items: center;
-    gap: .5rem;
-    margin-top: 2rem;
-    padding: .3rem 0;
-    border: 0;
-    background: none;
-    color: var(--secondary);
-    font-family: var(--font-heading);
-    font-size: 1.2rem;
-    cursor: pointer;
-}
-
-html.has-desk .tour-hint i { animation: hintBob 1.6s ease-in-out infinite; }
-
-@keyframes hintBob {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(5px); }
-}
-
-/* --- tour stops: one paper card each --- */
-html.has-desk .tour-step {
+html.has-desk .panel-bar {
     display: flex;
-    align-items: center;
-    min-height: 100vh;
-    min-height: 100svh;
-    padding: 6rem 0 7rem;   /* clear of the bottom dock */
+    justify-content: flex-end;
+    position: sticky;
+    top: 0;
+    height: 0;
+    z-index: 20;
 }
 
-html.has-desk .tour-step > .container { width: 100%; }
-
-/* The desk stop shows the whole desk, so its short card sits in the empty back-left corner. */
-html.has-desk .tour-step--top { align-items: flex-start; padding-top: 7rem; }
-
-/* The ID card on the desk already shows the years and projects. */
-html.has-desk .desk-tour .stats-row { display: none; }
-
-.tour-card {
-    max-width: 400px;
-    color: #2c3e50;
+.panel-close {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    margin: 12px 12px 0 0;
+    border-radius: 50%;
+    border: 2px solid #2c3e50;
     background: #fff;
-    border: 2px solid #2c3e50;
-    border-radius: 6px 14px 8px 16px;
-    box-shadow: 6px 6px 0 #2c3e50;
-    padding: 1.6rem 1.7rem 1.7rem;
-}
-
-.tour-kicker {
-    display: block;
-    font-family: var(--font-main);
-    font-size: .75rem;
-    font-weight: 700;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: #e74c3c;
-}
-
-.tour-card h2 {
-    margin: .35rem 0 .6rem;
-    font-family: var(--font-heading);
-    font-size: 2.3rem;
-    font-weight: 400;
-    line-height: 1.05;
     color: #2c3e50;
-    text-wrap: balance;
-}
-
-.tour-card p {
-    margin: 0;
-    color: #5f6b6c;
-    line-height: 1.55;
-}
-
-.tour-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .8rem;
-    margin-top: 1.3rem;
-}
-
-/* Cards are always light paper, so their buttons keep the light-paper look on every theme. */
-:root .tour-card .btn-primary { background: #2c3e50; color: #fff; border-color: #2c3e50; }
-:root .tour-card .btn-secondary { background: #fff; color: #2c3e50; border-color: #2c3e50; }
-
-/* Kertas' line at each object stop: a tiny paper face + a handwritten quote */
-.kertas-says {
-    display: flex;
-    align-items: center;
-    gap: .6rem;
-    margin: 1.1rem 0 0 !important;
-    padding-top: .9rem;
-    border-top: 1.5px dashed #c9cfd0;
-    font-family: var(--font-heading);
-    font-size: 1.05rem;
-    line-height: 1.25;
-    color: #2c3e50 !important;
-}
-
-.kertas-says::before {
-    content: "";
+    box-shadow: 2px 2px 0 #2c3e50;
+    font-size: 1.1rem;
+    text-decoration: none;
     flex: none;
-    width: 26px;
-    height: 28px;
-    border: 2px solid #2c3e50;
-    border-radius: 3px;
-    background:
-        radial-gradient(circle at 34% 40%, #2c3e50 0 2.2px, transparent 2.6px),
-        radial-gradient(circle at 66% 40%, #2c3e50 0 2.2px, transparent 2.6px),
-        radial-gradient(circle at 20% 66%, #ff9aa2 0 2.6px, transparent 3px),
-        radial-gradient(circle at 80% 66%, #ff9aa2 0 2.6px, transparent 3px),
-        #fff;
 }
 
-/* --- desktop: hero text on the left, desk on the right --- */
-@media (min-width: 980px) {
-    /* hero text lines up with the logo in the top-left, like the mockup */
-    html.has-desk .desk-tour > .hero > .container { width: 100%; }
+.panel-close:hover { background: var(--accent); }
+.panel-close:focus-visible,
+.sheet-grip:focus-visible { outline: 3px dashed var(--secondary); outline-offset: 3px; }
 
-    html.has-desk .desk-tour .hero-content.centered {
+/* the footer lives at the end of each page */
+html.has-desk #app .site-footer { padding-bottom: 2rem; }
+
+/* page content fades in when it changes inside the panel */
+html.has-desk .view.is-entering { animation: panelIn .35s ease both; }
+
+@keyframes panelIn {
+    from { opacity: 0; transform: translateY(10px); }
+}
+
+/* ---------- desktop: side panel ---------- */
+@media (min-width: 761px) {
+    /* Home: hero text floats over the left of the desk; the desk takes the rest */
+    html.has-desk body[data-view="home"] #app {
+        inset: 0;
+        overflow: hidden;
+        background: none;
+        pointer-events: none;
+    }
+
+    html.has-desk body[data-view="home"] .panel-bar,
+    html.has-desk body[data-view="home"] #app .site-footer { display: none; }
+
+    html.has-desk .hero {
+        min-height: 100vh;
+        min-height: 100svh;
+        padding: 6rem 0 7rem;
+    }
+
+    html.has-desk .hero > .container { width: 100%; }
+
+    html.has-desk .hero-content.centered {
+        pointer-events: auto;
         text-align: left;
         align-items: flex-start;
         margin: 0;
-        max-width: 540px;
+        max-width: 500px;
     }
 
-    html.has-desk .desk-tour .display-text {
-        font-size: clamp(3.2rem, 5vw, 4.5rem);
+    html.has-desk .hero .display-text {
+        font-size: clamp(3rem, 4.6vw, 4.3rem);
         min-height: 2em;
     }
 
-    html.has-desk .desk-tour .lead-text { padding: 0; }
-    html.has-desk .desk-tour .stats-row { gap: 2.4rem; }
-    html.has-desk .desk-tour .stat-item { align-items: flex-start; }
+    html.has-desk .hero .lead-text { padding: 0; margin-bottom: 2rem; }
+    html.has-desk .hero .hero-btns { margin-bottom: 1.2rem; }
 
+    html.has-desk .desk-hint {
+        display: block;
+        margin: 1.6rem 0 0;
+        font-family: var(--font-heading);
+        font-size: 1.15rem;
+        color: var(--secondary);
+    }
+
+    /* Pages: a paper panel on the right, between the top corners and the dock */
+    html.has-desk body:not([data-view="home"]) #app {
+        top: calc(78px + env(safe-area-inset-top, 0px));
+        right: max(20px, env(safe-area-inset-right, 0px));
+        bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+        width: min(var(--panel-w, 760px), calc(100vw - 40px));
+        border: 2px solid var(--primary);
+        border-radius: 16px;
+        box-shadow: 6px 6px 0 var(--primary);
+        animation: panelSlide .45s cubic-bezier(.2, .8, .2, 1) both;
+    }
+
+    html.has-desk { --panel-w: clamp(560px, 52vw, 820px); }
+
+    /* The panel is tablet-width, so pages use their tablet layouts inside it. */
+    html.has-desk #app .work-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    html.has-desk #app .work-card.featured { grid-column: span 2; grid-template-columns: 1fr; }
+    html.has-desk #app .work-card.featured .work-media {
+        border-bottom: 2px solid var(--primary);
+        border-right: 0;
+        min-height: 280px;
+    }
+    html.has-desk #app .rc-builder { grid-template-columns: 1fr; gap: 3rem; }
+    html.has-desk #app .rc-receipt-wrap { position: relative; top: 0; max-width: 460px; width: 100%; margin: 0 auto; }
+    html.has-desk #app .achievement-strip { grid-template-columns: 1fr; }
+
+    /* sections were spaced for a full page; tighten them for the panel */
+    html.has-desk body:not([data-view="home"]) #app .section { padding: 3rem 0 2rem; }
+    html.has-desk body:not([data-view="home"]) #app .container { padding: 0 1.75rem; }
 }
 
-/* --- phones and tablets: object up top, card at the bottom --- */
-@media (max-width: 979px) {
-    html.has-desk .desk-tour .display-text { min-height: 2em; }
+@keyframes panelSlide {
+    from { opacity: 0; transform: translateX(40px); }
+}
 
-    html.has-desk .tour-step,
-    html.has-desk .tour-step--top {
-        align-items: flex-end;
-        padding: 6rem 0 calc(6.2rem + env(safe-area-inset-bottom, 0px));
+/* ---------- phones: bottom sheet ---------- */
+@media (max-width: 760px) {
+    html.has-desk #app {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: calc(100svh - 70px - env(safe-area-inset-top, 0px));
+        border-top: 2px solid var(--primary);
+        border-radius: 22px 22px 0 0;
+        box-shadow: 0 -4px 0 rgba(44, 62, 80, .12);
+        padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+        /* peek: only the top ~46% of the screen is sheet; drag or scroll for more */
+        transform: translateY(var(--sheet-y, 46svh));
+        transition: transform .38s cubic-bezier(.2, .8, .2, 1);
     }
 
-    .tour-card {
-        max-width: 520px;
-        margin: 0 auto;
-        padding: 1.2rem 1.3rem 1.3rem;
-        box-shadow: 4px 4px 0 #2c3e50;
+    html.has-desk.sheet-full #app { transform: translateY(0); }
+    html.has-desk.sheet-dragging #app { transition: none; }
+
+    html.has-desk .panel-bar {
+        justify-content: center;
+        height: 0;
     }
 
-    .tour-card h2 { font-size: 1.9rem; }
-    .tour-card p { font-size: .95rem; }
-    .tour-actions { margin-top: 1rem; }
-    .tour-actions a { flex: 1 1 auto; justify-content: center; }
-    .kertas-bubble { max-width: 190px; font-size: 1rem; }
-    .kertas-says { font-size: .98rem; margin-top: .8rem !important; padding-top: .7rem; }
+    .sheet-grip {
+        display: grid;
+        place-items: center;
+        width: 100%;
+        height: 30px;
+        padding: 0;
+        border: 0;
+        background: none;
+        cursor: grab;
+        touch-action: none;
+    }
 
+    .sheet-grip span {
+        width: 46px;
+        height: 5px;
+        border-radius: 3px;
+        background: var(--text-dim);
+        opacity: .6;
+    }
+
+    html.has-desk .panel-close {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 38px;
+        height: 38px;
+        margin: 10px 12px 0 0;
+    }
+
+    html.has-desk body[data-view="home"] .panel-close,
+    html.has-desk body[data-view="home"] #app .site-footer { display: none; }
+
+    /* Home in the sheet: just the hero, compact */
+    html.has-desk .hero {
+        min-height: 0;
+        padding: 2.2rem 0 1rem;
+    }
+
+    html.has-desk .hero .badge-container { margin-bottom: .8rem; }
+    html.has-desk .hero .display-text { font-size: 2.2rem; margin-bottom: .8rem; min-height: 2em; }
+    html.has-desk .hero .lead-text { font-size: 1rem; margin-bottom: 1.2rem; }
+    html.has-desk .hero .hero-btns { margin-bottom: 1rem; }
+
+    /* pages in the sheet start right under the grip */
+    html.has-desk body:not([data-view="home"]) #app .view > .section:first-child,
+    html.has-desk body:not([data-view="home"]) #app .view > section:first-child { padding-top: 2.4rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .desk-tip,
-    .kertas-bubble,
-    .kertas-says { transition: none; }
-    html.has-desk .tour-hint i { animation: none; }
+    .kertas-bubble { transition: none; }
+    html.has-desk #app,
+    html.has-desk .view.is-entering { animation: none; transition: none; }
 }

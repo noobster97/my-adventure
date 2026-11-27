@@ -75,6 +75,9 @@ function swap(view, anchor, { focus }) {
         target.scrollIntoView({ block: 'start' });
     } else {
         window.scrollTo(0, 0);
+        // in desk mode the page scrolls inside #app (the panel / sheet)
+        const app = document.getElementById('app');
+        if (app) app.scrollTop = 0;
     }
 
     if (focus) {
@@ -102,6 +105,16 @@ function navigate({ initial = false } = {}) {
 
     if (initial || reducedMotion()) {
         run();
+        return;
+    }
+
+    // Desk mode: the desk stays put and only the panel content changes, so no full-page turn.
+    if (document.documentElement.classList.contains('has-desk')) {
+        run();
+        const page = views.find((v) => v.dataset.view === view);
+        page.classList.remove('is-entering');
+        void page.offsetWidth;
+        page.classList.add('is-entering');
         return;
     }
 
